@@ -1,0 +1,74 @@
+.home-img {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+.home-img img {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+
+.split-text-container {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0;
+  gap: 45px;
+
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: bold;
+  text-transform: uppercase;
+
+  color: #fff;
+  text-shadow: 2px 2px 2px black;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.text-part {
+  display: inline-block;
+  position: relative;
+
+  animation-duration: 1.5s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.text-part.left {
+  transform: translateX(-200%);
+  animation-name: slide-in-left;
+}
+
+.text-part.right {
+  transform: translateX(200%);
+  animation-name: slide-in-right;
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-200%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(200%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
