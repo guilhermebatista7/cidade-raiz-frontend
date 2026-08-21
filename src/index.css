@@ -12,4 +12,6 @@ html, body {
 :root {
   width: 100%;
   min-height: 100vh;
+
+  --cor-verde: #739d1e;
 }

@@ -1,26 +1,18 @@
 .nature-navbar {
   position: fixed;
-
   top: 20px;
-  right: 20px;
-
+  left: 20px;
   width: fit-content;
   min-width: 250px;
-
   padding: 8px 14px;
-
   z-index: 9999;
 
   background: rgba(25, 55, 35, 0.4);
-
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50px;
-
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-
   transition: background 0.3s ease;
 }
 
@@ -46,7 +38,6 @@
 
 .nature-link:hover {
   color: #d8f3dc !important;
-
   transform: translateY(-2px);
 }
 
@@ -55,15 +46,11 @@
 
 .home-link {
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   width: 38px;
   height: 38px;
-
   padding: 0 !important;
-
   border-radius: 50%;
 }
 
@@ -76,25 +63,17 @@
 
 .nature-login {
   color: #183c28 !important;
-
   background: #d8f3dc;
-
   border-radius: 30px;
-
   padding: 8px 18px !important;
-
   font-weight: 600;
-
   transition: all 0.3s ease;
 }
 
 .nature-login:hover {
   color: #183c28 !important;
-
   background: #ffffff;
-
   transform: translateY(-2px);
-
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
@@ -103,11 +82,8 @@
 
 .nature-toggler {
   border: none !important;
-
   padding: 7px 10px;
-
   border-radius: 50%;
-
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -134,7 +110,6 @@
     min-width: 0;
 
     padding: 7px 10px;
-
     border-radius: 20px;
   }
 
@@ -151,11 +126,8 @@
   .nature-link,
   .nature-login {
     display: block;
-
     width: 100%;
-
     text-align: center;
-
     margin-top: 4px;
   }
 
