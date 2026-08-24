@@ -1,0 +1,20 @@
+@import '../../../index.css';
+
+.cardInfo {
+  background-color: #F3EEE4;
+  width: 280px;
+  min-height: 350px;
+  border: 1px solid rgba(0, 0, 0, 0.199);
+}
+
+.icon {
+  background-color: #E6E0D3;
+  color: var(--cor-verde);
+  font-size: 25px;
+}
+
+.number,
+.cardText {
+  color: var(--cor-cinza);
+  font-family: 'Times New Roman', Times, serif;
+}

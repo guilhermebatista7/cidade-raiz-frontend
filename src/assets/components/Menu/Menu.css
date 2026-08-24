@@ -1,17 +1,17 @@
 .nature-navbar {
-  position: fixed;
+  position: absolute;
   top: 20px;
   left: 20px;
   width: fit-content;
-  min-width: 250px;
-  padding: 8px 14px;
+  min-width: 50px;
+  padding: 8px 2px;
   z-index: 9999;
 
   background: rgba(25, 55, 35, 0.4);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 50px;
+  border-radius: 30px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   transition: background 0.3s ease;
 }
@@ -106,14 +106,22 @@
     top: 12px;
     right: 12px;
 
-    width: auto;
+    width: 100px;
     min-width: 0;
 
     padding: 7px 10px;
     border-radius: 20px;
+
+    transition:
+      width 0.3s ease,
+      background 0.3s ease;
   }
 
   /* Quando fechado, só aparece o hamburger */
+
+  .nature-navbar:has(.navbar-collapse.show) {
+    width: auto;
+  }
 
   .navbar-collapse {
     padding-top: 10px;

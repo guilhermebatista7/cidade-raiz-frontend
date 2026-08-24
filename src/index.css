@@ -10,8 +10,7 @@ html, body {
 }
 
 :root {
-  width: 100%;
-  min-height: 100vh;
-
+  --cor-fundo: #F0EADF;
   --cor-verde: #739d1e;
+  --cor-cinza: rgba(0, 0, 0, 0.61);
 }

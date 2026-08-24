@@ -1,5 +1,31 @@
+@import './index.css';
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.sectionTitle, .sectionTitle h2{
+  background-color: var(--cor-fundo);
+  margin: 0;
+  padding: 8px 10px;
+}
+
+.homeContent{
+  background-color: var(--cor-fundo);
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+}
+
+.imgLogo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imgLogo img{
+  width: 270px;
 }
