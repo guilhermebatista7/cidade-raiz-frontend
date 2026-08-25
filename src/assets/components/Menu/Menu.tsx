@@ -1,9 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import { NavLink, useLocation } from "react-router-dom";
 
 import "./Menu.css";
 
 export function Menu() {
+  const { hash, pathname } = useLocation();
+  const menuLinkClass = (isActive: boolean, additionalClass = "") =>
+    `nav-link nature-link ${additionalClass} ${isActive ? "active" : ""}`.trim();
+
   return (
     <nav className="navbar navbar-expand-md nature-navbar">
       <div className="container-fluid">
@@ -30,34 +35,47 @@ export function Menu() {
 
             {/* Home */}
             <li className="nav-item">
-              <a
-                className="nav-link nature-link home-link"
-                href="#"
+              <NavLink
+                className={() => menuLinkClass(pathname === "/" && !hash, "home-link")}
+                to="/"
                 aria-label="Home"
               >
                 <FontAwesomeIcon icon={faHouse} />
-              </a>
+              </NavLink>
             </li>
 
             {/* Blog */}
             <li className="nav-item">
-              <a className="nav-link nature-link" href="#">
+              <NavLink className={({ isActive }) => menuLinkClass(isActive)} to="/blog">
                 Blog
-              </a>
+              </NavLink>
             </li>
 
             {/* Sobre */}
             <li className="nav-item">
-              <a className="nav-link nature-link" href="#">
+              <NavLink
+                className={() => menuLinkClass(pathname === "/" && hash === "#nosso-objetivo")}
+                to="/#nosso-objetivo"
+              >
                 Sobre
-              </a>
+              </NavLink>
+            </li>
+
+            {/* Plantar */}
+            <li className="nav-item">
+              <NavLink className={({ isActive }) => menuLinkClass(isActive)} to="/plantar">
+                Plantar
+              </NavLink>
             </li>
 
             {/* Login */}
             <li className="nav-item">
-              <a className="nav-link nature-login" href="#">
+              <NavLink
+                className={({ isActive }) => menuLinkClass(isActive, "nature-login")}
+                to="/login"
+              >
                 Login
-              </a>
+              </NavLink>
             </li>
 
           </ul>

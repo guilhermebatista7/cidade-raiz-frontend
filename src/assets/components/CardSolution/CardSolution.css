@@ -1,0 +1,17 @@
+@import '../../../index.css';
+
+.solutions-container{
+  color: var(--cor-cinza);
+}
+
+.btn-icon {
+  background-color: var(--cor-verde);
+  color: white; /* Deixa o ícone branco para destacar no fundo verde */
+  border: none;
+  font-size: 22px;
+}
+
+.btn-icon:hover {
+  background-color: var(--cor-verde);
+  scale: 1.1;
+}

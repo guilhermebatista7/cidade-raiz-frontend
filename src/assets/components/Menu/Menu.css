@@ -23,7 +23,8 @@
 
 /* Links */
 
-.nature-link {
+.nature-link,
+.nature-login {
   color: #ffffff !important;
 
   font-size: 1rem;
@@ -33,10 +34,13 @@
 
   transition:
     color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
     transform 0.3s ease;
 }
 
-.nature-link:hover {
+.nature-link:hover,
+.nature-login:hover {
   color: #d8f3dc !important;
   transform: translateY(-2px);
 }
@@ -59,22 +63,26 @@
 }
 
 
-/* Login */
+/* Item selecionado */
 
-.nature-login {
+.nature-link.active,
+.nature-login.active {
   color: #183c28 !important;
   background: #d8f3dc;
   border-radius: 30px;
   padding: 8px 18px !important;
   font-weight: 600;
-  transition: all 0.3s ease;
 }
 
-.nature-login:hover {
+.nature-link.active:hover,
+.nature-login.active:hover {
   color: #183c28 !important;
   background: #ffffff;
-  transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.home-link.active {
+  padding: 0 !important;
 }
 
 

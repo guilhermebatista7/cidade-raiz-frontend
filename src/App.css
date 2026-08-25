@@ -24,8 +24,39 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: var(--cor-fundo);
+  border-radius: 8px;
+  width: 300px;
 }
 
 .imgLogo img{
-  width: 270px;
+  width: 230px;
+}
+
+.sectionTitle{
+  color: var(--cor-cinza);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.internal-page {
+  min-height: 70vh;
+  padding: 160px 24px 72px;
+  background-color: var(--cor-fundo);
+  color: var(--cor-cinza);
+  text-align: center;
+}
+
+.internal-page h1 {
+  color: var(--cor-fundo-escuro);
+  margin-bottom: 16px;
+}
+
+.internal-page p {
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: 1.1rem;
 }

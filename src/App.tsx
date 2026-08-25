@@ -1,143 +1,91 @@
 import './App.css'
+import { useEffect } from 'react'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLeaf } from '@fortawesome/free-solid-svg-icons'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+
+import tree from './assets/media/tree.png'
+import imgLogo from './assets/media/imgLogo.png'
+import treeVideo from './assets/media/tree_video.mp4'
+import { cardsInfo } from './assets/dataInfo/cardsInfo'
+import { solucao } from './assets/dataInfo/solucao'
+import { CardInfo } from './assets/components/CardInfo/CardInfo'
+import { CardSolution } from './assets/components/CardSolution/CardSolution'
+import { Footer } from './assets/components/Footer/Footer'
+import { HomeContent } from './assets/components/HomeContent/HomeContent'
 import { HomeVideo } from './assets/components/HomeVideo/HomeVideo'
+import { Menu } from './assets/components/Menu/Menu'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { faBolt, faDroplet, faLeaf, faSeedling, faWind, } from '@fortawesome/free-solid-svg-icons';
-
-import tree from '../src/assets/media/tree.png';
-import imgLogo from '../src/assets/media/imgLogo.png';
-import tree_video from '../src/assets/media/tree_video.mp4';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { Menu } from './assets/components/Menu/Menu';
-import { HomeContent } from './assets/components/HomeContent/HomeContent';
-import { CardInfo } from './assets/components/CardInfo/CardInfo';
-
-
-
-function App() {
-
+function HomePage() {
   return (
     <>
-      <Menu />
       <HomeVideo
-        src={tree_video}
+        src={treeVideo}
         fallbackSrc={tree}
-        title='Cidade Raiz'
-        icon={
-          <FontAwesomeIcon
-            icon={faLeaf}
-            style={{ color: '#739d1e' }}
-          />
-        }
+        title="Cidade Raiz"
+        icon={<FontAwesomeIcon icon={faLeaf} style={{ color: '#739d1e' }} />}
       />
 
-      <HomeContent className='homeContent'>
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faDroplet}
-            />
-          }
-          number={'01'}
-          title='Água'
-          text='As árvores desempenham um papel importante na retenção de parte da água da chuva e na redução do escoamento superficial. Esse processo ajuda a minimizar os impactos de chuvas intensas nas cidades.'
-        />
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faBolt}
-            />
-          }
-          number={'03'}
-          title='Energia Limpa'
-          text='O sombreamento e o processo de transpiração das árvores ajudam a reduzir a temperatura e o efeito de ilha de calor urbano. A sombra proporcionada pelas ruas arborizadas pode reduzir a demanda e a necessidade de ar-condicionado em edifícios.'
-        />
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faSeedling}
-            />
-          }
-          number={'02'}
-          title='Biodiversidade'
-          text='A arborização tem o potencial de tornar as cidades mais amigáveis ao disponibilizar recursos que auxiliam no restabelecimento da fauna na matriz urbana.'
-        />
-
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faWind}
-            />
-          }
-          number={'03'}
-          title='Ar Puro'
-          text='As árvores urbanas são aliadas na luta contra a poluição, atuando na absorção de poluentes como monóxido de carbono e dióxido de enxofre. Quando bem planejada, a arborização ajuda a melhorar a qualidade do ar nas cidades.'
-        />
+      <section id="nosso-objetivo" className="sectionTitle"><h2>Nosso objetivo</h2></section>
+      <HomeContent className="homeContent">
+        {cardsInfo.map((card) => <CardInfo key={card.number} {...card} />)}
       </HomeContent>
 
-      <div className='sectionTitle'>
-        <h2>- Nossa solução</h2>
-      </div>
-
-      <HomeContent className='homeContent'>
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faDroplet}
-            />
-          }
-          number={'01'}
-          title='Água'
-          text='As árvores desempenham um papel importante na retenção de parte da água da chuva e na redução do escoamento superficial. Esse processo ajuda a minimizar os impactos de chuvas intensas nas cidades.'
-        />
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faBolt}
-            />
-          }
-          number={'03'}
-          title='Energia Limpa'
-          text='O sombreamento e o processo de transpiração das árvores ajudam a reduzir a temperatura e o efeito de ilha de calor urbano. A sombra proporcionada pelas ruas arborizadas pode reduzir a demanda e a necessidade de ar-condicionado em edifícios.'
-        />
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faSeedling}
-            />
-          }
-          number={'02'}
-          title='Biodiversidade'
-          text='A arborização tem o potencial de tornar as cidades mais amigáveis ao disponibilizar recursos que auxiliam no restabelecimento da fauna na matriz urbana.'
-        />
-
-
-        <CardInfo
-          icon={
-            <FontAwesomeIcon
-              icon={faWind}
-            />
-          }
-          number={'03'}
-          title='Ar Puro'
-          text='As árvores urbanas são aliadas na luta contra a poluição, atuando na absorção de poluentes como monóxido de carbono e dióxido de enxofre. Quando bem planejada, a arborização ajuda a melhorar a qualidade do ar nas cidades.'
-        />
+      <section className="sectionTitle"><h2>Nossa solução</h2></section>
+      <HomeContent className="homeContent align-items-start">
+        <CardSolution solutions={solucao} />
       </HomeContent>
-
-      <div className="imgLogo">
-        <img src={imgLogo} alt="Logo Cidade Raíz" />
-      </div>
-
     </>
+  )
+}
+
+function ScrollToHash() {
+  const { hash, pathname } = useLocation()
+
+  useEffect(() => {
+    if (hash) {
+      document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [hash, pathname])
+
+  return null
+}
+
+interface PageProps {
+  title: string
+  description: string
+}
+
+function Page({ title, description }: PageProps) {
+  return (
+    <main className="internal-page">
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </main>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToHash />
+      <Menu />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<Page title="Blog" description="Em breve, conteúdos sobre cidades mais verdes." />} />
+        <Route path="/login" element={<Page title="Login" description="A área de acesso estará disponível aqui." />} />
+        <Route path="/plantar" element={<Page title="Quero plantar uma árvore" description="Em breve você poderá iniciar seu plantio por aqui." />} />
+        <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
+      </Routes>
+      <Footer>
+        <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
+      </Footer>
+    </BrowserRouter>
   )
 }
 
