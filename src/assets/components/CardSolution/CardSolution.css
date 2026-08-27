@@ -15,3 +15,7 @@
   background-color: var(--cor-verde);
   scale: 1.1;
 }
+
+.iconText{
+  color: var(--cor-verde);
+}

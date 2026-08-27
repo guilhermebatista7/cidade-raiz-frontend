@@ -1,7 +1,7 @@
 @import '../../../index.css';
 
 .cardInfo {
-  background-color: #F3EEE4;
+  background-color: var(--cor-card);
   width: 280px;
   min-height: 350px;
   border: 1px solid rgba(0, 0, 0, 0.199);

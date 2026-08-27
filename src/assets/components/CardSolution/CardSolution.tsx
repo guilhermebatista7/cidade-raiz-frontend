@@ -43,7 +43,7 @@ export function CardSolution({ solutions }: CardSolutionProps) {
             id={`collapse-${solution.id}`}
           >
             <div className="card card-body">
-              <strong>{solution.title}</strong>
+              <strong><span className="iconText">{solution.icon}</span> {solution.title}</strong>
               <br/>
               {solution.content}
             </div>
