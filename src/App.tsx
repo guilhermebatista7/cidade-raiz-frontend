@@ -35,15 +35,27 @@ function HomePage() {
       </HomeContent>
 
       <HomeContent className="homeContent align-items-start">
-        <div className='cardBack'>
-          <div className='cardSistema d-flex flex-lg-row flex-column align-items-center justify-content-center gap-2'>
-            <div className="notebook"><img src={notebook} alt="Imagem notebook" /></div>
-            <div>
-              <h3 className='mb-3'>O Sistema</h3>
+        <div className="cardBack">
+          <div className="cardSistema ">
+
+            <div className="notebook">
+              <img src={notebook} alt="Imagem notebook" />
+            </div>
+
+            <div className="cardSistemaText">
+              <h3 className="mb-3">O Sistema</h3>
+
               <p>
-                O Cidade Raíz é uma plataforma que conecta moradores e Prefeitura para tornar o processo de plantio de árvores urbanas mais simples, acessível e transparente. Por meio do sistema, o cidadão pode conhecer as espécies disponíveis, solicitar uma muda, acompanhar o andamento do plantio e participar de um ranking de sustentabilidade. Assim, tecnologia e participação comunitária se unem para transformar nossas cidades em lugares mais verdes e sustentáveis.
+                O Cidade Raíz é uma plataforma que conecta moradores e Prefeitura
+                para tornar o processo de plantio de árvores urbanas mais simples,
+                acessível e transparente. Por meio do sistema, o cidadão pode
+                conhecer as espécies disponíveis, solicitar uma muda, acompanhar
+                o andamento do plantio e participar de um ranking de sustentabilidade.
+                Assim, tecnologia e participação comunitária se unem para transformar
+                nossas cidades em lugares mais verdes e sustentáveis.
               </p>
             </div>
+
           </div>
         </div>
       </HomeContent>
