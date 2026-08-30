@@ -8,6 +8,7 @@ import imgLogo from './assets/media/imgLogo.png'
 import { Footer } from './assets/components/Footer/Footer'
 import { Menu } from './assets/components/Menu/Menu'
 import { HomePage } from './assets/components/HomePage/HomePage'
+import { Login } from './assets/components/Login/Login'
 
 
 
@@ -48,7 +49,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/blog" element={<Page title="Blog" description="Em breve, conteúdos sobre cidades mais verdes." />} />
-        <Route path="/login" element={<Page title="Login" description="A área de acesso estará disponível aqui." />} />
+        <Route path="/login" element={<Login/>} />
         <Route path="/plantar" element={<Page title="Quero plantar uma árvore" description="Em breve você poderá iniciar seu plantio por aqui." />} />
         <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
       </Routes>
