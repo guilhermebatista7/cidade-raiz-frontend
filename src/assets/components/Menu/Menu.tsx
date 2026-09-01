@@ -7,15 +7,15 @@ import "./Menu.css";
 export function Menu() {
   const { hash, pathname } = useLocation();
   const menuLinkClass = (isActive: boolean, additionalClass = "") =>
-    `nav-link nature-link ${additionalClass} ${isActive ? "active" : ""}`.trim();
+    `nav-link natureLink ${additionalClass} ${isActive ? "active" : ""}`.trim();
 
   return (
-    <nav className="navbar navbar-expand-md nature-navbar">
+    <nav className="navbar navbar-expand-md natureNavbar">
       <div className="container-fluid">
 
         {/* Botão hamburger no mobile */}
         <button
-          className="navbar-toggler nature-toggler"
+          className="navbar-toggler natureToggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarContent"
@@ -36,7 +36,7 @@ export function Menu() {
             {/* Home */}
             <li className="nav-item">
               <NavLink
-                className={() => menuLinkClass(pathname === "/" && !hash, "home-link")}
+                className={() => menuLinkClass(pathname === "/" && !hash, "homeLink")}
                 to="/"
                 aria-label="Home"
               >
@@ -71,7 +71,7 @@ export function Menu() {
             {/* Login */}
             <li className="nav-item">
               <NavLink
-                className={({ isActive }) => menuLinkClass(isActive, "nature-login")}
+                className={({ isActive }) => menuLinkClass(isActive, "natureLogin")}
                 to="/login"
               >
                 Login

@@ -19,7 +19,7 @@
   width: 230px;
 }
 
-.internal-page {
+.internalPage {
   min-height: 70vh;
   padding: 160px 24px 72px;
   background-color: var(--cor-fundo);
@@ -27,12 +27,12 @@
   text-align: center;
 }
 
-.internal-page h1 {
+.internalPage h1 {
   color: var(--cor-fundo-escuro);
   margin-bottom: 16px;
 }
 
-.internal-page p {
+.internalPage p {
   max-width: 620px;
   margin: 0 auto;
   font-size: 1.1rem;

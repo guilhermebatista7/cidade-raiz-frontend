@@ -7,10 +7,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import imgLogo from './assets/media/imgLogo.png'
 import { Footer } from './assets/components/Footer/Footer'
 import { Menu } from './assets/components/Menu/Menu'
-import { HomePage } from './assets/components/HomePage/HomePage'
-import { Login } from './assets/components/Login/Login'
-
-
+import { HomePage } from './assets/pages/HomePage/HomePage'
+import { Login } from './assets/pages/Login/Login'
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation()
@@ -34,7 +32,7 @@ interface PageProps {
 
 function Page({ title, description }: PageProps) {
   return (
-    <main className="internal-page">
+    <main className="internalPage">
       <h1>{title}</h1>
       <p>{description}</p>
     </main>

@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type ImgHTMLAttributes } from "react";
-import { HomeImg } from "../HomeImg/HomeImg";
+import { useEffect, useRef, type ImgHTMLAttributes } from "react";
 import "./HomeVideo.css";
 import type { ReactNode } from "react";
 
@@ -19,7 +18,6 @@ export function HomeVideo({
   playbackRate = 0.7,
   ...props
 }: VideoProps) {
-  const [hasVideoError, setHasVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -50,20 +48,9 @@ export function HomeVideo({
     };
   }, [src]);
 
-  if (hasVideoError) {
-    return (
-      <HomeImg
-        src={fallbackSrc ?? src}
-        alt="Cidade Raiz"
-        title={title}
-        className="image home-fallback"
-      />
-    );
-  }
-
   return (
     <>
-      <div className="home-video">
+      <div className="homeVideo">
         <video
           ref={videoRef}
           src={src}
@@ -72,20 +59,19 @@ export function HomeVideo({
           loop
           muted
           playsInline
-          onError={() => setHasVideoError(true)}
           {...props}
         />
 
         {title && (
-          <h1 className="split-text-container">
-            <span className="text-part left">
+          <h1 className="splitTextContainer">
+            <span className="textPart left">
               {title.slice(0, title.indexOf(" "))}
             </span>
 
-            <span className="text-part right">
-              {icon} 
+            <span className="textPart right">
+              {icon}
               {title.slice(title.indexOf(" ") + 1)}
-            </span> 
+            </span>
           </h1>
         )}
       </div>

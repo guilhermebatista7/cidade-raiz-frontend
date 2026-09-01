@@ -17,7 +17,7 @@ export function Footer({children}:FooterProps) {
           <div className="col-lg-5">
             {children}
 
-            <p className="footer-description">
+            <p className="footerDescription">
               Conectando pessoas e natureza para construir
               cidades mais verdes, sustentáveis e vivas.
             </p>
@@ -26,11 +26,11 @@ export function Footer({children}:FooterProps) {
 
           {/* Navegação */}
           <div className="col-6 col-lg-3">
-            <h5 className="footer-heading">
+            <h5 className="footerHeading">
               Navegação
             </h5>
 
-            <ul className="footer-links">
+            <ul className="footerLinks">
               <li>
                 <Link to="/">Início</Link>
               </li>
@@ -53,16 +53,16 @@ export function Footer({children}:FooterProps) {
 
           {/* Contato */}
           <div className="col-6 col-lg-4">
-            <h5 className="footer-heading">
+            <h5 className="footerHeading">
               Faça parte
             </h5>
 
-            <p className="footer-description">
+            <p className="footerDescription">
               Ajude a transformar nossa cidade em um
               lugar mais verde.
             </p>
 
-            <Link to="/plantar" className="footer-button">
+            <Link to="/plantar" className="footerButton">
               Quero plantar uma árvore
             </Link>
           </div>
@@ -71,7 +71,7 @@ export function Footer({children}:FooterProps) {
 
 
         {/* Rodapé inferior */}
-        <div className="footer-bottom">
+        <div className="footerBottom">
 
           <span>
             © {new Date().getFullYear()} Cidade Raiz

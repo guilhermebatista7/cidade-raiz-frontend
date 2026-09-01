@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-.login-page {
+.loginPage {
   font-family: 'Montserrat', sans-serif;
   background: var(--cor-fundo);
 
@@ -17,11 +17,7 @@
   min-height: 100vh;
 }
 
-/* =========================
-   CONTAINER
-========================= */
-
-.login-container {
+.loginContainer {
   background: #fff;
 
   border-radius: 10px;
@@ -39,17 +35,12 @@
   margin-top: 40px;
 }
 
-
-/* =========================
-   TEXTOS
-========================= */
-
-.login-container h1 {
+.loginContainer h1 {
   font-weight: bold;
   margin: 0;
 }
 
-.login-container p {
+.loginContainer p {
   font-size: 14px;
   font-weight: 100;
 
@@ -59,11 +50,11 @@
   margin: 20px 0 30px;
 }
 
-.login-container span {
+.loginContainer span {
   font-size: 12px;
 }
 
-.login-container a {
+.loginContainer a {
   color: #333;
   font-size: 14px;
 
@@ -71,11 +62,7 @@
   margin: 15px 0;
 }
 
-/* =========================
-   FORMULÁRIOS
-========================= */
-
-.form-container {
+.formContainer {
   position: absolute;
 
   top: 0;
@@ -84,7 +71,7 @@
   transition: all 0.6s ease-in-out;
 }
 
-.form-container form {
+.formContainer form {
   background: var(--cor-card);
 
   display: flex;
@@ -100,11 +87,7 @@
   text-align: center;
 }
 
-/* =========================
-   LOGIN
-========================= */
-
-.sign-in-container {
+.signInContainer {
   left: 0;
 
   width: 50%;
@@ -112,12 +95,7 @@
   z-index: 2;
 }
 
-
-/* =========================
-   CADASTRO
-========================= */
-
-.sign-up-container {
+.signUpContainer {
   left: 0;
 
   width: 50%;
@@ -127,16 +105,11 @@
   opacity: 0;
 }
 
-
-/* =========================
-   SOCIAL
-========================= */
-
-.social-container {
+.socialContainer {
   margin: 20px 0;
 }
 
-.social-container a {
+.socialContainer a {
   border: 1px solid #ddd;
 
   border-radius: 50%;
@@ -152,12 +125,7 @@
   width: 40px;
 }
 
-
-/* =========================
-   INPUT
-========================= */
-
-.form-container input {
+.formContainer input {
   background: #fdfdfd;
 
   border: none;
@@ -173,17 +141,12 @@
   font-family: inherit;
 }
 
-.form-container input:focus {
+.formContainer input:focus {
   outline: 2px solid var(--cor-verde);
   border-radius: 8px;
 }
 
-
-/* =========================
-   BOTÕES
-========================= */
-
-.login-container button {
+.loginContainer button {
   border-radius: 20px;
 
   border: 1px solid #557a16;
@@ -209,30 +172,26 @@
   font-family: inherit;
 }
 
-.login-container button:active {
+.loginContainer button:active {
   transform: scale(0.95);
 }
 
-.login-container button:focus {
+.loginContainer button:focus {
   outline: none;
 }
 
-.login-container button.ghost {
+.loginContainer button.ghost {
   background: transparent;
 
   border-color: #fff;
 }
 
-.login-container button:hover {
+.loginContainer button:hover {
   scale: 1.05;
   transition: 0.5s;
 }
 
-/* =========================
-   OVERLAY
-========================= */
-
-.overlay-container {
+.overlayContainer {
   position: absolute;
 
   top: 0;
@@ -273,23 +232,17 @@
 }
 
 .overlay video {
-  position: absolute; /* Mudado de relative para absolute */
+  position: absolute;
   opacity: 90%;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Preenche a div sem achatar a imagem do vídeo */
-  z-index: 1; /* Camada mais ao fundo */
+  object-fit: cover;
+  z-index: 1;
 }
 
-
-
-/* =========================
-   OVERLAY PAINELS
-========================= */
-
-.overlay-panel {
+.overlayPanel {
   position: absolute;
   top: 0;
   display: flex;
@@ -302,86 +255,52 @@
   text-align: center;
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
-  
-  z-index: 2; /* Adicionado: deve ser maior que o do vídeo */
+  z-index: 2;
 }
 
-.overlay h1, p, button {
-  position: relative; /* Necessário para o z-index funcionar */
-  z-index: 3; /* Maior camada de todas */
+.overlay h1,
+.overlay p,
+.overlay button {
+  position: relative;
+  z-index: 3;
 }
 
-/* PAINEL DIREITO */
-
-.overlay-right {
+.overlayRight {
   right: 0;
   transform: translateX(0);
 }
 
-/* PAINEL ESQUERDO */
-
-.overlay-left {
+.overlayLeft {
   transform: translateX(-20%);
 }
 
-/* =========================
-   ANIMAÇÃO - ATIVAR CADASTRO
-========================= */
-
-/* Move login para direita */
-
-.login-container.right-panel-active
-.sign-in-container {
+.loginContainer.rightPanelActive .signInContainer {
   transform: translateX(100%);
 }
 
-/* Move overlay para esquerda */
-
-.login-container.right-panel-active
-.overlay-container {
+.loginContainer.rightPanelActive .overlayContainer {
   transform: translateX(-100%);
 }
 
-
-/* Mostra cadastro */
-
-.login-container.right-panel-active
-.sign-up-container {
+.loginContainer.rightPanelActive .signUpContainer {
   transform: translateX(100%);
   opacity: 1;
   z-index: 5;
 }
 
-
-/* Move overlay */
-
-.login-container.right-panel-active
-.overlay {
+.loginContainer.rightPanelActive .overlay {
   transform: translateX(50%);
 }
 
-
-/* Move texto esquerdo */
-
-.login-container.right-panel-active
-.overlay-left {
+.loginContainer.rightPanelActive .overlayLeft {
   transform: translateX(0);
 }
 
-
-/* Move texto direito */
-
-.login-container.right-panel-active
-.overlay-right {
+.loginContainer.rightPanelActive .overlayRight {
   transform: translateX(20%);
 }
 
-
-/* =========================
-   FOOTER
-========================= */
-
-.login-footer {
+.loginFooter {
   margin-top: 25px;
 
   text-align: center;
@@ -389,7 +308,7 @@
   color: var(--cor-cinza);
 }
 
-.footer-icons {
+.footerIcons {
   display: flex;
 
   justify-content: center;
@@ -400,7 +319,7 @@
   margin-top: 10px;
 }
 
-.footer-icons a {
+.footerIcons a {
   color: var(--cor-verde);
 
   font-size: 20px;
@@ -408,58 +327,47 @@
   transition: transform 0.2s ease;
 }
 
-.footer-icons a:hover {
+.footerIcons a:hover {
   transform: translateY(-3px);
 }
 
-
-/* =========================
-   RESPONSIVO
-========================= */
-
 @media (max-width: 768px) {
-
-  .login-container {
+  .loginContainer {
     width: 95%;
     min-height: 500px;
   }
 
-  .form-container form {
+  .formContainer form {
     padding: 0 25px;
   }
 
-  .overlay-panel {
+  .overlayPanel {
     padding: 0 20px;
   }
-
 }
 
 @media (max-width: 600px) {
-
-  .login-container {
+  .loginContainer {
     min-height: 500px;
   }
 
-  .overlay-container {
+  .overlayContainer {
     display: none;
   }
 
-  .sign-in-container {
+  .signInContainer {
     width: 100%;
   }
 
-  .sign-up-container {
+  .signUpContainer {
     width: 100%;
   }
 
-  .login-container.right-panel-active
-  .sign-in-container {
+  .loginContainer.rightPanelActive .signInContainer {
     transform: translateX(-100%);
   }
 
-  .login-container.right-panel-active
-  .sign-up-container {
+  .loginContainer.rightPanelActive .signUpContainer {
     transform: translateX(0);
   }
-
 }

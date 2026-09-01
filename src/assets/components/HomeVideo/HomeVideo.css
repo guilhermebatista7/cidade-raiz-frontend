@@ -1,37 +1,21 @@
-.home-video {
+.homeVideo {
   position: relative;
   width: 100%;
-  height: 100%;
+  max-width: 100%;
   overflow: hidden;
+  background: #000;
 }
 
-.home-video video.parallax {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100vh;
-  object-fit: contain;
-  display: block;
-  z-index: 0;
-}
-
-.home-img {
-  position: relative;
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  z-index: 1;
-  margin-top: 100vh;
-}
-
-.home-img img {
+.homeVideo video {
   display: block;
   width: 100%;
   height: 100vh;
+  min-height: 420px;
   object-fit: cover;
+  object-position: center;
 }
 
-.home-video .split-text-container {
+.homeVideo .splitTextContainer {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -47,30 +31,30 @@
   text-transform: uppercase;
 
   color: #f9faf8;
-    text-shadow:
-        0 0 2px rgba(255, 255, 255, 0.9),
-        1px 1px 2px rgba(0, 0, 0, 0.8),
-        -1px -1px 2px rgba(255, 255, 255, 0.5);
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.9),
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    -1px -1px 2px rgba(255, 255, 255, 0.5);
 
   overflow: hidden;
   pointer-events: none;
 }
 
-.split-text-container::before {
-    content: "";
-    position: absolute;
-    inset: -30px -50px;
-    background: radial-gradient(
-        ellipse,
-        rgba(20, 30, 15, 0.55) 0%,
-        rgba(20, 30, 15, 0.25) 45%,
-        transparent 75%
-    );
-    z-index: -1;
-    filter: blur(15px);
+.splitTextContainer::before {
+  content: "";
+  position: absolute;
+  inset: -30px -50px;
+  background: radial-gradient(
+    ellipse,
+    rgba(20, 30, 15, 0.55) 0%,
+    rgba(20, 30, 15, 0.25) 45%,
+    transparent 75%
+  );
+  z-index: -1;
+  filter: blur(15px);
 }
 
-.text-part {
+.textPart {
   display: inline-block;
   position: relative;
 
@@ -80,20 +64,20 @@
   margin-bottom: 60px;
 }
 
-.text-part.left {
+.textPart.left {
   transform: translateX(-200%);
-  animation-name: slide-in-left;
+  animation-name: slideInLeft;
   margin-left: 40px;
 }
 
-.text-part.right {
+.textPart.right {
   transform: translateX(200%);
-  animation-name: slide-in-right;
+  animation-name: slideInRight;
   margin-top: 150px;
   margin-left: -190px;
 }
 
-@keyframes slide-in-left {
+@keyframes slideInLeft {
   from {
     transform: translateX(-200%);
   }
@@ -103,7 +87,7 @@
   }
 }
 
-@keyframes slide-in-right {
+@keyframes slideInRight {
   from {
     transform: translateX(200%);
   }
@@ -113,15 +97,14 @@
   }
 }
 
-/* Styles apply to screens from 0px up to 768px */
 @media (max-width: 900px) {
-  .home-video video {
+  .homeVideo video {
     object-fit: cover;
     max-height: 600px;
     background-position: left;
   }
 
-  .home-video .split-text-container {
+  .homeVideo .splitTextContainer {
     font-size: 70px;
   }
 }

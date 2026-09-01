@@ -15,13 +15,13 @@ interface CardSolutionProps {
 
 export function CardSolution({ solutions }: CardSolutionProps) {
   return (
-    <div className="solutions-container">
+    <div className="solutionsContainer">
       {/* 1. Container dos Botões: Flexbox para deixar lado a lado */}
       <div className="d-flex justify-content-center flex-row flex-wrap gap-2 mb-3">
         {solutions.map((solution) => (
           <a
             key={`btn-${solution.id}`}
-            className="btn btn-icon" // Usando success para combinar com a temática verde
+            className="btn btnIcon"
             data-bs-toggle="collapse"
             href={`#collapse-${solution.id}`}
             role="button"
@@ -37,9 +37,9 @@ export function CardSolution({ solutions }: CardSolutionProps) {
       {/* 2. Container dos Conteúdos: Renderiza as abas de colapso */}
       <div>
         {solutions.map((solution) => (
-          <div 
-            key={`content-${solution.id}`} 
-            className="collapse mb-2" 
+          <div
+            key={`content-${solution.id}`}
+            className="collapse mb-2"
             id={`collapse-${solution.id}`}
           >
             <div className="card card-body">

@@ -1,4 +1,4 @@
-.nature-navbar {
+.natureNavbar {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -16,15 +16,12 @@
   transition: background 0.3s ease;
 }
 
-.nature-navbar:hover {
+.natureNavbar:hover {
   background: rgba(25, 55, 35, 0.55);
 }
 
-
-/* Links */
-
-.nature-link,
-.nature-login {
+.natureLink,
+.natureLogin {
   color: #ffffff !important;
 
   font-size: 1rem;
@@ -39,16 +36,13 @@
     transform 0.3s ease;
 }
 
-.nature-link:hover,
-.nature-login:hover {
+.natureLink:hover,
+.natureLogin:hover {
   color: #d8f3dc !important;
   transform: translateY(-2px);
 }
 
-
-/* Home */
-
-.home-link {
+.homeLink {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,15 +52,12 @@
   border-radius: 50%;
 }
 
-.home-link svg {
+.homeLink svg {
   font-size: 1rem;
 }
 
-
-/* Item selecionado */
-
-.nature-link.active,
-.nature-login.active {
+.natureLink.active,
+.natureLogin.active {
   color: #183c28 !important;
   background: #d8f3dc;
   border-radius: 30px;
@@ -74,43 +65,34 @@
   font-weight: 600;
 }
 
-.nature-link.active:hover,
-.nature-login.active:hover {
+.natureLink.active:hover,
+.natureLogin.active:hover {
   color: #183c28 !important;
   background: #ffffff;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
-.home-link.active {
+.homeLink.active {
   padding: 0 !important;
 }
 
-
-/* Hamburger */
-
-.nature-toggler {
+.natureToggler {
   border: none !important;
   padding: 7px 10px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
 }
 
-.nature-toggler:focus {
+.natureToggler:focus {
   box-shadow: none;
 }
 
-.nature-toggler .navbar-toggler-icon {
+.natureToggler .navbar-toggler-icon {
   filter: brightness(0) invert(1);
 }
 
-
-/* =================================
-   MOBILE
-================================= */
-
 @media (max-width: 767px) {
-
-  .nature-navbar {
+  .natureNavbar {
     top: 12px;
     right: 12px;
 
@@ -125,9 +107,7 @@
       background 0.3s ease;
   }
 
-  /* Quando fechado, só aparece o hamburger */
-
-  .nature-navbar:has(.navbar-collapse.show) {
+  .natureNavbar:has(.navbar-collapse.show) {
     width: auto;
   }
 
@@ -139,20 +119,20 @@
     align-items: stretch !important;
   }
 
-  .nature-link,
-  .nature-login {
+  .natureLink,
+  .natureLogin {
     display: block;
     width: 100%;
     text-align: center;
     margin-top: 4px;
   }
 
-  .home-link {
+  .homeLink {
     margin-left: auto;
     margin-right: auto;
   }
 
-  .nature-login {
+  .natureLogin {
     margin-top: 8px;
   }
 }

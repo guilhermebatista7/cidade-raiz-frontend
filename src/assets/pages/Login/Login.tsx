@@ -9,22 +9,22 @@ export function Login() {
   const [rightPanelActive, setRightPanelActive] = useState(false);
 
   return (
-    <div className="login-page">
+    <div className="loginPage">
 
       <div
-        className={`login-container ${rightPanelActive ? 'right-panel-active' : ''
+        className={`loginContainer ${rightPanelActive ? 'rightPanelActive' : ''
           }`}
         id="container"
       >
 
         {/* CADASTRO */}
-        <div className="form-container sign-up-container">
+        <div className="formContainer signUpContainer">
 
 
           <form>
             <h1>Criar conta</h1>
 
-            <div className="social-container">
+            <div className="socialContainer">
               <a href="#" className="social" title='Google'>
                 <FontAwesomeIcon icon={faGoogle} style={{color: '#4285F4'}}/>
               </a>
@@ -59,11 +59,11 @@ export function Login() {
 
 
         {/* LOGIN */}
-        <div className="form-container sign-in-container">
+        <div className="formContainer signInContainer">
           <form>
             <h1>Entrar</h1>
 
-            <div className="social-container">
+            <div className="socialContainer">
 
               <a href="#" className="social" title='Google'>
                 <FontAwesomeIcon icon={faGoogle} style={{color: '#4285F4'}}/>
@@ -97,12 +97,12 @@ export function Login() {
 
 
         {/* OVERLAY */}
-        <div className="overlay-container">
+        <div className="overlayContainer">
 
           <div className="overlay">
 
             {/* PAINEL ESQUERDO */}
-            <div className="overlay-panel overlay-left">
+            <div className="overlayPanel overlayLeft">
 
               <h1>Bem-vindo de volta!</h1>
 
@@ -124,7 +124,7 @@ export function Login() {
 
 
             {/* PAINEL DIREITO */}
-            <div className="overlay-panel overlay-right">
+            <div className="overlayPanel overlayRight">
 
               <h1>Olá, cidadão!</h1>
 
@@ -142,8 +142,6 @@ export function Login() {
                   Criar conta
                 </button>
 
-
-
             </div>
 
           </div>
@@ -154,11 +152,11 @@ export function Login() {
 
 
       {/* FOOTER */}
-      <div className="login-footer">
+      <div className="loginFooter">
 
         <b>Conecte-se conosco</b>
 
-        <div className="footer-icons">
+        <div className="footerIcons">
 
           <a
             href="https://github.com"

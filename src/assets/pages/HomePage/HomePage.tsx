@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { HomeVideo } from "../HomeVideo/HomeVideo";
+import { HomeVideo } from "../../components/HomeVideo/HomeVideo";
 import { faLeaf } from "@fortawesome/free-solid-svg-icons";
-import { HomeContent } from "../HomeContent/HomeContent";
+import { HomeContent } from "../../components/HomeContent/HomeContent";
 import { cardsInfo } from "../../dataInfo/cardsInfo";
-import { CardInfo } from "../CardInfo/CardInfo";
-import { CardSolution } from "../CardSolution/CardSolution";
+import { CardInfo } from "../../components/CardInfo/CardInfo";
+import { CardSolution } from "../../components/CardSolution/CardSolution";
 import { solucao } from "../../dataInfo/solucao";
 
 import treeVideo from '../../media/tree_video.mp4'
