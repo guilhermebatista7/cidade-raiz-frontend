@@ -1,20 +1,18 @@
 import { useEffect, useRef, type ImgHTMLAttributes } from "react";
-import "./HomeVideo.css";
+import "./HeaderVideo.css";
 import type { ReactNode } from "react";
 
 interface VideoProps extends ImgHTMLAttributes<HTMLVideoElement> {
   src: string;
   title?: string;
   icon?: ReactNode;
-  fallbackSrc?: string;
   playbackRate?: number;
 }
 
-export function HomeVideo({
+export function HeaderVideo({
   src,
   title,
   icon,
-  fallbackSrc,
   playbackRate = 0.7,
   ...props
 }: VideoProps) {
@@ -50,7 +48,7 @@ export function HomeVideo({
 
   return (
     <>
-      <div className="homeVideo">
+      <div className="headerVideo">
         <video
           ref={videoRef}
           src={src}

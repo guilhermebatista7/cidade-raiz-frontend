@@ -16,7 +16,7 @@ export const solucao: SolutionItem[] = [
       content: "Peça sua muda ao viveiro municipal de forma 100% digital, iniciando o processo para deixar sua rua mais verde."
     },
     {
-      id: "Status",
+      id: "status",
       icon: <FontAwesomeIcon icon={faListCheck} />,
       title: "Acompanhar Pedido",
       content: "Acompanhe em tempo real as etapas: Pendente, Em análise, Agendado, Aguardando retirada e Concluído."

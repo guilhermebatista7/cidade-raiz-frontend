@@ -1,12 +1,12 @@
 @import '../../../index.css';
 
-.sectionTitle, .sectionTitle h2{
+.sectionTitle, .sectionTitle h2 {
   background-color: var(--cor-fundo);
   margin: 0;
   padding: 8px 10px;
 }
 
-.homeContent{
+.homeContent {
   background-color: var(--cor-fundo);
   display: flex;
   flex-direction: row;
@@ -14,7 +14,7 @@
   padding: 20px;
 }
 
-.imgLogo{
+.imgLogo {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,7 +23,7 @@
   width: 300px;
 }
 
-.imgLogo img{
+.imgLogo img {
   width: 230px;
 }
 

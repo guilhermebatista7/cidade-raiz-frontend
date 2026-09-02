@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { HomeVideo } from "../../components/HomeVideo/HomeVideo";
+import { HeaderVideo } from "../../components/HeaderVideo/HeaderVideo";
 import { faLeaf } from "@fortawesome/free-solid-svg-icons";
-import { HomeContent } from "../../components/HomeContent/HomeContent";
+import { SectionContent } from "../../components/SectionContent/SectionContent";
 import { cardsInfo } from "../../dataInfo/cardsInfo";
 import { CardInfo } from "../../components/CardInfo/CardInfo";
 import { CardSolution } from "../../components/CardSolution/CardSolution";
@@ -9,25 +9,23 @@ import { solucao } from "../../dataInfo/solucao";
 
 import treeVideo from '../../media/tree_video.mp4'
 import notebook from '../../media/notebook.png'
-import tree from '../../media/tree.png'
 import './HomePage.css'
 
 export function HomePage() {
   return (
     <>
-      <HomeVideo
+      <HeaderVideo
         src={treeVideo}
-        fallbackSrc={tree}
         title="Cidade Raiz"
         icon={<FontAwesomeIcon icon={faLeaf} style={{ color: '#739d1e' }} />}
       />
 
-      <section id="nosso-objetivo" className="sectionTitle"><h2>Nosso objetivo</h2></section>
-      <HomeContent className="homeContent">
+      <section id="nossoObjetivo" className="sectionTitle"><h2>Nosso objetivo</h2></section>
+      <SectionContent className="homeContent">
         {cardsInfo.map((card) => <CardInfo key={card.number} {...card} />)}
-      </HomeContent>
+      </SectionContent>
 
-      <HomeContent className="homeContent align-items-start">
+      <SectionContent className="homeContent align-items-start">
         <div className="cardBack">
           <div className="cardSistema ">
 
@@ -51,12 +49,12 @@ export function HomePage() {
 
           </div>
         </div>
-      </HomeContent>
+      </SectionContent>
 
       <section className="sectionTitle"><h2>Nossa solução</h2></section>
-      <HomeContent className="homeContent align-items-start">
+      <SectionContent className="homeContent align-items-start">
         <CardSolution solutions={solucao} />
-      </HomeContent>
+      </SectionContent>
     </>
   )
 }

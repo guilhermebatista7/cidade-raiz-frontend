@@ -54,8 +54,8 @@ export function Menu() {
             {/* Sobre */}
             <li className="nav-item">
               <NavLink
-                className={() => menuLinkClass(pathname === "/" && hash === "#nosso-objetivo")}
-                to="/#nosso-objetivo"
+                className={() => menuLinkClass(pathname === "/" && hash === "#nossoObjetivo")}
+                to="/#nossoObjetivo"
               >
                 Sobre
               </NavLink>

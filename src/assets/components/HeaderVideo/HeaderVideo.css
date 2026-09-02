@@ -1,4 +1,4 @@
-.homeVideo {
+.headerVideo {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -6,7 +6,7 @@
   background: #000;
 }
 
-.homeVideo video {
+.headerVideo video {
   display: block;
   width: 100%;
   height: 100vh;
@@ -15,7 +15,7 @@
   object-position: center;
 }
 
-.homeVideo .splitTextContainer {
+.headerVideo .splitTextContainer {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -98,13 +98,13 @@
 }
 
 @media (max-width: 900px) {
-  .homeVideo video {
+  .headerVideo video {
     object-fit: cover;
     max-height: 600px;
     background-position: left;
   }
 
-  .homeVideo .splitTextContainer {
+  .headerVideo .splitTextContainer {
     font-size: 70px;
   }
 }

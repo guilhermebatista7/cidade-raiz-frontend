@@ -23,10 +23,10 @@ export function CardSolution({ solutions }: CardSolutionProps) {
             key={`btn-${solution.id}`}
             className="btn btnIcon"
             data-bs-toggle="collapse"
-            href={`#collapse-${solution.id}`}
+            href={`#collapse${solution.id}`}
             role="button"
             aria-expanded="false"
-            aria-controls={`collapse-${solution.id}`}
+            aria-controls={`collapse${solution.id}`}
             title={solution.title}
           >
             {solution.icon}
@@ -40,7 +40,7 @@ export function CardSolution({ solutions }: CardSolutionProps) {
           <div
             key={`content-${solution.id}`}
             className="collapse mb-2"
-            id={`collapse-${solution.id}`}
+            id={`collapse${solution.id}`}
           >
             <div className="card card-body">
               <strong><span className="iconText">{solution.icon}</span> {solution.title}</strong>

@@ -5,7 +5,7 @@ interface ContentProps{
   children: ReactNode,
 }
 
-export function HomeContent({ className, children }:ContentProps) {
+export function SectionContent({ className, children }: ContentProps) {
   return(
     <>
       <div className={`container-fluid d-flex flex-wrap justify-content-center align-items-center ${className}`}>

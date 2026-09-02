@@ -40,7 +40,7 @@ export function Footer({children}:FooterProps) {
               </li>
 
               <li>
-                <Link to="/#nosso-objetivo">Sobre</Link>
+                <Link to="/#nossoObjetivo">Sobre</Link>
               </li>
 
               <li>
