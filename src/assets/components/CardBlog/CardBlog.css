@@ -1,0 +1,14 @@
+
+.cardBlog{
+  width: 350px;
+  height: 500px;
+  border-radius: 8px;
+  border: 1px solid black
+}
+
+.user{
+  display: flex;
+  justify-content: flex-start;
+  align-self: center;
+  flex-direction: row;
+}

@@ -9,6 +9,7 @@ import { Footer } from './assets/components/Footer/Footer'
 import { Menu } from './assets/components/Menu/Menu'
 import { HomePage } from './assets/pages/HomePage/HomePage'
 import { Login } from './assets/pages/Login/Login'
+import { BlogPage } from './assets/pages/BlogPage/BlogPage'
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation()
@@ -46,7 +47,7 @@ function App() {
       <Menu />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/blog" element={<Page title="Blog" description="Em breve, conteúdos sobre cidades mais verdes." />} />
+        <Route path="/blog" element={<BlogPage/>} />
         <Route path="/login" element={<Login/>} />
         <Route path="/plantar" element={<Page title="Quero plantar uma árvore" description="Em breve você poderá iniciar seu plantio por aqui." />} />
         <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />

@@ -1,0 +1,22 @@
+@import '../../../index.css';
+
+.header{
+  height: 350px;
+}
+
+.header > .headerVideo{
+  top: -80px;
+  height: 430px;
+}
+
+.header > .headerVideo > .splitTextContainer{
+  font-size: clamp(2.8rem, 5vw, 7rem);
+  padding-left: 7%;
+}
+
+.sectionBlog{
+  background-color: var(--cor-fundo);
+  padding: 20px;
+}
+
+
