@@ -1,16 +1,18 @@
 import './CardInfo.css';
-import type { ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 interface CardProps {
-  icon: ReactNode;
-  number: string;
+  icon?: ReactNode;
+  number?: string;
   title: string;
-  text: string;
+  text?: string;
+  className?: string;
+  children?: ReactNode;
 }
 
-export function CardInfo({ icon, number, title, text }: CardProps) {
+export function CardInfo({ icon, number, title, text, className, children }: PropsWithChildren<CardProps>) {
   return (
-    <div className="cardInfo p-4 rounded-4">
+    <div className={`cardInfo p-4 rounded-4 ${className || ''}`}>
       
       <div className="d-flex justify-content-between align-items-center mb-3">
         <span className="icon rounded-circle p-2">
@@ -26,6 +28,8 @@ export function CardInfo({ icon, number, title, text }: CardProps) {
         <h3>{title}</h3>
         {text}
       </div>
+
+      {children}
 
     </div>
   );

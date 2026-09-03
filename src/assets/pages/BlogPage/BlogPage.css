@@ -17,6 +17,56 @@
 .sectionBlog{
   background-color: var(--cor-fundo);
   padding: 20px;
+  width: 100%;
 }
+
+.publication{
+  gap: 10px;
+}
+
+.infoBlog {
+  gap: 16px;
+  align-items: stretch;
+}
+
+.infoBlog .cardInfoBlog {
+  width: 100%;
+  min-height: auto;
+  max-width: 450px;
+  min-width: 270px;
+  padding: 1.5rem !important;
+  border: 1px solid rgba(115, 157, 30, 0.3);
+  border-left: 5px solid var(--cor-verde);
+  border-radius: 12px !important;
+  animation: none;
+  box-shadow: 0 8px 20px rgba(97, 88, 72, 0.12);
+}
+
+.infoBlog .cardInfoBlog .icon {
+  background-color: var(--cor-verde);
+  color: var(--cor-card);
+}
+
+.infoBlog .cardInfoBlog .cardText h3 {
+  color: var(--cor-fundo-escuro);
+  font-family: inherit;
+  font-size: 1.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.infoBlog .cardInfoBlog .cardText {
+  color: var(--cor-cinza);
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.publication .cardImg{
+  border-radius: 50%;
+}
+
+.detailCardBlog .cardImg {
+  border-radius: 20%;
+}
+
 
 
