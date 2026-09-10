@@ -33,11 +33,23 @@ export function Login() {
 
   const handleGoToLogin = () => {
     closeAlert();
+
+    setNome('');
+    setEmail('');
+    setSenha('');
+    setSenhaRepet('');
+
     setRightPanelActive(false);
   };
 
   const handleGoToRegister = () => {
     closeAlert();
+
+    setNome('');
+    setEmail('');
+    setSenha('');
+    setSenhaRepet('');
+
     setRightPanelActive(true);
   };
 
@@ -67,6 +79,10 @@ export function Login() {
       setEmail('');
       setSenha('');
       setRightPanelActive(false);
+      showAlert(
+        'Conta cadastrada com sucesso',
+        'success'
+      );
 
       console.log(resultado);
     } catch (error) {
