@@ -105,26 +105,6 @@
   opacity: 0;
 }
 
-.socialContainer {
-  margin: 20px 0;
-}
-
-.socialContainer a {
-  border: 1px solid #ddd;
-
-  border-radius: 50%;
-
-  display: inline-flex;
-
-  justify-content: center;
-  align-items: center;
-
-  margin: 0 5px;
-
-  height: 40px;
-  width: 40px;
-}
-
 .formContainer input {
   background: #fdfdfd;
 
@@ -146,7 +126,7 @@
   border-radius: 8px;
 }
 
-.loginContainer button {
+.loginContainer .btnDefault {
   border-radius: 20px;
 
   border: 1px solid #557a16;

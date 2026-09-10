@@ -1,40 +1,108 @@
 import React, { useState } from 'react';
 import './Login.css';
 import loginTree from '../../media/login_tree.webm'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { cadastrar, login } from '../../../services/authService';
+import Alert from '../../components/Alert/Alert';
 
 export function Login() {
   const [rightPanelActive, setRightPanelActive] = useState(false);
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [senhaRepet, setSenhaRepet] = useState('');
+
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: 'success' | 'danger' | 'warning' | 'info';
+  } | null>(null);
+
+
+  const showAlert = (
+    message: string,
+    type: 'success' | 'danger' | 'warning' | 'info' = 'danger'
+  ) => {
+    setAlert({
+      message,
+      type,
+    });
+  };
+
+  const closeAlert = () => {
+    setAlert(null);
+  };
+
+  const handleGoToLogin = () => {
+    closeAlert();
+    setRightPanelActive(false);
+  };
+
+  const handleGoToRegister = () => {
+    closeAlert();
+    setRightPanelActive(true);
+  };
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
+    if (senha.length < 6) {
+      showAlert(
+        'A senha deve ter pelo menos 6 caracteres.',
+        'danger'
+      )
+      return;
+    }
+
+    if(senha !== senhaRepet){
+      showAlert(
+        'Senhas diferentes',
+        'danger'
+      )
+      return;
+    }
+
     try {
-      const resultado = await cadastrar(email, senha);
+      const resultado = await cadastrar(nome, email, senha);
+
+      setNome('');
+      setEmail('');
+      setSenha('');
+      setRightPanelActive(false);
+
       console.log(resultado);
     } catch (error) {
+      showAlert(
+        `${error}`,
+        'danger'
+      );
+
       console.error(error);
     }
   }
 
-  async function handleLogin(event: React.FormEvent){
+  async function handleLogin(event: React.FormEvent) {
     event.preventDefault();
 
     try {
       const autenticado = await login(email, senha);
+      setEmail('');
+      setSenha('');
+      showAlert(
+        'Login efetuado com sucesso!',
+        'success'
+      );
       console.log(autenticado);
     } catch (error) {
+      showAlert(
+        'E-mail ou senha incorretos.',
+        'danger'
+      );
       console.error(error);
     }
   }
 
   return (
     <div className="loginPage">
+
 
       <div
         className={`loginContainer ${rightPanelActive ? 'rightPanelActive' : ''
@@ -49,13 +117,66 @@ export function Login() {
           <form onSubmit={handleSubmit}>
             <h1>Criar conta</h1>
 
-            <div className="socialContainer">
-              <a href="#" className="social" title='Google'>
-                <FontAwesomeIcon icon={faGoogle} style={{ color: '#4285F4' }} />
-              </a>
-            </div>
+            <input
+              type="text"
+              placeholder="Nome"
+              value={nome}
+              required
+              onChange={(e) => {
+                setNome(e.target.value);
+              }}
+            />
 
-            <span>ou utilize seu e-mail para cadastro</span>
+            <input
+              type="email"
+              placeholder="E-mail"
+              value={email}
+              required
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+
+            <input
+              type="password"
+              placeholder="Senha (mín. 6 caracteres)"
+              value={senha}
+              required
+              onChange={(e) =>
+                setSenha(e.target.value)
+              }
+            />
+
+            <input
+              type="password"
+              placeholder="Repita sua senha"
+              value={senhaRepet}
+              required
+              onChange={(e) =>
+                setSenhaRepet(e.target.value)
+              }
+            />
+
+            {alert && (
+              <Alert
+                message={alert.message}
+                type={alert.type}
+                onClose={closeAlert}
+              />
+            )}
+
+            <button type="submit" className='btnDefault'>
+              Criar conta
+            </button>
+          </form>
+
+        </div>
+
+
+        {/* LOGIN */}
+        <div className="formContainer signInContainer">
+          <form onSubmit={handleLogin}>
+            <h1>Entrar</h1>
 
             <input
               type="email"
@@ -72,59 +193,24 @@ export function Login() {
               placeholder="Senha"
               value={senha}
               required
-              onChange={(e) =>
-                setSenha(e.target.value)
-              }
-            />
-
-            <button type="submit">
-              Criar conta
-            </button>
-          </form>
-
-        </div>
-
-
-        {/* LOGIN */}
-        <div className="formContainer signInContainer">
-          <form onSubmit={handleLogin}>
-            <h1>Entrar</h1>
-
-            <div className="socialContainer">
-
-              <a href="#" className="social" title='Google'>
-                <FontAwesomeIcon icon={faGoogle} style={{ color: '#4285F4' }} />
-              </a>
-
-            </div>
-
-            <span>ou utilize sua conta</span>
-
-            <input
-              type="email"
-              placeholder="E-mail"
-              value={email}
-              required
-              onChange={(e)=>{
-                setEmail(e.target.value);
-              }}
-            />
-
-            <input
-              type="password"
-              placeholder="Senha"
-              value={senha}
-              required
-              onChange={(e)=>{
+              onChange={(e) => {
                 setSenha(e.target.value)
               }}
             />
+
+            {alert && (
+              <Alert
+                message={alert.message}
+                type={alert.type}
+                onClose={closeAlert}
+              />
+            )}
 
             <a href="#">
               Esqueceu sua senha?
             </a>
 
-            <button type="submit">
+            <button type="submit" className='btnDefault'>
               Entrar
             </button>
           </form>
@@ -149,8 +235,8 @@ export function Login() {
 
               <button
                 type="button"
-                className="ghost"
-                onClick={() => setRightPanelActive(false)}
+                className="ghost btnDefault"
+                onClick={() => handleGoToLogin()}
               >
                 Entrar
               </button>
@@ -171,8 +257,8 @@ export function Login() {
 
               <button
                 type="button"
-                className="ghost"
-                onClick={() => setRightPanelActive(true)}
+                className="ghost btnDefault"
+                onClick={() => handleGoToRegister()}
               >
                 Criar conta
               </button>

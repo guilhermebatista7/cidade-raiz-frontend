@@ -6,6 +6,7 @@ import "./Menu.css";
 
 export function Menu() {
   const { hash, pathname } = useLocation();
+
   const menuLinkClass = (isActive: boolean, additionalClass = "") =>
     `nav-link natureLink ${additionalClass} ${isActive ? "active" : ""}`.trim();
 
@@ -75,6 +76,15 @@ export function Menu() {
                 to="/login"
               >
                 Login
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) => menuLinkClass(isActive)}
+                to="/gestao"
+              >
+                Gestão
               </NavLink>
             </li>
 

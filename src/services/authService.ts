@@ -1,6 +1,7 @@
 import { apiFetch } from "./api";
 
 export async function cadastrar(
+  nome:  string,
   email: string,
   senha: string
 ) {
@@ -11,6 +12,7 @@ export async function cadastrar(
       method: "POST",
 
       body: JSON.stringify({
+        nome,
         email,
         senha
       })

@@ -48,9 +48,10 @@ function App() {
       <Menu />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/blog" element={<BlogPage/>} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/plantar" element={<Plantar/>} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/plantar" element={<Plantar />} />
+        <Route path="/gestao" element={<Page title="Gestão" description="Página de gestão." />} />
         <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
       </Routes>
       <Footer>
