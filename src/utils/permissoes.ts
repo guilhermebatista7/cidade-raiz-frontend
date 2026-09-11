@@ -13,6 +13,14 @@ export interface Usuario {
   cidadeId?: string;
 }
 
-export function podeAcessarGestao(usuario?: Usuario | null) {
-  return !!usuario && usuario.role !== "CIDADAO";
+const ROLES_GESTAO: Role[] = [
+  "FUNCIONARIO",
+  "ADMIN_LOCAL",
+  "GLOBAL"
+];
+
+export function podeAcessarGestao(
+  usuario?: Usuario | null
+): boolean {
+  return !!usuario && ROLES_GESTAO.includes(usuario.role);
 }

@@ -33,3 +33,15 @@ export async function login(email: string, senha: string) {
     }
   )
 }
+
+export async function obterUsuarioLogado() {
+  return await apiFetch("/auth/me", {
+    method: "GET"
+  })
+}
+
+export async function logout(){
+  return await apiFetch("/auth/logout", {
+    method: "POST"
+  })
+}

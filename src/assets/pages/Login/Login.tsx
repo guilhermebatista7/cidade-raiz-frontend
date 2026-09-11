@@ -3,6 +3,9 @@ import './Login.css';
 import loginTree from '../../media/login_tree.webm'
 import { cadastrar, login } from '../../../services/authService';
 import Alert from '../../components/Alert/Alert';
+import { podeAcessarGestao } from '../../../utils/permissoes';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export function Login() {
   const [rightPanelActive, setRightPanelActive] = useState(false);
@@ -10,6 +13,9 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [senhaRepet, setSenhaRepet] = useState('');
+
+  const navigate = useNavigate();
+  const { login: loginContext } = useAuth();
 
   const [alert, setAlert] = useState<{
     message: string;
@@ -64,7 +70,7 @@ export function Login() {
       return;
     }
 
-    if(senha !== senhaRepet){
+    if (senha !== senhaRepet) {
       showAlert(
         'Senhas diferentes',
         'danger'
@@ -97,24 +103,23 @@ export function Login() {
 
   async function handleLogin(event: React.FormEvent) {
     event.preventDefault();
-
     try {
-      const autenticado = await login(email, senha);
+      const usuarioLogado = await loginContext(email, senha);
       setEmail('');
       setSenha('');
-      showAlert(
-        'Login efetuado com sucesso!',
-        'success'
-      );
-      console.log(autenticado);
-    } catch (error) {
-      showAlert(
-        'E-mail ou senha incorretos.',
-        'danger'
-      );
+      showAlert('Login efetuado com sucesso!', 'success');
+      // Redireciona conforme permissão
+      if (podeAcessarGestao(usuarioLogado)) {
+        navigate('/gestao');
+      } else {
+        navigate('/');
+      }
+    } catch (error: any) {
+      showAlert(error?.message || 'E-mail ou senha incorretos.', 'danger');
       console.error(error);
     }
   }
+
 
   return (
     <div className="loginPage">

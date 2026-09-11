@@ -11,6 +11,8 @@ import { HomePage } from './assets/pages/HomePage/HomePage'
 import { Login } from './assets/pages/Login/Login'
 import { BlogPage } from './assets/pages/BlogPage/BlogPage'
 import { Plantar } from './assets/pages/Plantar/Plantar'
+import { AuthProvider } from './contexts/AuthContext'
+import { RotaProtegida } from './assets/components/RotaProtegida/RotaProtegida'
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation()
@@ -44,19 +46,28 @@ function Page({ title, description }: PageProps) {
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToHash />
-      <Menu />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/plantar" element={<Plantar />} />
-        <Route path="/gestao" element={<Page title="Gestão" description="Página de gestão." />} />
-        <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
-      </Routes>
-      <Footer>
-        <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
-      </Footer>
+      <AuthProvider>
+        <ScrollToHash />
+        <Menu />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/plantar" element={<Plantar />} />
+          <Route
+            path="/gestao"
+            element={
+              <RotaProtegida>
+                <Page title="Gestão" description="Página de gestão." />
+              </RotaProtegida>
+            }
+          />
+          <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
+        </Routes>
+        <Footer>
+          <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
+        </Footer>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

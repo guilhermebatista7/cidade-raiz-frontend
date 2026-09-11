@@ -9,6 +9,7 @@ export async function apiFetch(
         `${API_URL}${endpoint}`,
         {
             ...options,
+            credentials: "include", //ESSENCIAL: envia e recebe cookies httpOnly
 
             headers: {
                 "Content-Type": "application/json",
