@@ -169,6 +169,25 @@
   margin-bottom: 20px;
 }
 
+.barraFiltros{
+    display: flex;
+    padding: 10px;
+    border: 1px solid #d6d5d2;
+    background-color: var(--cor-fundo);
+    border-radius: 8px;
+    gap: 5px;
+}
+
+.barraFiltros > select, input{
+    display: flex;
+    padding: 10px;
+    border: 1px solid #d6d5d2;
+    background-color: var(--cor-card);
+    border-radius: 8px;
+    color: var(--cor-fundo-escuro);
+    font-size: 13px;
+}
+
 /* Animação suave entre abas */
 @keyframes fadeInGestao {
   from {
