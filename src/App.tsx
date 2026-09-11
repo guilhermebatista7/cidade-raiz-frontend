@@ -11,6 +11,7 @@ import { HomePage } from './assets/pages/HomePage/HomePage'
 import { Login } from './assets/pages/Login/Login'
 import { BlogPage } from './assets/pages/BlogPage/BlogPage'
 import { Plantar } from './assets/pages/Plantar/Plantar'
+import { Gestao } from './assets/pages/Gestao/Gestao'
 import { AuthProvider } from './contexts/AuthContext'
 import { RotaProtegida } from './assets/components/RotaProtegida/RotaProtegida'
 
@@ -58,7 +59,7 @@ function App() {
             path="/gestao"
             element={
               <RotaProtegida>
-                <Page title="Gestão" description="Página de gestão." />
+                <Gestao />
               </RotaProtegida>
             }
           />

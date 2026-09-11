@@ -43,14 +43,15 @@
 
 .solicitacaoHeader h2 {
     margin: 0 0 7px;
-    color: #10251a;
+    color: var(--cor-fundo-escuro);
     font-size: 21px;
+    font-weight: 700;
 }
 
 .solicitacaoHeader p,
 .statusHeader p {
     margin: 0;
-    color: #6f6f6f;
+    color: var(--cor-cinza);
     font-size: 14px;
 }
 
@@ -59,7 +60,7 @@
     height: 58px;
     display: grid;
     place-items: center;
-    color: #398b36;
+    color: var(--cor-verde);
     font-size: 27px;
 }
 
@@ -75,7 +76,7 @@
 
 .sectionTitle span,
 .sectionTitle h3 {
-    color: #13271b;
+    color: var(--cor-fundo-escuro);
     font-weight: 700;
 }
 
@@ -90,7 +91,7 @@
 
 .sectionDescription {
     margin: 0 0 12px;
-    color: #777;
+    color: var(--cor-cinza);
     font-size: 13px;
 }
 
@@ -116,7 +117,7 @@
 }
 
 .addPhoto:hover {
-    background: #fafafa;
+    background: rgba(0, 0, 0, 0.02);
     border-radius: 10px;
 }
 
@@ -132,27 +133,27 @@
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: #edf5e9;
-    color: #173b20;
+    background: rgba(115, 157, 30, 0.15);
+    color: var(--cor-verde);
     font-size: 23px;
 }
 
 .addPhoto strong {
     margin-bottom: 7px;
-    color: #12251a;
+    color: var(--cor-fundo-escuro);
     font-size: 14px;
 }
 
 .addPhoto span,
 .comprovanteUpload span {
-    color: #777;
+    color: var(--cor-cinza);
     font-size: 13px;
 }
 
 .successIcon {
     padding: 2px;
     border-radius: 50%;
-    background: green;
+    background: var(--cor-verde);
     color: #fff;
 }
 
@@ -161,9 +162,9 @@
     height: 140px;
     flex-shrink: 0;
     overflow: hidden;
-    border: 2px solid #e5e7eb;
+    border: 2px solid #d6d5d2;
     border-radius: 12px;
-    background: #f5f5f5;
+    background: var(--cor-fundo);
 }
 
 .photoPreview img,
@@ -182,9 +183,9 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    border: 1px solid #dce8df;
+    border: 1px solid #d6d5d2;
     border-radius: 14px;
-    background: #f7faf8;
+    background: var(--cor-fundo);
 }
 
 .arvoresOption {
@@ -206,13 +207,13 @@
 
 .arvoresOptionInfo strong,
 .arvoreSelecionadaInfo strong {
-    color: #254b32;
+    color: var(--cor-fundo-escuro);
     font-size: 15px;
 }
 
 .arvoresOptionInfo span,
 .arvoreSelecionadaInfo>span {
-    color: #6c7b71;
+    color: var(--cor-cinza);
     font-size: 13px;
 }
 
@@ -223,23 +224,25 @@
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: #dcefe1;
-    color: #347546;
+    background: rgba(115, 157, 30, 0.15);
+    color: var(--cor-verde);
 }
 
 .btnSelecionarArvore,
 .btnAlterarArvore {
-    border: 1px solid #347546;
+    border: 1px solid var(--cor-verde);
     border-radius: 8px;
-    background: #347546;
+    background: var(--cor-verde);
     color: #fff;
     padding: 11px 18px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btnSelecionarArvore:hover {
-    background: #285d36;
+    background: #5f8218;
+    border-color: #5f8218;
 }
 
 .arvoreSelecionada {
@@ -253,7 +256,7 @@
     flex-shrink: 0;
     overflow: hidden;
     border-radius: 10px;
-    background: #edf2ee;
+    background: #E6E0D3;
 }
 
 .arvoreSelecionadaInfo {
@@ -267,13 +270,13 @@
 
 .arvoreSelecionadaInfo p {
     margin: 2px 0 0;
-    color: #68766d;
+    color: var(--cor-cinza);
     font-size: 12px;
     line-height: 1.5;
 }
 
 .arvoreSelecionadaInfo small {
-    color: #28703b;
+    color: var(--cor-verde);
     font-size: 11px;
     font-weight: 600;
 }
@@ -281,13 +284,14 @@
 .btnAlterarArvore {
     flex-shrink: 0;
     padding: 9px 14px;
-    background: #fff;
-    color: #347546;
+    background: transparent;
+    color: var(--cor-verde);
+    border: 1px solid var(--cor-verde);
     font-size: 12px;
 }
 
 .btnAlterarArvore:hover {
-    background: #347546;
+    background: var(--cor-verde);
     color: #fff;
 }
 
@@ -298,7 +302,7 @@
 }
 
 .inputGroup label {
-    color: #707070;
+    color: var(--cor-cinza);
     font-size: 12px;
 }
 
@@ -317,7 +321,7 @@
 
 .inputGroup input:focus,
 .inputGroup select:focus {
-    border-color: #69a35e;
+    border-color: var(--cor-verde);
 }
 
 .inputGroup .radio {
@@ -335,10 +339,11 @@
     border: 1px solid #d6d5d2;
     border-radius: 9px;
     cursor: pointer;
+    background: #fff;
 }
 
 .comprovanteUpload strong {
-    color: #38833d;
+    color: var(--cor-verde);
     font-size: 13px;
 }
 
@@ -352,6 +357,7 @@
     gap: 12px;
     border: 1px solid #d6d5d2;
     border-radius: 9px;
+    background: #fff;
 }
 
 .fileIcon {
@@ -361,8 +367,8 @@
     display: grid;
     place-items: center;
     border-radius: 9px;
-    background: #edf6eb;
-    color: #38833d;
+    background: rgba(115, 157, 30, 0.15);
+    color: var(--cor-verde);
     font-size: 18px;
 }
 
@@ -374,13 +380,13 @@
 }
 
 .fileInfo strong {
-    color: #303030;
+    color: var(--cor-fundo-escuro);
     font-size: 13px;
     font-weight: 500;
 }
 
 .fileInfo span {
-    color: #858585;
+    color: var(--cor-cinza);
     font-size: 12px;
 }
 
@@ -401,15 +407,16 @@
     gap: 10px;
     border: 0;
     border-radius: 7px;
-    background: #21863c;
+    background: var(--cor-verde);
     color: #fff;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btnEnviar:hover {
-    background: #196d30;
+    background: #5f8218;
 }
 
 .statusColumn {
@@ -428,16 +435,18 @@
 
 .statusHeader h2 {
     margin: 0 0 10px;
-    color: #10251a;
+    color: var(--cor-fundo-escuro);
     font-size: 16px;
+    font-weight: 700;
 }
 
 .statusBadge {
     padding: 7px 13px;
     border-radius: 20px;
-    background: #edf5e9;
-    color: #277039;
+    background: rgba(115, 157, 30, 0.15);
+    color: #557516;
     font-size: 12px;
+    font-weight: 600;
     white-space: nowrap;
 }
 
@@ -463,7 +472,7 @@
 }
 
 .timelineItem.active:not(:last-child)::after {
-    background: #43a34d;
+    background: var(--cor-verde);
 }
 
 .timelineIcon {
@@ -481,12 +490,12 @@
 }
 
 .timelineItem.active .timelineIcon {
-    background: #21883d;
+    background: var(--cor-verde);
     color: #fff;
 }
 
 .timelineItem.current .timelineIcon {
-    background: #e0b71a;
+    background: #d4a317;
     color: #fff;
 }
 
@@ -497,13 +506,14 @@
 
 .timelineContent h3 {
     margin: 0 0 5px;
-    color: #17241c;
+    color: var(--cor-fundo-escuro);
     font-size: 14px;
+    font-weight: 600;
 }
 
 .timelineContent p,
 .timelineContent span {
-    color: #777;
+    color: var(--cor-cinza);
     font-size: 12px;
 }
 
@@ -519,22 +529,22 @@
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    border: 1px solid #d5e1cf;
+    border: 1px solid #d6d5d2;
     border-radius: 9px;
-    background: #f7faf5;
+    background: var(--cor-fundo);
 }
 
 .conclusaoBox strong {
     display: block;
     margin-bottom: 8px;
-    color: #277039;
+    color: var(--cor-verde);
     font-size: 13px;
 }
 
 .conclusaoBox p {
     max-width: 230px;
     margin: 0;
-    color: #416044;
+    color: var(--cor-cinza);
     font-size: 12px;
     line-height: 1.5;
 }
@@ -544,7 +554,8 @@
     align-items: center;
     gap: 4px;
     padding-right: 5px;
-    color: #cdddc5;
+    color: var(--cor-verde);
+    opacity: 0.45;
     font-size: 35px;
 }
 
@@ -565,7 +576,8 @@ body.modalAberto {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: rgba(20, 35, 25, .72);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
     overscroll-behavior: contain;
 }
 
@@ -578,8 +590,9 @@ body.modalAberto {
     flex-direction: column;
     overflow: hidden;
     border-radius: 18px;
-    background: #fff;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, .3);
+    background: var(--cor-card);
+    border: 1px solid #d6d5d2;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, .25);
 }
 
 .arvoresModalHeader {
@@ -589,18 +602,19 @@ body.modalAberto {
     align-items: flex-start;
     justify-content: space-between;
     gap: 20px;
-    border-bottom: 1px solid #e8eee9;
+    border-bottom: 1px solid #d6d5d2;
 }
 
 .arvoresModalHeader h2 {
     margin: 0;
-    color: #254b32;
+    color: var(--cor-fundo-escuro);
     font-size: 23px;
+    font-weight: 700;
 }
 
 .arvoresModalHeader p {
     margin: 6px 0 0;
-    color: #718077;
+    color: var(--cor-cinza);
     font-size: 14px;
 }
 
@@ -612,15 +626,16 @@ body.modalAberto {
     place-items: center;
     border: 0;
     border-radius: 50%;
-    background: #f1f4f2;
-    color: #53625a;
+    background: var(--cor-fundo);
+    color: var(--cor-fundo-escuro);
     font-size: 18px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btnFecharModal:hover {
-    background: #e2e9e4;
-    color: #26372c;
+    background: #dcd6cb;
+    color: #10251a;
 }
 
 .arvoresModalBody {
@@ -638,12 +653,12 @@ body.modalAberto {
 }
 
 .arvoresModalBody::-webkit-scrollbar-track {
-    background: #f1f4f2;
+    background: var(--cor-card);
 }
 
 .arvoresModalBody::-webkit-scrollbar-thumb {
     border-radius: 20px;
-    background: #a7b9ab;
+    background: #c2bbae;
 }
 
 .arvoresGrid {
@@ -656,22 +671,22 @@ body.modalAberto {
 .arvoreCard {
     min-width: 0;
     overflow: hidden;
-    border: 2px solid #e0e8e2;
+    border: 2px solid #d6d5d2;
     border-radius: 14px;
-    background: #fff;
+    background: var(--cor-fundo);
     cursor: pointer;
     transition: .2s;
 }
 
 .arvoreCard:hover {
-    border-color: #8db49a;
-    box-shadow: 0 8px 25px rgba(40, 80, 50, .1);
+    border-color: var(--cor-verde);
+    box-shadow: 0 8px 25px rgba(115, 157, 30, .15);
     transform: translateY(-2px);
 }
 
 .arvoreCard.selected {
-    border-color: #347546;
-    box-shadow: 0 0 0 3px rgba(52, 117, 70, .13), 0 10px 30px rgba(52, 117, 70, .12);
+    border-color: var(--cor-verde);
+    box-shadow: 0 0 0 3px rgba(115, 157, 30, .2), 0 10px 30px rgba(115, 157, 30, .15);
 }
 
 .arvoreCard.indisponivelCard {
@@ -680,7 +695,7 @@ body.modalAberto {
 }
 
 .arvoreCard.indisponivelCard:hover {
-    border-color: #e0e8e2;
+    border-color: #d6d5d2;
     box-shadow: none;
     transform: none;
 }
@@ -689,7 +704,7 @@ body.modalAberto {
     width: 100%;
     height: 300px;
     overflow: hidden;
-    background: #edf2ee;
+    background: #E6E0D3;
 }
 
 .arvoreImagem img {
@@ -713,14 +728,15 @@ body.modalAberto {
 
 .arvoreCardTitle h3 {
     margin: 0;
-    color: #294b34;
+    color: var(--cor-fundo-escuro);
     font-size: 19px;
     line-height: 1.3;
+    font-weight: 700;
 }
 
 .arvoreCardContent p {
     margin: 12px 0 15px;
-    color: #68766d;
+    color: var(--cor-cinza);
     font-size: 13px;
     line-height: 1.6;
 }
@@ -735,8 +751,8 @@ body.modalAberto {
 }
 
 .disponivel {
-    background: #e5f4e8;
-    color: #28703b;
+    background: rgba(115, 157, 30, 0.15);
+    color: #557516;
 }
 
 .indisponivel {
@@ -752,17 +768,18 @@ body.modalAberto {
     align-items: center;
     justify-content: center;
     gap: 7px;
-    border: 1px solid #347546;
+    border: 1px solid var(--cor-verde);
     border-radius: 8px;
-    background: #fff;
-    color: #347546;
+    background: transparent;
+    color: var(--cor-verde);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btnEscolherArvore:hover:not(:disabled) {
-    background: #347546;
+    background: var(--cor-verde);
     color: #fff;
 }
 

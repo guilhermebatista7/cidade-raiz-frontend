@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Login.css';
 import loginTree from '../../media/login_tree.webm'
-import { cadastrar, login } from '../../../services/authService';
+import { cadastrar } from '../../../services/authService';
 import Alert from '../../components/Alert/Alert';
 import { podeAcessarGestao } from '../../../utils/permissoes';
 import { useNavigate } from 'react-router-dom';

@@ -101,7 +101,6 @@ export function Menu() {
                   <button
                     type="button"
                     className="nav-link natureLink natureLogin"
-                    style={{ background: "transparent", border: "none" }}
                     onClick={() => setMostrarModalLogout(true)}
                   >
                     Sair
