@@ -13,7 +13,7 @@ export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
     const [comprovante, setComprovante] = useState<File | null>(null);
     const [modalArvoresAberto, setModalArvoresAberto] = useState(false);
-    const [arvoreSelecionada, setArvoreSelecionada] = useState<number | null>(null);
+    const [arvoreSelecionada, setArvoreSelecionada] = useState<string | null>(null);
 
     useEffect(() => {
         document.body.classList.toggle("modalAberto", modalArvoresAberto);
@@ -37,7 +37,7 @@ export const Plantar = () => {
         if (file) setComprovante(file);
     };
 
-    const selecionarArvore = (id: number) => {
+    const selecionarArvore = (id: string) => {
         const arvore = arvoresInfo.find(item => item.id === id);
         if (!arvore || arvore.quantidade <= 0) return;
         setArvoreSelecionada(id);

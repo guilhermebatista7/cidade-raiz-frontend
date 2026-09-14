@@ -4,25 +4,34 @@ export async function apiFetch(
     endpoint: string,
     options?: RequestInit
 ) {
+    // 1. Verifica se o corpo é um FormData
+    const isFormData = options?.body instanceof FormData;
+
+    // 2. Monta os headers dinamicamente
+    const headers: Record<string, string> = {
+        ...((options?.headers as Record<string, string>) || {})
+    };
+
+    // 3. SÓ injeta o application/json se NÃO for FormData
+    if (!isFormData && !headers["Content-Type"]) {
+        headers["Content-Type"] = "application/json";
+    }
 
     const response = await fetch(
         `${API_URL}${endpoint}`,
         {
             ...options,
-            credentials: "include", //ESSENCIAL: envia e recebe cookies httpOnly
-
-            headers: {
-                "Content-Type": "application/json",
-                ...options?.headers
-            }
+            credentials: "include", // ESSENCIAL: envia e recebe cookies httpOnly
+            headers,
         }
     );
 
-    const data = await response.json();
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
 
     if (!response.ok) {
         throw new Error(
-            data.message || "Erro na requisição"
+            data?.message || "Erro na requisição"
         );
     }
 

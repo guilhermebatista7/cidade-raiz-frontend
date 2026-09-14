@@ -10,6 +10,7 @@ import {
 import { SectionContent } from "../../components/SectionContent/SectionContent";
 import "./Gestao.css";
 import { AbaSolicitacoes } from "./abas/Solicitacao/AbaSolicitacao";
+import { AbaArvores } from "./abas/Arvores/AbaArvores";
 
 // Definição das abas disponíveis
 export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios";
@@ -91,10 +92,8 @@ export function Gestao() {
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
                                 <h3>Gerenciar Solicitações de Plantio</h3>
-                                <span className="badgeAba">Aba 1</span>
                             </div>
                             <AbaSolicitacoes/>
-
 
                             {/* Em breve: Tabela ou lista de solicitações */}
                         </section>
@@ -104,13 +103,9 @@ export function Gestao() {
                     {abaAtiva === "arvores" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
-                                <h3>Catálogo de Árvores e Mudas</h3>
-                                <span className="badgeAba">Aba 2</span>
+                                <h3>Catálogo de Árvores e Mudas</h3>                                
                             </div>
-                            <p>
-                                Cadastre novas espécies, atualize a quantidade de estoque de mudas e
-                                defina quais árvores estão ativas para solicitação.
-                            </p>
+                            <AbaArvores/>
                             {/* Em breve: Listagem e cadastro de árvores */}
                         </section>
                     )}
@@ -120,7 +115,6 @@ export function Gestao() {
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
                                 <h3>Relatórios</h3>
-                                <span className="badgeAba">Aba 3</span>
                             </div>
                             <p>
                                 Administre os papéis dos usuários (Cidadão, Funcionário, Admin Local, Global)
@@ -135,7 +129,6 @@ export function Gestao() {
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
                                 <h3>Gestão de Usuários e Permissões</h3>
-                                <span className="badgeAba">Aba 4</span>
                             </div>
                             <p>
                                 Administre os papéis dos usuários (Cidadão, Funcionário, Admin Local, Global)
