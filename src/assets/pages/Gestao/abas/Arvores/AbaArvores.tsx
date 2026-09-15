@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
 import './AbaArvores.css';
 
-import { atualizarArvore, cadastrarArvore, listarArvores } from "../../../../../services/arvoreService";
+import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores } from "../../../../../services/arvoreService";
 
 export function AbaArvores() {
     // 1. ESTADOS DE DADOS E CONTROLE DO MODAL
@@ -65,7 +65,7 @@ export function AbaArvores() {
         if (!arvoreAlvo) return;
 
         setArvoreEmEdicaoId(id);
-        setNome(arvoreAlvo.nomePopular || arvoreAlvo.nome || "");
+        setNome(arvoreAlvo.nomePopular || "");
         setDescricao(arvoreAlvo.descricao);
         setQuantidade(arvoreAlvo.quantidade.toString());
         setImagem(null); // Caso queira permitir alterar a imagem depois
@@ -82,7 +82,7 @@ export function AbaArvores() {
         return arvores.map(item => ({
             ...item,
             // Normaliza garantindo que nunca serão undefined/null para a busca
-            nomePopular: item.nomePopular || item.nome || "",
+            nomePopular: item.nomePopular || "",
             descricao: item.descricao || ""
         })).filter((item) => {
             const termo = busca.toLowerCase();
@@ -132,8 +132,19 @@ export function AbaArvores() {
         }
     };
 
-    const handleExcluir = (id: string) => {
-        alert(`Excluir árvore: ${id}`);
+    const handleExcluir = async (id: string) => {
+
+        const confirm = window.confirm("Tem certeza que deseja excluir esta árvore?");
+        if (!confirm) return;
+
+        try {
+            await excluirArvore(id);
+            alert("Árvore excluída com sucesso!");
+            await carregarDados();
+        } catch (error) {
+            alert('Não foi possível realizar a exclusão');
+            console.log(error);
+        }
     }
 
     return (
@@ -176,12 +187,12 @@ export function AbaArvores() {
                             return (
                                 <article key={arvore.id} className="arvoreCard">
                                     <div className="arvoreImagem">
-                                        <img src={arvore.imagem} alt={arvore.nome} />
+                                        <img src={arvore.imagemUrl} alt={arvore.nomePopular} />
                                     </div>
 
                                     <div className="arvoreCardContent">
                                         <div className="arvoreCardTitle">
-                                            <h3>{arvore.nome}</h3>
+                                            <h3>{arvore.nomePopular}</h3>
                                             <span className={disponivel ? "disponivel" : "indisponivel"}>
                                                 {disponivel ? `${arvore.quantidade} disponíveis` : "0 disponíveis"}
                                             </span>
