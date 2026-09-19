@@ -5,15 +5,30 @@ import {
     faPaperPlane, faTrash, faClock, faCalendarCheck, faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import { SectionContent } from "../../components/SectionContent/SectionContent";
-import { arvoresInfo } from "../../dataInfo/arvoresInfo";
 import { estados } from "../../dataInfo/estados";
 import "./Plantar.css";
+import { listarArvores } from "../../../services/arvoreService";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
     const [comprovante, setComprovante] = useState<File | null>(null);
     const [modalArvoresAberto, setModalArvoresAberto] = useState(false);
+    const [arvores, setArvores] = useState<any[]>([]);
     const [arvoreSelecionada, setArvoreSelecionada] = useState<string | null>(null);
+
+    useEffect(() => {
+        carregarDados();
+    }, []);
+
+    const carregarDados = async () => {
+        try {
+            const dados = await listarArvores();
+            setArvores(dados);
+            console.log(dados);
+        } catch (error) {
+            console.log("Erro ao carregar árvores: ", error);
+        }
+    }
 
     useEffect(() => {
         document.body.classList.toggle("modalAberto", modalArvoresAberto);
@@ -38,20 +53,20 @@ export const Plantar = () => {
     };
 
     const selecionarArvore = (id: string) => {
-        const arvore = arvoresInfo.find(item => item.id === id);
+        const arvore = arvores.find(item => item.id === id);
         if (!arvore || arvore.quantidade <= 0) return;
         setArvoreSelecionada(id);
         setModalArvoresAberto(false);
     };
 
-    const arvoreEscolhida = arvoresInfo.find(
+    const arvoreEscolhida = arvores.find(
         arvore => arvore.id === arvoreSelecionada
     );
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if(fotoLocal === null){
+        if (fotoLocal === null) {
             alert("Por favor, adicione a foto do local para plantio.");
             return;
         }
@@ -143,7 +158,7 @@ export const Plantar = () => {
                                     onClick={() => setModalArvoresAberto(true)}
                                 >
                                     {arvoreEscolhida
-                                        ? `Árvore: ${arvoreEscolhida.nome}`
+                                        ? `Árvore: ${arvoreEscolhida.nomePopular}`
                                         : "Ver árvores disponíveis"}
                                 </button>
                             </div>
@@ -151,12 +166,12 @@ export const Plantar = () => {
                             {arvoreEscolhida && (
                                 <div className="arvoreSelecionada">
                                     <div className="arvoreSelecionadaImagem">
-                                        <img src={arvoreEscolhida.imagem} alt={arvoreEscolhida.nome} />
+                                        <img src={arvoreEscolhida.imagemUrl} alt={arvoreEscolhida.nome} />
                                     </div>
 
                                     <div className="arvoreSelecionadaInfo">
                                         <span>Árvore selecionada</span>
-                                        <strong>{arvoreEscolhida.nome}</strong>
+                                        <strong>{arvoreEscolhida.nomePopular}</strong>
                                         <p>{arvoreEscolhida.descricao}</p>
                                         <small>{arvoreEscolhida.quantidade} disponíveis</small>
                                     </div>
@@ -415,7 +430,7 @@ export const Plantar = () => {
 
                         <div className="arvoresModalBody">
                             <div className="arvoresGrid">
-                                {arvoresInfo.map(arvore => {
+                                {arvores.map(arvore => {
                                     const selecionada = arvoreSelecionada === arvore.id;
                                     const disponivel = arvore.quantidade > 0;
 
@@ -426,12 +441,12 @@ export const Plantar = () => {
                                             onClick={() => disponivel && selecionarArvore(arvore.id)}
                                         >
                                             <div className="arvoreImagem">
-                                                <img src={arvore.imagem} alt={arvore.nome} />
+                                                <img src={arvore.imagemUrl} alt={arvore.nome} />
                                             </div>
 
                                             <div className="arvoreCardContent">
                                                 <div className="arvoreCardTitle">
-                                                    <h3>{arvore.nome}</h3>
+                                                    <h3>{arvore.nomePopular}</h3>
                                                     <span className={disponivel ? "disponivel" : "indisponivel"}>
                                                         {disponivel ? `${arvore.quantidade} disponíveis` : "Indisponível"}
                                                     </span>

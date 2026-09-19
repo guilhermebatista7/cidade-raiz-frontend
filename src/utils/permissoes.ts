@@ -19,8 +19,6 @@ const ROLES_GESTAO: Role[] = [
   "GLOBAL"
 ];
 
-export function podeAcessarGestao(
-  usuario?: Usuario | null
-): boolean {
+export function podeAcessarGestao(usuario?: Usuario | null): boolean {
   return !!usuario && ROLES_GESTAO.includes(usuario.role);
 }

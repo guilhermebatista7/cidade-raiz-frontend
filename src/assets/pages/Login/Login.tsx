@@ -59,6 +59,7 @@ export function Login() {
     setRightPanelActive(true);
   };
 
+  //Criar conta
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
@@ -189,6 +190,14 @@ export function Login() {
             <button type="submit" className='btnDefault'>
               Criar conta
             </button>
+
+            <button
+              type="button"
+              className="btnSecondary"
+              onClick={() => handleGoToLogin()}
+            >
+              Entrar
+            </button>
           </form>
 
         </div>
@@ -233,6 +242,14 @@ export function Login() {
 
             <button type="submit" className='btnDefault'>
               Entrar
+            </button>
+
+            <button
+              type="button"
+              className="btnSecondary"
+              onClick={() => handleGoToRegister()}
+            >
+              Criar conta
             </button>
           </form>
         </div>

@@ -166,6 +166,12 @@
   border-color: #fff;
 }
 
+.loginContainer button.btnSecondary{
+  margin-top: 10px;
+  border: none;
+  font-weight: 500;
+}
+
 .loginContainer button:hover {
   scale: 1.05;
   transition: 0.5s;
