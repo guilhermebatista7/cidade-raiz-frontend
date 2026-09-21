@@ -8,7 +8,7 @@ function Pagination() {
         <div className="d-flex align-items-center gap-4 pagination">
             <button
                 type="button"
-                className="btn flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                className="btnPagination flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:bg-gray-100 transition"
                 aria-label="Página anterior"
             >
                 <FontAwesomeIcon icon={faArrowLeft} />
@@ -20,7 +20,7 @@ function Pagination() {
 
             <button
                 type="button"
-                className="btn flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                className="btnPagination flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:bg-gray-100 transition"
                 aria-label="Próxima página"
             >
                 <FontAwesomeIcon icon={faArrowRight} />

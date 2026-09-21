@@ -5,15 +5,17 @@ import {
     faTree,
     faUsers,
     faShieldHalved,
-    faChartPie
+    faChartPie,
+    faGear
 } from "@fortawesome/free-solid-svg-icons";
 import { SectionContent } from "../../components/SectionContent/SectionContent";
 import "./Gestao.css";
 import { AbaSolicitacoes } from "./abas/Solicitacao/AbaSolicitacao";
 import { AbaArvores } from "./abas/Arvores/AbaArvores";
+import { AbaConfig } from "./abas/ConfigAdmin/AbaConfig";
 
 // Definição das abas disponíveis
-export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios";
+export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
 
 interface TabItem {
     id: AbaGestao;
@@ -41,6 +43,11 @@ const TABS: TabItem[] = [
         id: "usuarios",
         label: "Usuários",
         icon: faUsers
+    },
+    {
+        id: "configAdmin",
+        label: "Config. Administrador",
+        icon: faGear
     }
 ];
 
@@ -134,6 +141,17 @@ export function Gestao() {
                                 Administre os papéis dos usuários (Cidadão, Funcionário, Admin Local, Global)
                                 e vincule funcionários às respectivas cidades.
                             </p>
+                            {/* Em breve: Gestão de permissões e cidades */}
+                        </section>
+                    )}
+
+                    {/* Aba 5: Configurações Admin */}
+                    {abaAtiva === "configAdmin" && (
+                        <section className="gestaoAbaCard" role="tabpanel">
+                            <div className="cardHeaderAba">
+                                <h3>Configurações Administrador</h3>
+                            </div>
+                            <AbaConfig/>
                             {/* Em breve: Gestão de permissões e cidades */}
                         </section>
                     )}

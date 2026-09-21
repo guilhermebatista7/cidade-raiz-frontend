@@ -4,6 +4,7 @@ import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
 import './AbaArvores.css';
 
 import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores } from "../../../../../services/arvoreService";
+import ModalForm from "../../../../components/ModalForm/ModalForm";
 
 export function AbaArvores() {
     // 1. ESTADOS DE DADOS E CONTROLE DO MODAL
@@ -170,7 +171,7 @@ export function AbaArvores() {
 
                 <button
                     type="button"
-                    className="btn btn-light"
+                    className="btnPagination btn-light"
                     onClick={abrirModalAdicionar}
                 >
                     Adicionar
@@ -202,12 +203,12 @@ export function AbaArvores() {
 
                                         {/* Passamos o ID da árvore para o botão de editar */}
                                         <button
-                                            className="btn btn-light m-1"
+                                            className="btnPagination btn-light m-1"
                                             onClick={() => abrirModalEditar(arvore.id)}
                                         >
                                             Editar
                                         </button>
-                                        <button className="btn btn-light" onClick={() => handleExcluir(arvore.id)}>Excluir</button>
+                                        <button className="btnPagination btn-light" onClick={() => handleExcluir(arvore.id)}>Excluir</button>
                                     </div>
                                 </article>
                             );
@@ -217,94 +218,109 @@ export function AbaArvores() {
             </div>
 
             {/* MODAL HÍBRIDO (ADICIONAR / EDITAR) */}
-            {modalAberto && (
-                <div
-                    className="arvoresModalOverlay"
-                    onMouseDown={e => e.target === e.currentTarget && fecharModal()}
+            <ModalForm
+                aberto={modalAberto}
+                fechar={fecharModal}
+                titulo={
+                    arvoreEmEdicaoId !== null
+                        ? "Editar Árvore"
+                        : "Adicionar Nova Árvore"
+                }
+            >
+                <form
+                    onSubmit={handleSubmitForm}
+                    className="formSection"
                 >
-                    <div className="arvoresModal" role="dialog" aria-modal="true" aria-labelledby="tituloModalArvore">
-                        <div className="arvoresModalHeader">
-                            <div>
-                                <h2 id="tituloModalArvore">
-                                    {arvoreEmEdicaoId !== null ? "Editar Árvore" : "Adicionar Nova Árvore"}
-                                </h2>
-                            </div>
-                            <button
-                                type="button"
-                                className="btnFecharModal"
-                                onClick={fecharModal}
-                                aria-label="Fechar modal"
-                            >
-                                <FontAwesomeIcon icon={faXmark} />
-                            </button>
-                        </div>
+                    <div className="inputGroup mb-3">
+                        <label htmlFor="nomeArvore">
+                            Nome da Árvore *
+                        </label>
 
-                        <div className="arvoresModalBody p-3">
-                            <form onSubmit={handleSubmitForm} className="formSection">
-                                <div className="inputGroup mb-3">
-                                    <label htmlFor="nomeArvore">Nome da Árvore *</label>
-                                    <input
-                                        id="nomeArvore"
-                                        type="text"
-                                        placeholder="Ex: Ipê Amarelo"
-                                        value={nome}
-                                        onChange={(e) => setNome(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="inputGroup mb-3">
-                                    <label htmlFor="descricaoArvore">Descrição *</label>
-                                    <textarea
-                                        id="descricaoArvore"
-                                        placeholder="Digite uma breve descrição..."
-                                        className="p-3 rounded-3"
-                                        value={descricao}
-                                        onChange={(e) => setDescricao(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="inputGroup mb-3">
-                                    <label htmlFor="qtdArvore">Quantidade Disponível *</label>
-                                    <input
-                                        id="qtdArvore"
-                                        type="number"
-                                        placeholder="Ex: 10"
-                                        value={quantidade}
-                                        onChange={(e) => setQuantidade(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="inputGroup fotoArvore mb-3">
-                                    <label>Foto da Árvore {arvoreEmEdicaoId !== null && "(Opcional alterar)"}</label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        className="p-3"
-                                        onChange={(e) => e.target.files?.[0] && setImagem(e.target.files[0])}
-                                    />
-                                </div>
-
-                                <div className="d-flex justify-content-end gap-2 mt-4">
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={fecharModal}
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" className="btn btn-success" disabled={carregando}>
-                                        <FontAwesomeIcon icon={faCheck} /> 
-                                        {carregando ? "Salvando..." : (arvoreEmEdicaoId !== null ? "Salvar Alterações" : "Adicionar Árvore")}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        <input
+                            id="nomeArvore"
+                            type="text"
+                            placeholder="Ex: Ipê Amarelo"
+                            value={nome}
+                            onChange={(e) => setNome(e.target.value)}
+                            required
+                        />
                     </div>
-                </div>
-            )}
+
+                    <div className="inputGroup mb-3">
+                        <label htmlFor="descricaoArvore">
+                            Descrição *
+                        </label>
+
+                        <textarea
+                            id="descricaoArvore"
+                            placeholder="Digite uma breve descrição..."
+                            value={descricao}
+                            onChange={(e) => setDescricao(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="inputGroup mb-3">
+                        <label htmlFor="qtdArvore">
+                            Quantidade Disponível *
+                        </label>
+
+                        <input
+                            id="qtdArvore"
+                            type="number"
+                            placeholder="Ex: 10"
+                            value={quantidade}
+                            onChange={(e) => setQuantidade(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="inputGroup mb-3">
+                        <label htmlFor="fotoArvore">
+                            Foto da Árvore{" "}
+                            {arvoreEmEdicaoId !== null &&
+                                "(Opcional alterar)"}
+                        </label>
+
+                        <input
+                            id="fotoArvore"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const arquivo = e.target.files?.[0];
+
+                                if (arquivo) {
+                                    setImagem(arquivo);
+                                }
+                            }}
+                        />
+                    </div>
+
+                    <div className="d-flex justify-content-end gap-2 mt-4">
+                        <button
+                            type="button"
+                            className="btnPagination btn-secondary"
+                            onClick={fecharModal}
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            className="btnPagination btn-success"
+                            disabled={carregando}
+                        >
+                            <FontAwesomeIcon icon={faCheck} />
+
+                            {carregando
+                                ? "Salvando..."
+                                : arvoreEmEdicaoId !== null
+                                    ? "Salvar Alterações"
+                                    : "Adicionar Árvore"}
+                        </button>
+                    </div>
+                </form>
+            </ModalForm>
         </div>
     );
 }

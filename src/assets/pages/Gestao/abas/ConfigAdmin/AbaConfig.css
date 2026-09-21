@@ -1,0 +1,7 @@
+.btnStatusCidade{
+    width: 100px;
+}
+
+.btnStatusCidade:hover{
+    transform: translateY(-1px);
+}

@@ -21,7 +21,7 @@ export function CardSolution({ solutions }: CardSolutionProps) {
         {solutions.map((solution) => (
           <a
             key={`btn-${solution.id}`}
-            className="btn btnIcon"
+            className="btnPagination btnIcon"
             data-bs-toggle="collapse"
             href={`#collapse${solution.id}`}
             role="button"
