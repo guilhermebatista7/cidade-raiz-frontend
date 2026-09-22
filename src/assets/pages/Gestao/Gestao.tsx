@@ -13,6 +13,7 @@ import "./Gestao.css";
 import { AbaSolicitacoes } from "./abas/Solicitacao/AbaSolicitacao";
 import { AbaArvores } from "./abas/Arvores/AbaArvores";
 import { AbaConfig } from "./abas/ConfigAdmin/AbaConfig";
+import { AbaUsuarios } from "./abas/Usuarios/AbaUsuarios";
 
 // Definição das abas disponíveis
 export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
@@ -137,10 +138,7 @@ export function Gestao() {
                             <div className="cardHeaderAba">
                                 <h3>Gestão de Usuários e Permissões</h3>
                             </div>
-                            <p>
-                                Administre os papéis dos usuários (Cidadão, Funcionário, Admin Local, Global)
-                                e vincule funcionários às respectivas cidades.
-                            </p>
+                            <AbaUsuarios/>
                             {/* Em breve: Gestão de permissões e cidades */}
                         </section>
                     )}

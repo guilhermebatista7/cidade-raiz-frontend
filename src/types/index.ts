@@ -22,6 +22,7 @@ export interface Usuario {
   cidade?: Cidade;
   criadoEm: string; // No JSON da API, datas costumam vir como string ISO
   atualizadoEm: string;
+  ativo: boolean;
 }
 
 export interface Arvore {

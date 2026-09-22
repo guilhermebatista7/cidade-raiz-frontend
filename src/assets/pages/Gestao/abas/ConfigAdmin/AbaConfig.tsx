@@ -12,7 +12,7 @@ export function AbaConfig() {
     const [cidades, setCidades] = useState<any[]>([]);
     const [modalAberto, setModalAberto] = useState(false);
 
-    // Armazena o ID da árvore que está sendo editada (null = modo Adicionar)
+    // Armazena o ID da cidade que está sendo editada (null = modo Adicionar)
     const [cidadeEmEdicaoId, setCidadeEmEdicaoId] = useState<string | null>(null);
 
     // Campos do formulário
