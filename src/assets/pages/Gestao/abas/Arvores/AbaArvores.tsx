@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
+import {  faCheck } from "@fortawesome/free-solid-svg-icons";
 import './AbaArvores.css';
 
 import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores } from "../../../../../services/arvoreService";
@@ -22,8 +22,6 @@ export function AbaArvores() {
 
     // 2. ESTADOS DOS FILTROS
     const [busca, setBusca] = useState("");
-    const [carregando, setCarregando] = useState(false);
-
     useEffect(() => {
         carregarDados();
     }, []);
@@ -104,7 +102,6 @@ export function AbaArvores() {
         }
 
         try {
-            setCarregando(true);
             const formData = new FormData();
             formData.append("nome", nome);
             formData.append("descricao", descricao);
@@ -128,8 +125,6 @@ export function AbaArvores() {
             fecharModal();
         } catch (error: any) {
             alert(`Erro ao salvar: ${error.message}`);
-        } finally {
-            setCarregando(false);
         }
     };
 
@@ -308,13 +303,10 @@ export function AbaArvores() {
                         <button
                             type="submit"
                             className="btnPagination btn-success"
-                            disabled={carregando}
                         >
                             <FontAwesomeIcon icon={faCheck} />
 
-                            {carregando
-                                ? "Salvando..."
-                                : arvoreEmEdicaoId !== null
+                            {arvoreEmEdicaoId !== null
                                     ? "Salvar Alterações"
                                     : "Adicionar Árvore"}
                         </button>

@@ -14,6 +14,8 @@ import { Plantar } from './assets/pages/Plantar/Plantar'
 import { Gestao } from './assets/pages/Gestao/Gestao'
 import { AuthProvider } from './contexts/AuthContext'
 import { RotaProtegida } from './assets/components/RotaProtegida/RotaProtegida'
+import { LoadingProvider } from './contexts/LoadingContext'
+import { LoadingOverlay } from './assets/components/LoadingOverlay/LoadingOverlay'
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation()
@@ -48,26 +50,29 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ScrollToHash />
-        <Menu />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/plantar" element={<Plantar />} />
-          <Route
-            path="/gestao"
-            element={
-              <RotaProtegida>
-                <Gestao />
-              </RotaProtegida>
-            }
-          />
-          <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
-        </Routes>
-        <Footer>
-          <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
-        </Footer>
+        <LoadingProvider>
+          <ScrollToHash />
+          <LoadingOverlay />
+          <Menu />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/plantar" element={<Plantar />} />
+            <Route
+              path="/gestao"
+              element={
+                <RotaProtegida>
+                  <Gestao />
+                </RotaProtegida>
+              }
+            />
+            <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
+          </Routes>
+          <Footer>
+            <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
+          </Footer>
+        </LoadingProvider>
       </AuthProvider>
     </BrowserRouter>
   )

@@ -19,9 +19,6 @@ export function AbaConfig() {
     const [nome, setNome] = useState("");
     const [uf, setUf] = useState("");
 
-    const [carregando, setCarregando] = useState(false);
-
-
     useEffect(() => {
         carregarDados();
     }, []);
@@ -99,7 +96,6 @@ export function AbaConfig() {
         }
 
         try {
-            setCarregando(true);
 
             if (cidadeEmEdicaoId !== null) {
                 // MODO EDIÇÃO
@@ -119,8 +115,6 @@ export function AbaConfig() {
             fecharModal();
         } catch (error: any) {
             alert(`Erro ao salvar: ${error.message}`);
-        } finally {
-            setCarregando(false);
         }
 
     };
@@ -131,15 +125,11 @@ export function AbaConfig() {
         }
 
         try {
-            setCarregando(true);
-
             await ativarCidade(id);
             alert("Cidade ativada com sucesso");
             await carregarDados();
         } catch (error) {
             alert(`Erro ao ativar cidade: ${error}`);
-        } finally{
-            setCarregando(false);
         }
     }
 
@@ -150,16 +140,13 @@ export function AbaConfig() {
         }
 
         try {
-            setCarregando(true);
             // Certifique-se de importar e usar a função correta do seu service, ex: desativarCidade(id)
             await desativarCidade(id); 
             alert("Cidade desativada com sucesso!");
             await carregarDados(); // Atualiza a tabela
         } catch (error: any) {
             alert(`Erro ao desativar cidade: ${error.message || error}`);
-        } finally {
-            setCarregando(false);
-        }
+        } 
     };
 
     return (
@@ -300,13 +287,10 @@ export function AbaConfig() {
                             <button
                                 type="submit"
                                 className="btnPagination btn-success"
-                                disabled={carregando}
                             >
                                 <FontAwesomeIcon icon={faCheck} />
 
-                                {carregando
-                                    ? "Salvando..."
-                                    : cidadeEmEdicaoId !== null
+                                {cidadeEmEdicaoId !== null
                                         ? "Salvar Alterações"
                                         : "Adicionar Cidade"}
                             </button>
