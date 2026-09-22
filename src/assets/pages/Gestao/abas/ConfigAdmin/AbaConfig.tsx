@@ -1,11 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import type { Arvore, Cidade, Requisicao, Usuario } from "../../../../../types";
-
 import './AbaConfig.css';
-import { atualizarCidade, cadastrarCidade, listarCidades } from "../../../../../services/cidadeService";
+import { ativarCidade, atualizarCidade, cadastrarCidade, desativarCidade, listarCidades } from "../../../../../services/cidadeService";
 import { estados } from "../../../../dataInfo/estados";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
 
 export function AbaConfig() {
@@ -127,6 +125,43 @@ export function AbaConfig() {
 
     };
 
+    const handleAtivar = async (id: string) => {
+        if(!id){
+            alert('ID inválido');
+        }
+
+        try {
+            setCarregando(true);
+
+            await ativarCidade(id);
+            alert("Cidade ativada com sucesso");
+            await carregarDados();
+        } catch (error) {
+            alert(`Erro ao ativar cidade: ${error}`);
+        } finally{
+            setCarregando(false);
+        }
+    }
+
+    const handleDesativar = async (id: string) => {
+        if (!id) {
+            alert("ID inválido");
+            return;
+        }
+
+        try {
+            setCarregando(true);
+            // Certifique-se de importar e usar a função correta do seu service, ex: desativarCidade(id)
+            await desativarCidade(id); 
+            alert("Cidade desativada com sucesso!");
+            await carregarDados(); // Atualiza a tabela
+        } catch (error: any) {
+            alert(`Erro ao desativar cidade: ${error.message || error}`);
+        } finally {
+            setCarregando(false);
+        }
+    };
+
     return (
         <div className="abaSolicitacaoConteudo">
             {/* BARRA VISUAL DE FILTROS */}
@@ -178,7 +213,7 @@ export function AbaConfig() {
                                             </button>
                                         ) : (
 
-                                            <button type="button" className="btnPagination btnAtivar btnStatusCidade">
+                                            <button type="button" className="btnPagination btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
                                                 Ativar
                                             </button>
                                         )}
