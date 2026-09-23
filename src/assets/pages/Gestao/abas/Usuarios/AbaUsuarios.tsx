@@ -2,10 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { estados } from "../../../../dataInfo/estados";
 import { listarCidadesAtivas } from "../../../../../services/cidadeService";
 import { type Role, type Cidade } from "../../../../../types";
-import { listarRoles } from "../../../../../services/usuarioService";
+import { ativarUsuario, atualizarUsuario, desativarUsuario, listarRoles, listarUsuarios } from "../../../../../services/usuarioService";
 
 export function AbaUsuarios() {
 
@@ -20,7 +19,7 @@ export function AbaUsuarios() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [telefone, setTelefone] = useState("");
-    const [tipo, setTipo] = useState("");
+    const [tipo, setTipo] = useState<Role | undefined>(undefined);
     const [cidadeId, setCidadeId] = useState("");
 
     //dados do select do form
@@ -38,9 +37,10 @@ export function AbaUsuarios() {
 
             const dadosRoles = await listarRoles();
             setRoles(dadosRoles);
-            console.log(dadosRoles);
 
-            // const dadosRoles = await ...
+            const dadosUsuarios = await listarUsuarios();
+            console.log(dadosUsuarios);
+            setUsuarios(dadosUsuarios);
         } catch (error) {
             console.log("Erro ao carregar dados: ", error);
         }
@@ -64,7 +64,7 @@ export function AbaUsuarios() {
         setUsuarioEmEdicaoId(null);
         setNome("");
         setEmail("");
-        setTipo("");
+        setTipo(undefined);
         setTelefone("");
         setCidadeId("");
         setModalAberto(true);
@@ -78,9 +78,9 @@ export function AbaUsuarios() {
         setUsuarioEmEdicaoId(id);
         setNome(usuarioAlvo.nome || "");
         setEmail(usuarioAlvo.email || "");
-        setTipo(usuarioAlvo.tipo || "");
+        setTipo(usuarioAlvo.tipo || usuarioAlvo.role || undefined);
         setTelefone(usuarioAlvo.telefone || "");
-        setCidadeId(usuarioAlvo.cidadeId || "");
+        setCidadeId(usuarioAlvo.cidadeId || usuarioAlvo.cidade?.id || "");
         setModalAberto(true);
     };
 
@@ -99,7 +99,9 @@ export function AbaUsuarios() {
             const termo = busca.toLowerCase();
             const bateTexto =
                 item.nome.toLowerCase().includes(termo) ||
-                item.uf.toLowerCase().includes(termo);
+                item.email.toLowerCase().includes(termo) ||
+                item.cidade?.nome.toLowerCase().includes(termo)||
+                item.telefone.toLowerCase().includes(termo);
 
             return bateTexto
         });
@@ -118,13 +120,11 @@ export function AbaUsuarios() {
 
             if (usuarioEmEdicaoId !== null) {
                 // MODO EDIÇÃO
-                //await atualizarCidade(cidadeEmEdicaoId, nome, uf);
-                alert("Cidade atualizada com sucesso!");
+                await atualizarUsuario(usuarioEmEdicaoId, nome, email, tipo, telefone, cidadeId);
+                alert("Usuário atualizado com sucesso!");
             } else {
-                // MODO CRIAÇÃO
+                // MODO CRIAÇÃO - Futura implementação, em razão da limitação de email do supabase 
                 //await cadastrarCidade(nome,uf);
-
-                alert("Cidade cadastrada com sucesso!");
             }
 
             await carregarDados(); // Atualiza a listagem do banco
@@ -141,11 +141,11 @@ export function AbaUsuarios() {
         }
 
         try {
-           // await ativarCidade(id);
-            alert("Cidade ativada com sucesso");
+            await ativarUsuario(id);
+            alert("Usuário ativada com sucesso");
             await carregarDados();
         } catch (error) {
-            alert(`Erro ao ativar cidade: ${error}`);
+            alert(`Erro ao ativar usuário: ${error}`);
         }
     }
 
@@ -156,15 +156,13 @@ export function AbaUsuarios() {
         }
 
         try {
-            // Certifique-se de importar e usar a função correta do seu service, ex: desativarCidade(id)
-            //await desativarCidade(id);
-            alert("Cidade desativada com sucesso!");
+            await desativarUsuario(id);
+            alert("Uusário desativado com sucesso!");
             await carregarDados(); // Atualiza a tabela
         } catch (error: any) {
-            alert(`Erro ao desativar cidade: ${error.message || error}`);
+            alert(`Erro ao desativar usuário: ${error.message || error}`);
         }
     };
-
 
     return (
         <div className="abaSolicitacaoConteudo">
@@ -187,7 +185,7 @@ export function AbaUsuarios() {
                 <table className="table tableSolicitacao">
                     <thead>
                         <tr>
-                            <th scope="col">Nome Cidade</th>
+                            <th scope="col">Nome Usuário</th>
                             <th scope="col">Email</th>
                             <th scope="col">Telefone</th>
                             <th scope="col">Tipo</th>
@@ -208,8 +206,8 @@ export function AbaUsuarios() {
                                     <td><strong>{item.nome}</strong></td>
                                     <td>{item.email}</td>
                                     <td>{item.telefone}</td>
-                                    <td>{item.tipo}</td>
-                                    <td>{item.cidade}</td>
+                                    <td>{item.role}</td>
+                                    <td>{item.cidade?.nome}</td>
                                     <td className="text-center">
                                         {item.ativo ? (
                                             <button type="button" className="btn btn-light btnStatusCidade" style={{ backgroundColor: "#", }} onClick={() => handleDesativar(item.id)}>
@@ -274,7 +272,7 @@ export function AbaUsuarios() {
                                 id="email"
                                 type="text"
                                 placeholder="Ex: joao@gmail.com"
-                                value={nome}
+                                value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
@@ -289,9 +287,8 @@ export function AbaUsuarios() {
                                 id="telefone"
                                 type="text"
                                 placeholder="Ex: (11) 1111111-1111"
-                                value={nome}
+                                value={telefone}
                                 onChange={(e) => setTelefone(e.target.value)}
-                                required
                             />
                         </div>
 
@@ -304,7 +301,11 @@ export function AbaUsuarios() {
                                 name="tipo"
                                 id="tipo"
                                 value={tipo}
-                                onChange={(e) => setTipo(e.target.value)}
+                                onChange={(e) => {
+                                    const valor = e.target.value;
+
+                                    setTipo(valor === '' ? undefined : valor as Role)
+                                }}
                                 required
                             >
                                 <option value="">
@@ -332,7 +333,6 @@ export function AbaUsuarios() {
                                 id="cidade"
                                 value={cidadeId}
                                 onChange={(e) => setCidadeId(e.target.value)}
-                                required
                             >
                                 <option value="">
                                     Selecione

@@ -27,9 +27,8 @@ export function AbaConfig() {
         try {
             const dados = await listarCidades();
             setCidades(dados);
-            console.log('Nada')
         } catch (error) {
-            console.log("Erro ao carregar árvores: ", error);
+            console.log("Erro ao carregar árvores");
         }
     }
 
@@ -85,6 +84,8 @@ export function AbaConfig() {
             return bateTexto
         });
     }, [cidades, busca]);
+
+    console.log(cidades);
 
     // Manipulador unificado de salvamento (Adição ou Edição)
     const handleSubmitForm = async (e: React.FormEvent) => {
@@ -190,9 +191,9 @@ export function AbaConfig() {
                                 <tr key={item.id}>
                                     <td><strong>{item.nome}</strong></td>
                                     <td>{item.uf}</td>
-                                    <td>{item.arvores ? item.arvores?.length : 0}</td>
-                                    <td>{item.requisicoes? item.requisicoes?.length : 0}</td>
-                                    <td>{item.usuarios? item.usuarios?.length : 0}</td>
+                                    <td>{item._count?.arvores ?? 0}</td>
+                                    <td>{item._count?.requisicoes ?? 0}</td>
+                                    <td>{item._count?.usuarios ?? 0}</td>
                                     <td className="text-center">
                                         {item.ativa ? (
                                             <button type="button" className="btn btn-light btnStatusCidade" style={{ backgroundColor: "#", }} onClick={() => handleDesativar(item.id)}>
