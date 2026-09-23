@@ -3,6 +3,9 @@ import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { estados } from "../../../../dataInfo/estados";
+import { listarCidadesAtivas } from "../../../../../services/cidadeService";
+import { type Role, type Cidade } from "../../../../../types";
+import { listarRoles } from "../../../../../services/usuarioService";
 
 export function AbaUsuarios() {
 
@@ -20,6 +23,9 @@ export function AbaUsuarios() {
     const [tipo, setTipo] = useState("");
     const [cidadeId, setCidadeId] = useState("");
 
+    //dados do select do form
+    const [cidades, setCidades] = useState<Cidade[]>([]);
+    const [roles, setRoles] = useState<Role[]>([]);
 
     useEffect(() => {
         carregarDados();
@@ -27,11 +33,16 @@ export function AbaUsuarios() {
 
     const carregarDados = async () => {
         try {
-            //const dados = await listarCidades();
-            //setCidades(dados);
-            console.log('Nada')
+            const dadosCidades = await listarCidadesAtivas();
+            setCidades(dadosCidades);
+
+            const dadosRoles = await listarRoles();
+            setRoles(dadosRoles);
+            console.log(dadosRoles);
+
+            // const dadosRoles = await ...
         } catch (error) {
-            console.log("Erro ao carregar árvores: ", error);
+            console.log("Erro ao carregar dados: ", error);
         }
     }
 
@@ -300,12 +311,12 @@ export function AbaUsuarios() {
                                     Selecione
                                 </option>
 
-                                {estados.map((estado) => (
+                                {roles.map((role) => (
                                     <option
-                                        key={estado.sigla}
-                                        value={estado.sigla}
+                                        key={role}
+                                        value={role}
                                     >
-                                        {estado.nome}
+                                        {role}
                                     </option>
                                 ))}
                             </select>
@@ -320,19 +331,19 @@ export function AbaUsuarios() {
                                 name="cidade"
                                 id="cidade"
                                 value={cidadeId}
-                                onChange={(e) => setTipo(e.target.value)}
+                                onChange={(e) => setCidadeId(e.target.value)}
                                 required
                             >
                                 <option value="">
                                     Selecione
                                 </option>
 
-                                {estados.map((estado) => (
+                                {cidades.map((cidade) => (
                                     <option
-                                        key={estado.sigla}
-                                        value={estado.sigla}
+                                        key={cidade.id}
+                                        value={cidade.id}
                                     >
-                                        {estado.nome}
+                                        {cidade.nome}
                                     </option>
                                 ))}
                             </select>

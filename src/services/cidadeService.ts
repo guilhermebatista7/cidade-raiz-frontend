@@ -6,6 +6,12 @@ export async function listarCidades(){
     })
 }
 
+export async function listarCidadesAtivas(){
+    return await apiFetch('/cidades/ativas', {
+        method: "GET",
+    })
+}
+
 export async function cadastrarCidade(nome: string, uf: string){
     return await apiFetch('/cidades', {
         method: 'POST',
