@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import './Login.css';
 import loginTree from '../../media/login_tree.webm'
 import { cadastrar } from '../../../services/authService';
-import Alert from '../../components/Alert/Alert';
+import Alert, { type AlertType } from '../../components/Alert/Alert';
 import { podeAcessarGestao } from '../../../utils/permissoes';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useAlert } from '../../components/hooks/useAlert';
 
 export function Login() {
   const [rightPanelActive, setRightPanelActive] = useState(false);
@@ -17,45 +18,24 @@ export function Login() {
   const navigate = useNavigate();
   const { login: loginContext } = useAuth();
 
-  const [alert, setAlert] = useState<{
-    message: string;
-    type: 'success' | 'danger' | 'warning' | 'info';
-  } | null>(null);
+  const { alert, showAlert, closeAlert } = useAlert();
 
-
-  const showAlert = (
-    message: string,
-    type: 'success' | 'danger' | 'warning' | 'info' = 'danger'
-  ) => {
-    setAlert({
-      message,
-      type,
-    });
-  };
-
-  const closeAlert = () => {
-    setAlert(null);
-  };
-
-  const handleGoToLogin = () => {
-    closeAlert();
-
+  const limparCampos = () => {
     setNome('');
     setEmail('');
     setSenha('');
     setSenhaRepet('');
+  };
 
+  const handleGoToLogin = () => {
+    closeAlert();
+    limparCampos();
     setRightPanelActive(false);
   };
 
   const handleGoToRegister = () => {
     closeAlert();
-
-    setNome('');
-    setEmail('');
-    setSenha('');
-    setSenhaRepet('');
-
+    limparCampos()
     setRightPanelActive(true);
   };
 
@@ -73,7 +53,7 @@ export function Login() {
 
     if (senha !== senhaRepet) {
       showAlert(
-        'Senhas diferentes',
+        'As senhas não coincidem.',
         'danger'
       )
       return;
@@ -87,7 +67,7 @@ export function Login() {
       setSenha('');
       setRightPanelActive(false);
       showAlert(
-        'Conta cadastrada com sucesso',
+        'Conta cadastrada com sucesso - Faça verificação em seu email',
         'success'
       );
 
@@ -106,14 +86,20 @@ export function Login() {
     event.preventDefault();
     try {
       const usuarioLogado = await loginContext(email, senha);
+
       setEmail('');
       setSenha('');
-      showAlert('Login efetuado com sucesso!', 'success');
+
+      showAlert(
+        'Login efetuado com sucesso!', 
+        'success'
+      );
+
       // Redireciona conforme permissão
       if (podeAcessarGestao(usuarioLogado)) {
         navigate('/gestao');
       } else {
-        navigate('/');
+        navigate('/plantar');
       }
     } catch (error: any) {
       showAlert(error?.message || 'E-mail ou senha incorretos.', 'danger');

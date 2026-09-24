@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import './Alert.css'
 
-type AlertType = "success" | "danger" | "warning" | "info";
+export type AlertType = "success" | "danger" | "warning" | "info";
 
 interface AlertProps {
   message: string;

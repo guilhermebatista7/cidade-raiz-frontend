@@ -9,6 +9,11 @@ import { estados } from "../../dataInfo/estados";
 import "./Plantar.css";
 import { listarArvoresCidade } from "../../../services/arvoreService";
 import { listarCidadesAtivas } from "../../../services/cidadeService";
+import { cadastrarRequisicao } from "../../../services/requisicaoService";
+import { obterUsuarioLogado } from "../../../services/authService";
+import type { Usuario } from "../../../types";
+import { useAlert } from "../../components/hooks/useAlert";
+import Alert from "../../components/Alert/Alert";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
@@ -19,6 +24,11 @@ export const Plantar = () => {
     const [cidadeSelecionada, setCidadeSelecionada] = useState<string>("");
     const [arvores, setArvores] = useState<any[]>([]);
     const [arvoreSelecionada, setArvoreSelecionada] = useState<string | null>(null);
+
+    const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
+    const { alert, showAlert, closeAlert } = useAlert();
+
+
 
     useEffect(() => {
         carregarDados();
@@ -38,6 +48,9 @@ export const Plantar = () => {
 
     const carregarDados = async () => {
         try {
+            const dadosLogado = await obterUsuarioLogado();
+            setUsuarioLogado(dadosLogado.usuario);
+
             const cidadeAtivas = await listarCidadesAtivas();
             setCidades(cidadeAtivas);
 
@@ -47,7 +60,10 @@ export const Plantar = () => {
                 await carregarArvores(primeiraCidade.id);
             }
         } catch (error) {
-            console.error("Erro ao carregar dados:", error);
+            showAlert(
+                `${error}`,
+                "danger"
+            );
         }
     }
 
@@ -102,31 +118,70 @@ export const Plantar = () => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (fotoLocal === null) {
-            alert("Por favor, adicione a foto do local para plantio.");
+        if (!cidadeSelecionada) {
+            showAlert(
+                `Por favor, selecione uma cidade.`,
+                "warning"
+            );
             return;
         }
 
-        if (arvoreSelecionada === null) {
-            alert("Por favor, escolha uma árvore antes de enviar a solicitação.");
+        if (!fotoLocal) {
+            showAlert(
+                "Por favor, adicione a foto do local para plantio.",
+                "warning"
+            );
+            return;
+        }
+
+        if (!arvoreSelecionada) {
+            showAlert(
+                "Por favor, escolha uma árvore antes de enviar a solicitação.",
+                "warning"
+            );
             setModalArvoresAberto(true);
             return;
         }
 
         if (!comprovante) {
-            alert("Por favor, adicione um comprovante de residência.");
+            showAlert(
+                "Por favor, adicione um comprovante de residência.",
+                "warning"
+            );
             return;
         }
 
         const formData = new FormData(e.currentTarget);
-        for (const [key, value] of formData.entries()) console.log(key, value);
+        enviarDados(formData);
     };
+
+    const enviarDados = async (formData: FormData) => {
+        try {
+            await cadastrarRequisicao(formData);
+            showAlert(
+                "Solicitação cadastrada com sucesso!",
+                "success"
+            );
+        } catch (error) {
+            showAlert(
+                `Erro ao cadastrar solicitação: ${error}`,
+                "danger"
+            );
+        }
+    }
 
     return (
         <SectionContent className="sectionPlantar">
             <div className="container-fluid">
                 <form className="plantarLayout" onSubmit={handleSubmit}>
                     <div className="solicitacaoCard">
+                        {alert && (
+                            <Alert
+                                message={alert.message}
+                                type={alert.type}
+                                onClose={closeAlert}
+                            />
+                        )}
                         <div className="solicitacaoHeader">
                             <div>
                                 <h2>Nova Solicitação de Plantio</h2>
@@ -227,6 +282,30 @@ export const Plantar = () => {
                                 name="arvoreId"
                                 value={arvoreSelecionada ?? ""}
                             />
+
+                            <div className="col-md-12 mt-2">
+                                <div className="inputGroup">
+                                    <label htmlFor="cidade">Árvore selecionada com base na cidade *</label>
+
+                                    <select
+                                        id="cidade"
+                                        name="cidade"
+                                        value={cidadeSelecionada}
+                                        onChange={handleCidadeChange}
+                                        required
+                                    >
+                                        <option value="" disabled>
+                                            Selecione a cidade
+                                        </option>
+
+                                        {cidades.map(cidade => (
+                                            <option key={cidade.id} value={cidade.id}>
+                                                {cidade.nome}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="formSection">
@@ -309,9 +388,6 @@ export const Plantar = () => {
                                             onChange={handleCidadeChange}
                                             required
                                         >
-                                            <option value="" disabled>
-                                                Selecione a cidade
-                                            </option>
 
                                             {cidades.map(cidade => (
                                                 <option key={cidade.id} value={cidade.id}>
