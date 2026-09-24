@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faClipboardList,
@@ -14,6 +14,8 @@ import { AbaSolicitacoes } from "./abas/Solicitacao/AbaSolicitacao";
 import { AbaArvores } from "./abas/Arvores/AbaArvores";
 import { AbaConfig } from "./abas/ConfigAdmin/AbaConfig";
 import { AbaUsuarios } from "./abas/Usuarios/AbaUsuarios";
+import { obterUsuarioLogado } from "../../../services/authService";
+import { type Usuario, type Role } from "../../../types";
 
 // Definição das abas disponíveis
 export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
@@ -55,6 +57,27 @@ const TABS: TabItem[] = [
 export function Gestao() {
     // Estado para armazenar qual aba está ativa no momento
     const [abaAtiva, setAbaAtiva] = useState<AbaGestao>("solicitacoes");
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
+
+    useEffect(() => {
+        carregarDados();
+    }, []);
+
+    const carregarDados = async () => {
+        try {
+            const dadosUsuario = await obterUsuarioLogado();
+            setUsuario(dadosUsuario.usuario);
+
+        } catch (error) {
+            console.log("Erro ao carregar dados: ", error);
+        }
+    }
+
+    useEffect(() => {
+        if (usuario?.role !== "GLOBAL" && abaAtiva === "configAdmin") {
+            setAbaAtiva("solicitacoes");
+        }
+    }, [usuario, abaAtiva]);
 
     return (
         <SectionContent className="sectionGestao">
@@ -72,11 +95,23 @@ export function Gestao() {
                         </div>
                     </div>
 
-                    {/* MENU DE 3 ABAS NO TOPO */}
+                    {/* MENU DE 5 ABAS NO TOPO */}
                     <nav className="gestaoAbasNav" aria-label="Abas de Gestão">
-                        {TABS.map((tab) => {
+                        {TABS.filter((tab) => {
+                            if(tab.id === 'configAdmin'){
+                                return usuario?.role === 'GLOBAL';
+                            }
+
+                            if(tab.id === 'usuarios'){
+                                return usuario?.role === 'GLOBAL' || usuario?.role === 'ADMIN_LOCAL';
+                            }
+
+                            return true;
+                        })
+                        .map((tab) => {
                             const isActive = abaAtiva === tab.id;
                             return (
+                                
                                 <button
                                     key={tab.id}
                                     type="button"
@@ -101,7 +136,7 @@ export function Gestao() {
                             <div className="cardHeaderAba">
                                 <h3>Gerenciar Solicitações de Plantio</h3>
                             </div>
-                            <AbaSolicitacoes/>
+                            <AbaSolicitacoes />
 
                             {/* Em breve: Tabela ou lista de solicitações */}
                         </section>
@@ -111,9 +146,9 @@ export function Gestao() {
                     {abaAtiva === "arvores" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
-                                <h3>Catálogo de Árvores e Mudas</h3>                                
+                                <h3>Catálogo de Árvores e Mudas</h3>
                             </div>
-                            <AbaArvores/>
+                            <AbaArvores />
                             {/* Em breve: Listagem e cadastro de árvores */}
                         </section>
                     )}
@@ -133,26 +168,27 @@ export function Gestao() {
                     )}
 
                     {/* Aba 4: Usuários e Cidades */}
-                    {abaAtiva === "usuarios" && (
+                    {(usuario?.role === 'GLOBAL' || usuario?.role === 'ADMIN_LOCAL') && abaAtiva === "usuarios" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
                                 <h3>Gestão de Usuários e Permissões</h3>
                             </div>
-                            <AbaUsuarios/>
+                            <AbaUsuarios />
                             {/* Em breve: Gestão de permissões e cidades */}
                         </section>
                     )}
 
                     {/* Aba 5: Configurações Admin */}
-                    {abaAtiva === "configAdmin" && (
+                    {usuario?.role === 'GLOBAL' && abaAtiva === "configAdmin" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
                                 <h3>Configurações Administrador</h3>
                             </div>
-                            <AbaConfig/>
+                            <AbaConfig />
                             {/* Em breve: Gestão de permissões e cidades */}
                         </section>
                     )}
+
                 </main>
 
             </div>
