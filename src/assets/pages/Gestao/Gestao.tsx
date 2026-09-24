@@ -15,7 +15,7 @@ import { AbaArvores } from "./abas/Arvores/AbaArvores";
 import { AbaConfig } from "./abas/ConfigAdmin/AbaConfig";
 import { AbaUsuarios } from "./abas/Usuarios/AbaUsuarios";
 import { obterUsuarioLogado } from "../../../services/authService";
-import { type Usuario, type Role } from "../../../types";
+import { type Usuario } from "../../../types";
 
 // Definição das abas disponíveis
 export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";

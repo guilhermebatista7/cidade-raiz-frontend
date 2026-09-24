@@ -14,6 +14,12 @@ export async function listarArvores(){
     });
 }
 
+export async function listarArvoresCidade(id: string){
+    return await apiFetch(`/arvores/cidade/${id}`, {
+        method: "GET",
+    });
+}
+
 export async function atualizarArvore(id: string, formData: FormData) {
   return await apiFetch(`/arvores/${id}`, {
     method: "PUT", 

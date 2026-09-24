@@ -7,28 +7,22 @@ import {
 import { SectionContent } from "../../components/SectionContent/SectionContent";
 import { estados } from "../../dataInfo/estados";
 import "./Plantar.css";
-import { listarArvores } from "../../../services/arvoreService";
+import { listarArvoresCidade } from "../../../services/arvoreService";
+import { listarCidadesAtivas } from "../../../services/cidadeService";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
     const [comprovante, setComprovante] = useState<File | null>(null);
     const [modalArvoresAberto, setModalArvoresAberto] = useState(false);
+
+    const [cidades, setCidades] = useState<any[]>([]);
+    const [cidadeSelecionada, setCidadeSelecionada] = useState<string>("");
     const [arvores, setArvores] = useState<any[]>([]);
     const [arvoreSelecionada, setArvoreSelecionada] = useState<string | null>(null);
 
     useEffect(() => {
         carregarDados();
     }, []);
-
-    const carregarDados = async () => {
-        try {
-            const dados = await listarArvores();
-            setArvores(dados);
-            console.log(dados);
-        } catch (error) {
-            console.log("Erro ao carregar árvores: ", error);
-        }
-    }
 
     useEffect(() => {
         document.body.classList.toggle("modalAberto", modalArvoresAberto);
@@ -41,6 +35,48 @@ export const Plantar = () => {
         document.addEventListener("keydown", fechar);
         return () => document.removeEventListener("keydown", fechar);
     }, [modalArvoresAberto]);
+
+    const carregarDados = async () => {
+        try {
+            const cidadeAtivas = await listarCidadesAtivas();
+            setCidades(cidadeAtivas);
+
+            if (cidadeAtivas.length > 0) {
+                const primeiraCidade = cidadeAtivas[0];
+                setCidadeSelecionada(primeiraCidade.id);
+                await carregarArvores(primeiraCidade.id);
+            }
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error);
+        }
+    }
+
+    const carregarArvores = async (cidadeId: string) => {
+        try {
+            const dados = await listarArvoresCidade(cidadeId);
+            setArvores(dados);
+            console.log(dados);
+        } catch (error) {
+            console.log("Erro ao carregar árvores: ", error);
+        }
+    }
+
+    const handleCidadeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const cidadeId = e.target.value;
+
+        setCidadeSelecionada(cidadeId);
+
+        // A árvore selecionada anteriormente não pertence
+        // necessariamente à nova cidade.
+        setArvoreSelecionada(null);
+        setArvores([]);
+
+        if (!cidadeId) {
+            return;
+        }
+
+        await carregarArvores(cidadeId);
+    };
 
     const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -252,7 +288,6 @@ export const Plantar = () => {
                                     ["rua", "Rua / Avenida *", "Digite o nome da rua", "col-md-6"],
                                     ["numero", "Número *", "Nº", "col-md-2"],
                                     ["bairro", "Bairro *", "Digite o bairro", "col-md-4"],
-                                    ["cidade", "Cidade *", "Digite a cidade", "col-md-5"],
                                     ["cep", "CEP *", "00000-000", "col-md-3"]
                                 ].map(([id, label, placeholder, col]) => (
                                     <div className={col} key={id}>
@@ -262,6 +297,30 @@ export const Plantar = () => {
                                         </div>
                                     </div>
                                 ))}
+
+                                <div className="col-md-5">
+                                    <div className="inputGroup">
+                                        <label htmlFor="cidade">Cidade *</label>
+
+                                        <select
+                                            id="cidade"
+                                            name="cidade"
+                                            value={cidadeSelecionada}
+                                            onChange={handleCidadeChange}
+                                            required
+                                        >
+                                            <option value="" disabled>
+                                                Selecione a cidade
+                                            </option>
+
+                                            {cidades.map(cidade => (
+                                                <option key={cidade.id} value={cidade.id}>
+                                                    {cidade.nome}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div className="col-md-4">
                                     <div className="inputGroup">
