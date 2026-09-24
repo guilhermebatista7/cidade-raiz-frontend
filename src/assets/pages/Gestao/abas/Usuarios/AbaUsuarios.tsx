@@ -39,7 +39,6 @@ export function AbaUsuarios() {
             setRoles(dadosRoles);
 
             const dadosUsuarios = await listarUsuarios();
-            console.log(dadosUsuarios);
             setUsuarios(dadosUsuarios);
         } catch (error) {
             console.log("Erro ao carregar dados: ", error);

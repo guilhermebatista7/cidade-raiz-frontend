@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import './AbaArvores.css';
 
 import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores } from "../../../../../services/arvoreService";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
+import { listarCidadesUsuario } from "../../../../../services/cidadeService";
+import type { Cidade } from "../../../../../types";
 
 export function AbaArvores() {
     // 1. ESTADOS DE DADOS E CONTROLE DO MODAL
@@ -19,6 +21,10 @@ export function AbaArvores() {
     const [descricao, setDescricao] = useState("");
     const [quantidade, setQuantidade] = useState("");
     const [imagem, setImagem] = useState<File | null>(null);
+    const [cidadeId, setCidadeId] = useState("");
+    
+    //dados do select do form
+    const [cidades, setCidades] = useState<Cidade[]>([]);
 
     // 2. ESTADOS DOS FILTROS
     const [busca, setBusca] = useState("");
@@ -30,6 +36,9 @@ export function AbaArvores() {
         try {
             const dados = await listarArvores();
             setArvores(dados);
+
+            const dadosCidades = await listarCidadesUsuario();
+            setCidades([dadosCidades]);
         } catch (error) {
             console.log("Erro ao carregar árvores: ", error);
         }
@@ -54,6 +63,7 @@ export function AbaArvores() {
         setNome("");
         setDescricao("");
         setQuantidade("");
+        setCidadeId("");
         setImagem(null);
         setModalAberto(true);
     };
@@ -67,6 +77,7 @@ export function AbaArvores() {
         setNome(arvoreAlvo.nomePopular || "");
         setDescricao(arvoreAlvo.descricao);
         setQuantidade(arvoreAlvo.quantidade.toString());
+        setCidadeId(arvoreAlvo.cidadeId);
         setImagem(null); // Caso queira permitir alterar a imagem depois
         setModalAberto(true);
     };
@@ -106,6 +117,7 @@ export function AbaArvores() {
             formData.append("nome", nome);
             formData.append("descricao", descricao);
             formData.append("quantidade", quantidade);
+            formData.append("cidadeId", cidadeId);
 
             if (imagem) {
                 formData.append("imagem", imagem); // Nova imagem opcional
@@ -271,6 +283,32 @@ export function AbaArvores() {
                     </div>
 
                     <div className="inputGroup mb-3">
+                        <label htmlFor="cidade">
+                            Cidade*
+                        </label>
+
+                        <select
+                            name="cidade"
+                            id="cidade"
+                            value={cidadeId}
+                            onChange={(e) => setCidadeId(e.target.value)}
+                        >
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            {cidades.map((cidade) => (
+                                <option
+                                    key={cidade.id}
+                                    value={cidade.id}
+                                >
+                                    {cidade.nome}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="inputGroup mb-3">
                         <label htmlFor="fotoArvore">
                             Foto da Árvore{" "}
                             {arvoreEmEdicaoId !== null &&
@@ -307,8 +345,8 @@ export function AbaArvores() {
                             <FontAwesomeIcon icon={faCheck} />
 
                             {arvoreEmEdicaoId !== null
-                                    ? "Salvar Alterações"
-                                    : "Adicionar Árvore"}
+                                ? "Salvar Alterações"
+                                : "Adicionar Árvore"}
                         </button>
                     </div>
                 </form>
