@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { listarCidadesAtivas } from "../../../../../services/cidadeService";
-import { type Role, type Cidade } from "../../../../../types";
+import { faCheck, faUserAlt } from "@fortawesome/free-solid-svg-icons";
+import { listarCidadesUsuario } from "../../../../../services/cidadeService";
+import { type Role, type Cidade, type Usuario } from "../../../../../types";
 import { ativarUsuario, atualizarUsuario, desativarUsuario, listarRoles, listarUsuarios } from "../../../../../services/usuarioService";
+import { obterUsuarioLogado } from "../../../../../services/authService";
 
 export function AbaUsuarios() {
 
@@ -26,20 +27,25 @@ export function AbaUsuarios() {
     const [cidades, setCidades] = useState<Cidade[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
 
+    const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
+
     useEffect(() => {
         carregarDados();
     }, []);
 
     const carregarDados = async () => {
         try {
-            const dadosCidades = await listarCidadesAtivas();
-            setCidades(dadosCidades);
+            const dadosCidades = await listarCidadesUsuario();
+            setCidades([dadosCidades]);
 
             const dadosRoles = await listarRoles();
             setRoles(dadosRoles);
 
             const dadosUsuarios = await listarUsuarios();
             setUsuarios(dadosUsuarios);
+
+            const dadosLogado = await obterUsuarioLogado();
+            setUsuarioLogado(dadosLogado.usuario);
         } catch (error) {
             console.log("Erro ao carregar dados: ", error);
         }
@@ -66,6 +72,10 @@ export function AbaUsuarios() {
         setTipo(undefined);
         setTelefone("");
         setCidadeId("");
+        
+        if(usuarioLogado?.role === 'ADMIN_LOCAL'){
+            setCidadeId(usuarioLogado.cidadeId || '');
+        }
         setModalAberto(true);
     };
 
@@ -202,7 +212,7 @@ export function AbaUsuarios() {
                         ) : (
                             usuariosFiltrados.map((item) => (
                                 <tr key={item.id}>
-                                    <td><strong>{item.nome}</strong></td>
+                                    <td>{usuarioLogado?.id === item.id ? <FontAwesomeIcon icon={faUserAlt}/> : ""}<strong>{item.nome}</strong></td>
                                     <td>{item.email}</td>
                                     <td>{item.telefone}</td>
                                     <td>{item.role}</td>
@@ -332,6 +342,9 @@ export function AbaUsuarios() {
                                 id="cidade"
                                 value={cidadeId}
                                 onChange={(e) => setCidadeId(e.target.value)}
+                                disabled={usuarioLogado?.role === "ADMIN_LOCAL"}
+                                className={usuarioLogado?.role === "ADMIN_LOCAL" ? "bg-light" : ""}
+
                             >
                                 <option value="">
                                     Selecione
