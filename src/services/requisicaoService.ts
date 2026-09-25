@@ -6,3 +6,15 @@ export async function cadastrarRequisicao(formData: FormData) {
     body: formData,
   })
 }
+
+export async function listarRequisicoes(){
+  return await apiFetch("/requisicao", {
+    method: "GET"
+  })
+}
+
+export async function listarRequisicoesCidade(id: string){
+  return await apiFetch(`/requisicao/cidade/${id}`, {
+    method: "GET"
+  })
+}

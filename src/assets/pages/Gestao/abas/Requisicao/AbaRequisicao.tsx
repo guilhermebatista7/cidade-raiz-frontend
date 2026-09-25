@@ -1,8 +1,12 @@
-import { useState, useMemo } from "react";
-import './AbaSolicitacao.css';
+import { useState, useMemo, useEffect } from "react";
+import './AbaRequisicao.css';
+import { obterUsuarioLogado } from "../../../../../services/authService";
+import type { Cidade, Usuario } from "../../../../../types";
+import { listarRequisicoes, listarRequisicoesCidade } from "../../../../../services/requisicaoService";
+import { listarCidades } from "../../../../../services/cidadeService";
 
 // 1. Tipagem dos dados da aba
-interface Solicitacao {
+interface Requisicao {
     id: string;
     cidadaoNome: string;
     arvoreNome: string;
@@ -11,26 +15,23 @@ interface Solicitacao {
     status: "SOLICITADO" | "APROVADO" | "RECUSADO" | "CONCLUIDO" | "AGUARDANDO_RETIRADA" | "AGENDADO_PLANTIO";
 }
 
-export function AbaSolicitacoes() {
+export function AbaRequisicoes() {
     // Dados vindos da API (ou lista inicial)
-    const [solicitacoes] = useState<Solicitacao[]>([
-        { id: "001", cidadaoNome: "Maria Silva", arvoreNome: "Ipê Amarelo", tipo:"Agendar Plantio" , bairro: "Centro", status: "SOLICITADO" },
-        { id: "002", cidadaoNome: "João Souza", arvoreNome: "Jacarandá", tipo:"Retirar no Local", bairro: "Jardins", status: "APROVADO" },
-        { id: "003", cidadaoNome: "João ", arvoreNome: "Jacarandá", tipo:"Agendar Plantio", bairro: "Jardins", status: "RECUSADO" },
-        { id: "004", cidadaoNome: " Souza", arvoreNome: "Jacarandá", tipo:"Retirar no Local", bairro: "Jardins", status: "CONCLUIDO" },
-        { id: "005", cidadaoNome: " Souza", arvoreNome: "Jacarandá", tipo:"Retirar no Local", bairro: "Jardins", status: "AGUARDANDO_RETIRADA" },
-        { id: "006", cidadaoNome: " Souza", arvoreNome: "Jacarandá", tipo:"Retirar no Local", bairro: "Jardins", status: "AGENDADO_PLANTIO" },
 
-        // ...
-    ]);
 
     // 2. ESTADOS DOS FILTROS
     const [busca, setBusca] = useState("");
     const [statusFiltro, setStatusFiltro] = useState("TODOS");
+    const [cidadeFiltro, setCidadeFiltro] = useState("");
+
+
+    const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
+    const [requisicoes, setRequisicoes] = useState<Requisicao[]>([]);
+    const [cidades, setCidades] = useState<Cidade[]>([]);
 
     // 3. LÓGICA DE FILTRAGEM REATIVA COM useMemo
-    const solicitacoesFiltradas = useMemo(() => {
-        return solicitacoes.filter((item) => {
+    const requisicoesFiltradas = useMemo(() => {
+        return requisicoes.filter((item) => {
             // Regra 1: Filtro de texto (busca por nome do cidadão, árvore ou bairro)
             const termo = busca.toLowerCase();
             const bateTexto =
@@ -44,10 +45,56 @@ export function AbaSolicitacoes() {
             // O item só passa se atender a todos os filtros ativos
             return bateTexto && bateStatus;
         });
-    }, [solicitacoes, busca, statusFiltro]);
+    }, [requisicoes, busca, statusFiltro]);
+
+    useEffect(() => {
+        carregarDados();
+    }, []);
+
+    const carregarDados = async () => {
+        try {
+            const dadosLogado = await obterUsuarioLogado();
+            setUsuarioLogado(dadosLogado.usuario);
+
+            if (dadosLogado.usuario.role !== 'GLOBAL') {
+                const dadosReq = await listarRequisicoes();
+                setRequisicoes(dadosReq);
+                console.log(dadosReq);
+                return;
+            }
+
+            // Se for usuário GLOBAL busca todas as cidades para fazer filtro no select
+            const dadosCidades = await listarCidades();
+            setCidades(dadosCidades);
+
+
+            if (dadosCidades.length > 0) {
+
+                const primeiraCidadeId = dadosCidades[0].id;
+                setCidadeFiltro(primeiraCidadeId);
+
+                const dadosReq = await listarRequisicoesCidade(primeiraCidadeId);
+                setRequisicoes(dadosReq);
+                console.log(dadosReq);
+            }
+
+        } catch (error) {
+            console.log("Erro ao carregar dados: ", error);
+        }
+    }
+
+    const buscarReqCidade = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const cidadeId = e.target.value;
+
+        setCidadeFiltro(cidadeId);
+
+        const dadosReq = await listarRequisicoesCidade(cidadeId);
+        setRequisicoes([dadosReq]);
+    }
+
 
     return (
-        <div className="abaSolicitacaoConteudo">
+        <div className="abaRequisicaoConteudo">
             {/* BARRA VISUAL DE FILTROS */}
             <div className="barraFiltros">
                 {/* Input de Busca Textual */}
@@ -72,6 +119,17 @@ export function AbaSolicitacoes() {
                     <option value="AGUARDANDO_RETIRADA">Aguardando Retirada</option>
                 </select>
 
+                {usuarioLogado?.role === 'GLOBAL' && (
+                    <select
+                        value={cidadeFiltro}
+                        onChange={buscarReqCidade}
+                    >
+                        {cidades.map((item) => (
+                            <option key={item.id} value={item.id}>{item.nome}</option>
+                        ))}
+                    </select>
+                )}
+
                 {/* Botão para limpar filtros (caso algum esteja ativo) */}
                 {(busca || statusFiltro !== "TODOS") && (
                     <button
@@ -89,7 +147,7 @@ export function AbaSolicitacoes() {
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
             <div className="listaResultado">
-                <table className="table tableSolicitacao">
+                <table className="table tableRequisicao">
                     <thead>
                         <tr>
                             <th scope="col">Nome cidadão</th>
@@ -101,14 +159,14 @@ export function AbaSolicitacoes() {
                         </tr>
                     </thead>
                     <tbody>
-                        {solicitacoesFiltradas.length === 0 ? (
+                        {requisicoesFiltradas.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="mensagemVazio">
                                     Nenhum resultado encontrado com os filtros atuais.
                                 </td>
                             </tr>
                         ) : (
-                            solicitacoesFiltradas.map((item) => (
+                            requisicoesFiltradas.map((item) => (
                                 <tr key={item.id}>
                                     <td><strong>{item.cidadaoNome}</strong></td>
                                     <td>{item.arvoreNome}</td>

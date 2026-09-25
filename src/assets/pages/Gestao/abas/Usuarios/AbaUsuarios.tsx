@@ -36,7 +36,8 @@ export function AbaUsuarios() {
     const carregarDados = async () => {
         try {
             const dadosCidades = await listarCidadesUsuario();
-            setCidades([dadosCidades]);
+            setCidades(dadosCidades);
+            console.log(dadosCidades);
 
             const dadosRoles = await listarRoles();
             setRoles(dadosRoles);

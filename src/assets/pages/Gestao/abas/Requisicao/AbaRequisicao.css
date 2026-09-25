@@ -1,6 +1,6 @@
 @import "../../../../../index.css";
 
-.abaSolicitacaoConteudo {
+.abaRequisicaoConteudo {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -85,7 +85,7 @@
 }
 
 /* ==========================================================
-   TABELA DE SOLICITAÇÕES
+   TABELA DE Requisições
 ========================================================== */
 .listaResultado {
     width: 100%;
@@ -96,7 +96,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-.tableSolicitacao {
+.tableSRequisicao {
     width: 100%;
     margin-bottom: 0 !important;
     border-collapse: collapse;
@@ -104,12 +104,12 @@
 }
 
 /* Cabeçalho da Tabela */
-.tableSolicitacao thead {
+.tableRequisicao thead {
     background-color: var(--cor-fundo-escuro);
     border-bottom: 2px solid #524a3c;
 }
 
-.tableSolicitacao th {
+.tableRequisicao th {
     padding: 14px 18px;
     color: var(--cor-cinza);
     font-size: 13px;
@@ -121,25 +121,25 @@
 }
 
 /* Linhas e Células */
-.tableSolicitacao tbody tr {
+.tableRequisicao tbody tr {
     background-color: var(--cor-fundo);
     border-bottom: 1px solid #dcd7ce;
     transition: background-color 0.2s ease;
 }
 
-.tableSolicitacao tbody tr:nth-child(even) {
+.tableRequisicao tbody tr:nth-child(even) {
     background-color: rgba(243, 238, 228, 0.6);
 }
 
-.tableSolicitacao tbody tr:hover {
+.tableRequisicao tbody tr:hover {
     background-color: rgba(115, 157, 30, 0.08);
 }
 
-.tableSolicitacao tbody tr:last-child {
+.tableRequisicao tbody tr:last-child {
     border-bottom: none;
 }
 
-.tableSolicitacao td {
+.tableRequisicao td {
     padding: 14px 18px;
     color: var(--cor-fundo-escuro);
     font-size: 14px;
@@ -147,7 +147,7 @@
     border: none;
 }
 
-.tableSolicitacao td strong {
+.tableRequisicao td strong {
     color: #1a1611;
     font-weight: 700;
 }

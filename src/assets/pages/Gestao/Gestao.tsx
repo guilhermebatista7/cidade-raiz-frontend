@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { SectionContent } from "../../components/SectionContent/SectionContent";
 import "./Gestao.css";
-import { AbaSolicitacoes } from "./abas/Solicitacao/AbaSolicitacao";
+import { AbaRequisicoes } from "./abas/Requisicao/AbaRequisicao";
 import { AbaArvores } from "./abas/Arvores/AbaArvores";
 import { AbaConfig } from "./abas/ConfigAdmin/AbaConfig";
 import { AbaUsuarios } from "./abas/Usuarios/AbaUsuarios";
@@ -18,7 +18,7 @@ import { obterUsuarioLogado } from "../../../services/authService";
 import { type Usuario } from "../../../types";
 
 // Definição das abas disponíveis
-export type AbaGestao = "solicitacoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
+export type AbaGestao = "requisicoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
 
 interface TabItem {
     id: AbaGestao;
@@ -28,8 +28,8 @@ interface TabItem {
 
 const TABS: TabItem[] = [
     {
-        id: "solicitacoes",
-        label: "Solicitações",
+        id: "requisicoes",
+        label: "Requisições",
         icon: faClipboardList
     },
     {
@@ -56,7 +56,7 @@ const TABS: TabItem[] = [
 
 export function Gestao() {
     // Estado para armazenar qual aba está ativa no momento
-    const [abaAtiva, setAbaAtiva] = useState<AbaGestao>("solicitacoes");
+    const [abaAtiva, setAbaAtiva] = useState<AbaGestao>("requisicoes");
     const [usuario, setUsuario] = useState<Usuario | null>(null);
 
     useEffect(() => {
@@ -75,7 +75,7 @@ export function Gestao() {
 
     useEffect(() => {
         if (usuario?.role !== "GLOBAL" && abaAtiva === "configAdmin") {
-            setAbaAtiva("solicitacoes");
+            setAbaAtiva("requisicoes");
         }
     }, [usuario, abaAtiva]);
 
@@ -131,12 +131,12 @@ export function Gestao() {
                 {/* CONTEÚDO DAS ABAS */}
                 <main className="gestaoConteudoArea">
                     {/* Aba 1: Solicitações */}
-                    {abaAtiva === "solicitacoes" && (
+                    {abaAtiva === "requisicoes" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
                                 <h3>Gerenciar Solicitações de Plantio</h3>
                             </div>
-                            <AbaSolicitacoes />
+                            <AbaRequisicoes />
 
                             {/* Em breve: Tabela ou lista de solicitações */}
                         </section>
