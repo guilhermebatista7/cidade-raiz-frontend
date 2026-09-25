@@ -1,18 +1,19 @@
 import { useState, useMemo, useEffect } from "react";
 import './AbaRequisicao.css';
 import { obterUsuarioLogado } from "../../../../../services/authService";
-import type { Cidade, Usuario } from "../../../../../types";
+import type { Arvore, Cidade, Usuario } from "../../../../../types";
 import { listarRequisicoes, listarRequisicoesCidade } from "../../../../../services/requisicaoService";
 import { listarCidades } from "../../../../../services/cidadeService";
 
 // 1. Tipagem dos dados da aba
 interface Requisicao {
     id: string;
-    cidadaoNome: string;
-    arvoreNome: string;
-    tipo: string;
+    tipoAtendimento: string;
     bairro: string;
     status: "SOLICITADO" | "APROVADO" | "RECUSADO" | "CONCLUIDO" | "AGUARDANDO_RETIRADA" | "AGENDADO_PLANTIO";
+    cidadeEndereco: string;
+    nomeBeneficiario: string;
+    arvore: Arvore;
 }
 
 export function AbaRequisicoes() {
@@ -32,17 +33,19 @@ export function AbaRequisicoes() {
     // 3. LÓGICA DE FILTRAGEM REATIVA COM useMemo
     const requisicoesFiltradas = useMemo(() => {
         return requisicoes.filter((item) => {
-            // Regra 1: Filtro de texto (busca por nome do cidadão, árvore ou bairro)
             const termo = busca.toLowerCase();
+
             const bateTexto =
-                item.cidadaoNome.toLowerCase().includes(termo) ||
-                item.arvoreNome.toLowerCase().includes(termo) ||
-                item.bairro.toLowerCase().includes(termo);
+                (item.nomeBeneficiario ?? "").toLowerCase().includes(termo) ||
+                (item.arvore?.nomePopular ?? "").toLowerCase().includes(termo) ||
+                (item.bairro ?? "").toLowerCase().includes(termo) ||
+                (item.tipoAtendimento ?? "").toLowerCase().includes(termo) ||
+                (item.status ?? "").toLowerCase().includes(termo);
 
-            // Regra 2: Filtro por Status
-            const bateStatus = statusFiltro === "TODOS" || item.status === statusFiltro;
+            const bateStatus =
+                statusFiltro === "TODOS" ||
+                item.status === statusFiltro;
 
-            // O item só passa se atender a todos os filtros ativos
             return bateTexto && bateStatus;
         });
     }, [requisicoes, busca, statusFiltro]);
@@ -89,7 +92,7 @@ export function AbaRequisicoes() {
         setCidadeFiltro(cidadeId);
 
         const dadosReq = await listarRequisicoesCidade(cidadeId);
-        setRequisicoes([dadosReq]);
+        setRequisicoes(dadosReq);
     }
 
 
@@ -168,10 +171,10 @@ export function AbaRequisicoes() {
                         ) : (
                             requisicoesFiltradas.map((item) => (
                                 <tr key={item.id}>
-                                    <td><strong>{item.cidadaoNome}</strong></td>
-                                    <td>{item.arvoreNome}</td>
+                                    <td><strong>{item.nomeBeneficiario}</strong></td>
+                                    <td>{item?.arvore?.nomePopular}</td>
                                     <td>{item.bairro}</td>
-                                    <td><span className="tipoTag">{item.tipo}</span></td>
+                                    <td><span className="tipoTag">{item.tipoAtendimento}</span></td>
                                     <td><span className={`statusTag ${item.status.toLowerCase()}`}>{item.status}</span></td>
                                     <td className="text-center">
                                         <button type="button" className="btnVerificar">
