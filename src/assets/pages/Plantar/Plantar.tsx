@@ -51,6 +51,8 @@ export const Plantar = () => {
             const dadosLogado = await obterUsuarioLogado();
             setUsuarioLogado(dadosLogado.usuario);
 
+            console.log("USUÁRIO LOGADO:", dadosLogado.usuario);
+
             const cidadeAtivas = await listarCidadesAtivas();
             setCidades(cidadeAtivas);
 
@@ -115,6 +117,10 @@ export const Plantar = () => {
         arvore => arvore.id === arvoreSelecionada
     );
 
+    const cidadeEscolhida = cidades.find(
+        cidade => cidade.id === cidadeSelecionada
+    );
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -136,7 +142,7 @@ export const Plantar = () => {
 
         if (!arvoreSelecionada) {
             showAlert(
-                "Por favor, escolha uma árvore antes de enviar a solicitação.",
+                "Por favor, escolha uma árvore antes de enviar a requisição.",
                 "warning"
             );
             setModalArvoresAberto(true);
@@ -159,12 +165,12 @@ export const Plantar = () => {
         try {
             await cadastrarRequisicao(formData);
             showAlert(
-                "Solicitação cadastrada com sucesso!",
+                "Requisição enviada com sucesso!",
                 "success"
             );
         } catch (error) {
             showAlert(
-                `Erro ao cadastrar solicitação: ${error}`,
+                `Erro ao cadastrar requisição: ${error}`,
                 "danger"
             );
         }
@@ -184,7 +190,7 @@ export const Plantar = () => {
                         )}
                         <div className="solicitacaoHeader">
                             <div>
-                                <h2>Nova Solicitação de Plantio</h2>
+                                <h2>Nova Requisição de Plantio</h2>
                                 <p>Preencha os dados abaixo para solicitar o plantio de uma árvore.</p>
                             </div>
                             <div className="plantarHeaderIcon">
@@ -279,17 +285,23 @@ export const Plantar = () => {
 
                             <input
                                 type="hidden"
+                                name="cidadaoId"
+                                value={usuarioLogado?.id ?? ""}
+                            />
+
+                            <input
+                                type="hidden"
                                 name="arvoreId"
                                 value={arvoreSelecionada ?? ""}
                             />
 
                             <div className="col-md-12 mt-2">
                                 <div className="inputGroup">
-                                    <label htmlFor="cidade">Árvore selecionada com base na cidade *</label>
+                                    <label htmlFor="cidadeId">Árvore selecionada com base na cidade *</label>
 
                                     <select
-                                        id="cidade"
-                                        name="cidade"
+                                        id="cidadeId"
+                                        name="cidadeId"
                                         value={cidadeSelecionada}
                                         onChange={handleCidadeChange}
                                         required
@@ -331,21 +343,14 @@ export const Plantar = () => {
 
                                 <div className="col-md-8">
                                     <div className="inputGroup">
-                                        <label htmlFor="cpf_cnpj">CPF ou CNPJ</label>
-                                        <input id="cpf_cnpj" name="cpf_cnpj" type="text" placeholder="111.111.111-11" required />
-                                    </div>
-                                </div>
-
-                                <div className="col-md-8">
-                                    <div className="inputGroup">
                                         <label>Deseja retirar no local ou agendar o plantio e deixar por nossa conta?</label>
                                         <div className="tipoSolicitacao d-flex align-items-center gap-3">
                                             <div className="d-flex align-items-center gap-1">
-                                                <input type="radio" className="radio" id="retirar" name="tipoAgendamento" value="retirar" required />
+                                                <input type="radio" className="radio" id="retirar" name="tipoAtendimento" value="retirar" required />
                                                 <label htmlFor="retirar">Retirar no local</label>
                                             </div>
                                             <div className="d-flex align-items-center gap-1">
-                                                <input type="radio" className="radio" id="agendar" name="tipoAgendamento" value="agendar" />
+                                                <input type="radio" className="radio" id="agendar" name="tipoAtendimento" value="agendar" />
                                                 <label htmlFor="agendar">Agendar plantio</label>
                                             </div>
                                         </div>
@@ -381,20 +386,13 @@ export const Plantar = () => {
                                     <div className="inputGroup">
                                         <label htmlFor="cidade">Cidade *</label>
 
-                                        <select
-                                            id="cidade"
-                                            name="cidade"
-                                            value={cidadeSelecionada}
-                                            onChange={handleCidadeChange}
-                                            required
-                                        >
-
-                                            {cidades.map(cidade => (
-                                                <option key={cidade.id} value={cidade.id}>
-                                                    {cidade.nome}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <input
+                                            id="cidadeEndereco"
+                                            name="cidadeEndereco"
+                                            type="text"
+                                            value={cidadeEscolhida?.nome ?? ""}
+                                            readOnly
+                                        />
                                     </div>
                                 </div>
 
@@ -414,10 +412,10 @@ export const Plantar = () => {
 
                                 <div className="col-12">
                                     <div className="inputGroup">
-                                        <label htmlFor="referencia">Ponto de referência (opcional)</label>
+                                        <label htmlFor="pontoReferencia">Ponto de referência (opcional)</label>
                                         <input
-                                            id="referencia"
-                                            name="referencia"
+                                            id="pontoReferencia"
+                                            name="pontoReferencia"
                                             type="text"
                                             placeholder="Ex: próximo ao ponto de ônibus..."
                                         />
@@ -468,7 +466,7 @@ export const Plantar = () => {
                         </div>
 
                         <button type="submit" className="btnEnviar">
-                            <FontAwesomeIcon icon={faPaperPlane} /> Enviar Solicitação
+                            <FontAwesomeIcon icon={faPaperPlane} /> Enviar requisição
                         </button>
                     </div>
 
@@ -476,7 +474,7 @@ export const Plantar = () => {
                         <div className="statusCard">
                             <div className="statusHeader">
                                 <div>
-                                    <h2>Acompanhe sua solicitação</h2>
+                                    <h2>Acompanhe sua requisição</h2>
                                     <p>Protocolo: #SRP-2024-0056</p>
                                 </div>
                                 <span className="statusBadge">Em andamento</span>
@@ -487,7 +485,7 @@ export const Plantar = () => {
                                     <div className="timelineIcon"><FontAwesomeIcon icon={faCheck} /></div>
                                     <div className="timelineContent">
                                         <h3>Solicitado</h3>
-                                        <p>Sua solicitação foi recebida com sucesso.</p>
+                                        <p>Sua requisição foi recebida com sucesso.</p>
                                         <span>12/05/2024 às 10:32</span>
                                     </div>
                                 </div>
@@ -496,7 +494,7 @@ export const Plantar = () => {
                                     <div className="timelineIcon"><FontAwesomeIcon icon={faCheck} /></div>
                                     <div className="timelineContent">
                                         <h3>Aprovado</h3>
-                                        <p>Sua solicitação foi aprovada.</p>
+                                        <p>Sua requisição foi aprovada.</p>
                                         <span>14/05/2024 às 14:15</span>
                                     </div>
                                 </div>
