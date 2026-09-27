@@ -285,7 +285,7 @@ export const Plantar = () => {
 
                             <input
                                 type="hidden"
-                                name="cidadaoId"
+                                name="criadoPorId"
                                 value={usuarioLogado?.id ?? ""}
                             />
 
@@ -329,15 +329,15 @@ export const Plantar = () => {
                             <div className="row g-3">
                                 <div className="col-md-12">
                                     <div className="inputGroup">
-                                        <label htmlFor="nome">Nome</label>
-                                        <input id="nome" name="nome" type="text" placeholder="Digite seu nome" required />
+                                        <label htmlFor="nomeBeneficiario">Nome</label>
+                                        <input id="nomeBeneficiario" name="nomeBeneficiario" type="text" placeholder="Digite seu nome" required />
                                     </div>
                                 </div>
 
                                 <div className="col-md-4">
                                     <div className="inputGroup">
-                                        <label htmlFor="telefone">Telefone</label>
-                                        <input id="telefone" name="telefone" type="text" placeholder="(11) 11111-1111" required />
+                                        <label htmlFor="telefoneBeneficiario">Telefone</label>
+                                        <input id="telefoneBeneficiario" name="telefoneBeneficiario" type="text" placeholder="(11) 11111-1111" required />
                                     </div>
                                 </div>
 
