@@ -151,7 +151,7 @@ export function AbaConfig() {
     };
 
     return (
-        <div className="abaSolicitacaoConteudo">
+        <div className="abaRequisicaoConteudo">
             {/* BARRA VISUAL DE FILTROS */}
             <div className="barraFiltros">
                 {/* Input de Busca Textual */}
@@ -168,7 +168,7 @@ export function AbaConfig() {
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
             <div className="listaResultado">
-                <table className="table tableSolicitacao">
+                <table className="table tableRequisicao">
                     <thead>
                         <tr>
                             <th scope="col">Nome Cidade</th>

@@ -4,15 +4,53 @@ import { obterUsuarioLogado } from "../../../../../services/authService";
 import type { Arvore, Cidade, Usuario } from "../../../../../types";
 import { listarRequisicoes, listarRequisicoesCidade } from "../../../../../services/requisicaoService";
 import { listarCidades } from "../../../../../services/cidadeService";
+import ModalRequisicao from "../../../../components/ModalRequisicao/ModalRequisicao";
 
 // 1. Tipagem dos dados da aba
 interface Requisicao {
     id: string;
+    criadoPorId: string | null;
+    nomeBeneficiario: string | null;
+    telefoneBeneficiario: string | null;
+    cidadeId: string;
+    arvoreId: string;
+
+    status:
+    | "SOLICITADO"
+    | "APROVADO"
+    | "RECUSADO"
+    | "CONCLUIDO"
+    | "AGUARDANDO_RETIRADA"
+    | "AGENDADO_PLANTIO";
+
     tipoAtendimento: string;
+
+    rua: string;
+    numero: string;
     bairro: string;
-    status: "SOLICITADO" | "APROVADO" | "RECUSADO" | "CONCLUIDO" | "AGUARDANDO_RETIRADA" | "AGENDADO_PLANTIO";
     cidadeEndereco: string;
-    nomeBeneficiario: string;
+    cep: string;
+    estado: string;
+    pontoReferencia: string;
+
+    fotoLocalUrl: string | null;
+    comprovanteResidenciaUrl: string | null;
+
+    criadoEm: string;
+    atualizadoEm: string;
+
+    cidade?: {
+        id: string;
+        nome: string;
+        uf: string;
+    };
+
+    criadoPor?: {
+        id: string;
+        nome: string;
+        email: string;
+    } | null;
+
     arvore: Arvore;
 }
 
@@ -29,6 +67,21 @@ export function AbaRequisicoes() {
     const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
     const [requisicoes, setRequisicoes] = useState<Requisicao[]>([]);
     const [cidades, setCidades] = useState<Cidade[]>([]);
+
+    const [modalAberto, setModalAberto] = useState(false);
+    const [requisicaoSelecionada, setRequisicaoSelecionada] = useState<Requisicao | null>(null);
+
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    const abrirModalRequisicao = (requisicao: Requisicao) => {
+        setRequisicaoSelecionada(requisicao);
+        setModalAberto(true);
+    };
+
+    const fecharModalRequisicao = () => {
+        setModalAberto(false);
+        setRequisicaoSelecionada(null);
+    };
 
     // 3. LÓGICA DE FILTRAGEM REATIVA COM useMemo
     const requisicoesFiltradas = useMemo(() => {
@@ -92,6 +145,7 @@ export function AbaRequisicoes() {
         setCidadeFiltro(cidadeId);
 
         const dadosReq = await listarRequisicoesCidade(cidadeId);
+        console.log(dadosReq);
         setRequisicoes(dadosReq);
     }
 
@@ -155,6 +209,7 @@ export function AbaRequisicoes() {
                         <tr>
                             <th scope="col">Nome cidadão</th>
                             <th scope="col">Árvore</th>
+                            <th scope="col">Cidade</th>
                             <th scope="col">Bairro</th>
                             <th scope="col">Tipo</th>
                             <th scope="col">Status</th>
@@ -173,11 +228,12 @@ export function AbaRequisicoes() {
                                 <tr key={item.id}>
                                     <td><strong>{item.nomeBeneficiario}</strong></td>
                                     <td>{item?.arvore?.nomePopular}</td>
+                                    <td>{item?.cidadeEndereco}</td>
                                     <td>{item.bairro}</td>
                                     <td><span className="tipoTag">{item.tipoAtendimento}</span></td>
                                     <td><span className={`statusTag ${item.status.toLowerCase()}`}>{item.status}</span></td>
                                     <td className="text-center">
-                                        <button type="button" className="btnVerificar">
+                                        <button type="button" className="btnVerificar" onClick={() => abrirModalRequisicao(item)}>
                                             Verificar
                                         </button>
                                     </td>
@@ -187,6 +243,25 @@ export function AbaRequisicoes() {
                     </tbody>
                 </table>
             </div>
+            <div className="abaRequisicaoConteudo">
+
+                {/* seus filtros */}
+
+                <div className="listaResultado">
+                    <table className="table tableRequisicao">
+                        {/* ... */}
+                    </table>
+                </div>
+
+                <ModalRequisicao
+                    aberto={modalAberto}
+                    fechar={fecharModalRequisicao}
+                    requisicao={requisicaoSelecionada}
+                    baseUrl={API_URL}
+                />
+
+            </div>
         </div>
+
     );
 }

@@ -134,7 +134,7 @@ export function Gestao() {
                     {abaAtiva === "requisicoes" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
-                                <h3>Gerenciar Solicitações de Plantio</h3>
+                                <h3>Gerenciar Requisições de Plantio</h3>
                             </div>
                             <AbaRequisicoes />
 

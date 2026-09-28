@@ -40,13 +40,14 @@ export interface Arvore {
 
 export interface Requisicao {
   id: string;
-  cidadaoId: string;
+  criadoPorId: string;
   cidadao?: Usuario;
   cidadeId: string;
   cidade?: Cidade;
   arvoreId: string;
   arvore?: Arvore;
   status: StatusRequisicao;
+  observacaoStatus?: string; //OBS caso req seja negada 
   tipoAtendimento: TipoAtendimento;
   rua: string;
   numero: string;
