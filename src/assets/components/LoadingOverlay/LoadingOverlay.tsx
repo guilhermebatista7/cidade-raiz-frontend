@@ -1,4 +1,5 @@
 import { useLoading } from "../../../contexts/LoadingContext";
+import { createPortal } from "react-dom";
 import "./LoadingOverlay.css";
 
 export function LoadingOverlay() {
@@ -8,12 +9,13 @@ export function LoadingOverlay() {
         return null;
     }
 
-    return (
+    return createPortal(
         <div className="loadingOverlay">
             <div className="loadingBox">
                 <div className="spinner"></div>
                 <span>Carregando...</span>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

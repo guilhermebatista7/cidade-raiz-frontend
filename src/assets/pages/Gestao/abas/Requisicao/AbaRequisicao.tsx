@@ -149,6 +149,9 @@ export function AbaRequisicoes() {
         setRequisicoes(dadosReq);
     }
 
+    const atualizarRequisicoes = async () => {
+        await carregarDados();
+    };
 
     return (
         <div className="abaRequisicaoConteudo">
@@ -258,6 +261,7 @@ export function AbaRequisicoes() {
                     fechar={fecharModalRequisicao}
                     requisicao={requisicaoSelecionada}
                     baseUrl={API_URL}
+                    onAtualizado={atualizarRequisicoes}
                 />
 
             </div>

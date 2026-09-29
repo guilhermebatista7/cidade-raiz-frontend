@@ -3,6 +3,7 @@ import type { Arvore } from "../../../types";
 
 import "./ModalRequisicao.css";
 import { useEffect, useState } from "react";
+import { recusarRequisicao } from "../../../services/requisicaoService";
 
 interface RequisicaoModal {
     id: string;
@@ -33,6 +34,7 @@ interface ModalRequisicaoProps {
     fechar: () => void;
     requisicao: RequisicaoModal | null;
     baseUrl: string;
+    onAtualizado: () => Promise<void>;
 }
 
 const formatarData = (data: string) => {
@@ -106,6 +108,7 @@ export default function ModalRequisicao({
     aberto,
     fechar,
     requisicao,
+    onAtualizado
 }: ModalRequisicaoProps) {
 
     if (!requisicao) {
@@ -121,12 +124,50 @@ export default function ModalRequisicao({
         : null;
 
     const [status, setStatus] = useState(requisicao?.status ?? "");
+    const [obsStatus, setObsStatus] = useState('');
+    const [dataInicial, setDataInicial] = useState('');
+    const [dataFinal, setDataFinal] = useState('');
 
     useEffect(() => {
         if (requisicao) {
             setStatus(requisicao.status);
         }
     }, [requisicao]);
+
+    const handleChangeStatus = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (
+            !status || (!obsStatus && status === 'RECUSADO') || 
+            ((!dataInicial || !dataFinal) && status === 'AGENDADO_PLANTIO')
+        ) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return;
+        }
+        
+        try {
+
+            if(status === 'RECUSADO'){
+                await recusarRequisicao(requisicao.id, obsStatus);
+                await onAtualizado();
+                fechar();
+                return;
+            }
+    
+            if(status === 'AGENDADO_PLANTIO'){
+                //await agendarPlantio(requisicao.id, dataInicial, dataFinal);
+                await onAtualizado();
+                fechar();
+                return;
+            }
+
+            //await alterarStatus(requisicao.id, status);
+            await onAtualizado();
+            fechar();
+
+        } catch (error: any) {
+            alert(`Erro ao salvar: ${error.message}`);
+        }
+    }
 
     return (
         <ModalForm
@@ -136,79 +177,102 @@ export default function ModalRequisicao({
             descricao={`Requisição #${requisicao.id.substring(0, 8)}`}
         >
             <div className="modalRequisicao">
+                <form className="formSection" onSubmit={handleChangeStatus}>
 
-                {/* RESUMO */}
-                <section className="secaoRequisicao">
-                    <div className="d-flex align-items-center gap-3">
+                    {/* RESUMO */}
+                    <section className="secaoRequisicao">
                         <h3>Resumo da requisição</h3>
-                        <select name="requisicaoStatus" id="requisicaoStatus" value={status} onChange={(e) => setStatus(e.target.value)}>
-                            <option value="SOLICITADO">Solicitado</option>
-                            <option value="APROVADO">Aprovado</option>
-                            <option value="RECUSADO">Recusado</option>
-                            <option value="AGUARDANDO_RETIRADA">Aguardando retirada</option>
-                            <option value="AGENDADO_PLANTIO">Plantio agendado</option>
-                            <option value="CONCLUIDO">Concluído</option>
-                        </select>
-                        {status !== requisicao.status ? (
-                            <button className="btnRequisicao">Salvar</button>
-                        ) : ''}
-                    </div>
 
-                    <div className="gridInformacoes">
+                        <div className="d-flex align-items-center gap-3 flex-wrap">
+                            <div className="select d-flex flex-column">
+                                <span>Situação</span>
+                                <select name="requisicaoStatus" id="requisicaoStatus" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                    <option value="SOLICITADO">Solicitado</option>
+                                    <option value="APROVADO">Aprovado</option>
+                                    <option value="RECUSADO">Recusado</option>
+                                    <option value="AGUARDANDO_RETIRADA">Aguardando retirada</option>
+                                    <option value="AGENDADO_PLANTIO">Plantio agendado</option>
+                                    <option value="CONCLUIDO">Concluído</option>
+                                </select>
+                            </div>
+                            {(status !== requisicao.status && status === 'RECUSADO') ? (
+                                <input value={obsStatus} className="w-50 mt-3" type="text" placeholder="Informe o motivo" onChange={(e) => setObsStatus(e.target.value)}/>
+                            ) : ''}
+                            {(status !== requisicao.status && status === 'AGENDADO_PLANTIO') ? (
+                                <>
 
-                        <div className="informacao">
-                            <span>Beneficiário</span>
-                            <strong>
-                                {requisicao.nomeBeneficiario ||
-                                    "Não informado"}
-                            </strong>
+                                    <div className="d-flex flex-column">
+                                        <span>Data inicial (estimada)</span>
+                                        <input className="w-auto dataInicial " type="date" value={dataInicial} onChange={(e)=> (setDataInicial(e.target.value))}/>
+                                    </div>
+
+                                    <div className="d-flex flex-column">
+                                        <span>Data final (estimada)</span>
+                                        <input className="w-auto dataFinal " type="date" value={dataFinal} onChange={(e)=> setDataFinal(e.target.value)}/>
+                                    </div>
+                                </>
+                            ) : ''}
+                            {status !== requisicao.status ? (
+                                <button type="submit" className={`btnRequisicao w-auto mt-3`}>Salvar</button>
+                            ) : ''}
                         </div>
 
-                        <div className="informacao">
-                            <span>Telefone</span>
-                            <strong>
-                                {formatarTelefone(
-                                    requisicao.telefoneBeneficiario
-                                )}
-                            </strong>
+                        <div className="gridInformacoes">
+
+                            <div className="informacao">
+                                <span>Beneficiário</span>
+                                <strong>
+                                    {requisicao.nomeBeneficiario ||
+                                        "Não informado"}
+                                </strong>
+                            </div>
+
+                            <div className="informacao">
+                                <span>Telefone</span>
+                                <strong>
+                                    {formatarTelefone(
+                                        requisicao.telefoneBeneficiario
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div className="informacao">
+                                <span>Árvore</span>
+                                <strong>
+                                    {requisicao.arvore?.nomePopular ||
+                                        "Não informado"}
+                                </strong>
+                            </div>
+
+                            <div className="informacao">
+                                <span>Tipo de atendimento</span>
+                                <strong>
+                                    {formatarTipoAtendimento(
+                                        requisicao.tipoAtendimento
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div className="informacao">
+                                <span>Status</span>
+
+                                <span
+                                    className={`statusModal status-${requisicao.status.toLowerCase()}`}
+                                >
+                                    {formatarStatus(requisicao.status)}
+                                </span>
+                            </div>
+
+                            <div className="informacao">
+                                <span>Data da solicitação</span>
+                                <strong>
+                                    {formatarData(requisicao.criadoEm)}
+                                </strong>
+                            </div>
+
                         </div>
-
-                        <div className="informacao">
-                            <span>Árvore</span>
-                            <strong>
-                                {requisicao.arvore?.nomePopular ||
-                                    "Não informado"}
-                            </strong>
-                        </div>
-
-                        <div className="informacao">
-                            <span>Tipo de atendimento</span>
-                            <strong>
-                                {formatarTipoAtendimento(
-                                    requisicao.tipoAtendimento
-                                )}
-                            </strong>
-                        </div>
-
-                        <div className="informacao">
-                            <span>Status</span>
-
-                            <span
-                                className={`statusModal status-${requisicao.status.toLowerCase()}`}
-                            >
-                                {formatarStatus(requisicao.status)}
-                            </span>
-                        </div>
-
-                        <div className="informacao">
-                            <span>Data da solicitação</span>
-                            <strong>
-                                {formatarData(requisicao.criadoEm)}
-                            </strong>
-                        </div>
-
-                    </div>
-                </section>
+                    </section>
+                </form>
 
                 {/* ENDEREÇO */}
                 <section className="secaoRequisicao">

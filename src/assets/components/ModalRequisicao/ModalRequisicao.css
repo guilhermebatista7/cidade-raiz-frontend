@@ -64,7 +64,7 @@
     gap: 4px;
 }
 
-.informacao span:first-child {
+.informacao span:first-child, .secaoRequisicao span {
     font-size: 12px;
     color: #777;
 }
