@@ -1,17 +1,21 @@
 import ModalForm from "../ModalForm/ModalForm";
-import type { Arvore } from "../../../types";
+import type { Arvore, StatusRequisicao } from "../../../types";
 
 import "./ModalRequisicao.css";
 import { useEffect, useState } from "react";
-import { recusarRequisicao } from "../../../services/requisicaoService";
+import { agendarPlantio, alterarStatus, recusarRequisicao } from "../../../services/requisicaoService";
 
 interface RequisicaoModal {
     id: string;
     nomeBeneficiario: string | null;
     telefoneBeneficiario: string | null;
 
-    status: string;
+    status: StatusRequisicao;
     tipoAtendimento: string;
+
+    dataInicial: Date;
+    dataFinal: Date;
+    observacaoStatus: string;
 
     rua: string;
     numero: string;
@@ -123,7 +127,7 @@ export default function ModalRequisicao({
         ? requisicao.comprovanteResidenciaUrl
         : null;
 
-    const [status, setStatus] = useState(requisicao?.status ?? "");
+    const [status, setStatus] = useState<StatusRequisicao>(requisicao.status);
     const [obsStatus, setObsStatus] = useState('');
     const [dataInicial, setDataInicial] = useState('');
     const [dataFinal, setDataFinal] = useState('');
@@ -137,30 +141,30 @@ export default function ModalRequisicao({
     const handleChangeStatus = async (e: React.FormEvent) => {
         e.preventDefault();
         if (
-            !status || (!obsStatus && status === 'RECUSADO') || 
+            !status || (!obsStatus && status === 'RECUSADO') ||
             ((!dataInicial || !dataFinal) && status === 'AGENDADO_PLANTIO')
         ) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
-        
+
         try {
 
-            if(status === 'RECUSADO'){
+            if (status === 'RECUSADO') {
                 await recusarRequisicao(requisicao.id, obsStatus);
                 await onAtualizado();
                 fechar();
                 return;
             }
-    
-            if(status === 'AGENDADO_PLANTIO'){
-                //await agendarPlantio(requisicao.id, dataInicial, dataFinal);
+
+            if (status === 'AGENDADO_PLANTIO') {
+                await agendarPlantio(requisicao.id, new Date(`${dataInicial}`), new Date(`${dataFinal}`));
                 await onAtualizado();
                 fechar();
                 return;
             }
 
-            //await alterarStatus(requisicao.id, status);
+            await alterarStatus(requisicao.id, status);
             await onAtualizado();
             fechar();
 
@@ -186,7 +190,7 @@ export default function ModalRequisicao({
                         <div className="d-flex align-items-center gap-3 flex-wrap">
                             <div className="select d-flex flex-column">
                                 <span>Situação</span>
-                                <select name="requisicaoStatus" id="requisicaoStatus" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                <select name="requisicaoStatus" id="requisicaoStatus" value={status} onChange={(e) => setStatus(e.target.value as StatusRequisicao)}>
                                     <option value="SOLICITADO">Solicitado</option>
                                     <option value="APROVADO">Aprovado</option>
                                     <option value="RECUSADO">Recusado</option>
@@ -196,19 +200,19 @@ export default function ModalRequisicao({
                                 </select>
                             </div>
                             {(status !== requisicao.status && status === 'RECUSADO') ? (
-                                <input value={obsStatus} className="w-50 mt-3" type="text" placeholder="Informe o motivo" onChange={(e) => setObsStatus(e.target.value)}/>
+                                <input value={obsStatus} className="w-50 mt-3" type="text" placeholder="Informe o motivo" onChange={(e) => setObsStatus(e.target.value)} />
                             ) : ''}
                             {(status !== requisicao.status && status === 'AGENDADO_PLANTIO') ? (
                                 <>
 
                                     <div className="d-flex flex-column">
                                         <span>Data inicial (estimada)</span>
-                                        <input className="w-auto dataInicial " type="date" value={dataInicial} onChange={(e)=> (setDataInicial(e.target.value))}/>
+                                        <input className="w-auto dataInicial " type="date" value={dataInicial} onChange={(e) => (setDataInicial(e.target.value))} />
                                     </div>
 
                                     <div className="d-flex flex-column">
                                         <span>Data final (estimada)</span>
-                                        <input className="w-auto dataFinal " type="date" value={dataFinal} onChange={(e)=> setDataFinal(e.target.value)}/>
+                                        <input className="w-auto dataFinal " type="date" value={dataFinal} onChange={(e) => setDataFinal(e.target.value)} />
                                     </div>
                                 </>
                             ) : ''}
@@ -269,6 +273,26 @@ export default function ModalRequisicao({
                                     {formatarData(requisicao.criadoEm)}
                                 </strong>
                             </div>
+
+                            {requisicao.status === 'AGENDADO_PLANTIO' ?
+                                <>
+
+                                    <div className="informacao">
+                                        <span>Data inicial (estimada)</span>
+                                        <strong>
+                                            {formatarData(requisicao.dataInicial)}
+                                        </strong>
+                                    </div>
+
+                                    <div className="informacao">
+                                        <span>Data final (estimada)</span>
+                                        <strong>
+                                            {formatarData(requisicao.dataFinal)}
+                                        </strong>
+                                    </div>
+                                </>
+                                : ''
+                            }
 
                         </div>
                     </section>

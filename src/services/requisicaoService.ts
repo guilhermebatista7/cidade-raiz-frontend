@@ -1,3 +1,4 @@
+import type { StatusRequisicao } from "../types";
 import { apiFetch } from "./api";
 
 export async function cadastrarRequisicao(formData: FormData) {
@@ -21,12 +22,37 @@ export async function listarRequisicoesCidade(id: string) {
 
 export async function recusarRequisicao(id: string, observacaoStatus: string) {
   return await apiFetch(`/requisicao/recusar/${id}`, {
-    method: 'POST',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       observacaoStatus
     }),
+  })
+}
+
+export async function agendarPlantio(id:string, dataInicial: Date, dataFinal: Date){
+  return await apiFetch(`/requisicao/agendar/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      dataInicial,
+      dataFinal
+    })
+  })
+}
+
+export async function alterarStatus(id:string, status:StatusRequisicao){
+  return await apiFetch(`/requisicao/alterarStuacao/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      status
+    })
   })
 }
