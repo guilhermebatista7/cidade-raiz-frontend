@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import './AbaArvores.css';
 
-import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores } from "../../../../../services/arvoreService";
+import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores, listarArvoresCidade } from "../../../../../services/arvoreService";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
-import { listarCidadesUsuario } from "../../../../../services/cidadeService";
-import type { Cidade } from "../../../../../types";
+import { listarCidades, listarCidadesUsuario } from "../../../../../services/cidadeService";
+import type { Cidade, Usuario } from "../../../../../types";
+import { obterUsuarioLogado } from "../../../../../services/authService";
 
 export function AbaArvores() {
     // 1. ESTADOS DE DADOS E CONTROLE DO MODAL
@@ -22,26 +23,55 @@ export function AbaArvores() {
     const [quantidade, setQuantidade] = useState("");
     const [imagem, setImagem] = useState<File | null>(null);
     const [cidadeId, setCidadeId] = useState("");
-    
+
     //dados do select do form
     const [cidades, setCidades] = useState<Cidade[]>([]);
 
     // 2. ESTADOS DOS FILTROS
     const [busca, setBusca] = useState("");
+    const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
+    const [cidadeFiltro, setCidadeFiltro] = useState("");
+
     useEffect(() => {
         carregarDados();
     }, []);
 
     const carregarDados = async () => {
         try {
-            const dados = await listarArvores();
-            setArvores(dados);
+            const dadosLogado = await obterUsuarioLogado();
+            setUsuarioLogado(dadosLogado.usuario);
 
-            const dadosCidades = await listarCidadesUsuario();
-            setCidades([dadosCidades]);
+            if (dadosLogado.usuario.role !== 'GLOBAL') {
+                const dados = await listarArvores();
+                setArvores(dados);
+                return;
+            }
+
+            // Se for usuário GLOBAL busca todas as cidades para fazer filtro no select
+            const dadosCidades = await listarCidades();
+            setCidades(dadosCidades);
+
+
+            if (dadosCidades.length > 0) {
+
+                const primeiraCidadeId = dadosCidades[0].id;
+                setCidadeFiltro(primeiraCidadeId);
+
+                const arvoresCidade = await listarArvoresCidade(primeiraCidadeId);
+                setArvores(arvoresCidade);
+            }
         } catch (error) {
             console.log("Erro ao carregar árvores: ", error);
         }
+    }
+
+    const buscarArvoresCidade = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const cidadeId = e.target.value;
+
+        setCidadeFiltro(cidadeId);
+
+        const arvoresCidade = await listarArvoresCidade(cidadeId);
+        setArvores(arvoresCidade);
     }
 
     // Efeitos para controle do modal (mesmo padrão do seu código)
@@ -165,6 +195,17 @@ export function AbaArvores() {
                     value={busca}
                     onChange={(e) => setBusca(e.target.value)}
                 />
+
+                {usuarioLogado?.role === 'GLOBAL' && (
+                    <select
+                        value={cidadeFiltro}
+                        onChange={buscarArvoresCidade}
+                    >
+                        {cidades.map((item) => (
+                            <option key={item.id} value={item.id}>{item.nome}</option>
+                        ))}
+                    </select>
+                )}
 
                 {busca && (
                     <button
