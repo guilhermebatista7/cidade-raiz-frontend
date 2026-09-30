@@ -13,9 +13,9 @@ interface RequisicaoModal {
     status: StatusRequisicao;
     tipoAtendimento: string;
 
-    dataInicial: Date;
-    dataFinal: Date;
-    observacaoStatus: string;
+    dataInicial: string | null;
+    dataFinal: string | null;
+    observacaoStatus: string | null;
 
     rua: string;
     numero: string;
@@ -41,11 +41,35 @@ interface ModalRequisicaoProps {
     onAtualizado: () => Promise<void>;
 }
 
-const formatarData = (data: string) => {
-    return new Date(data).toLocaleString("pt-BR", {
+const formatarData = (data: string | null | undefined) => {
+    if (!data) return "Não informado";
+
+    const dataConvertida = new Date(data);
+
+    if (Number.isNaN(dataConvertida.getTime())) {
+        return "Data inválida";
+    }
+
+    return dataConvertida.toLocaleString("pt-BR", {
         dateStyle: "short",
         timeStyle: "short",
     });
+};
+
+const formatarDataAgendamento = (
+    valor: string | null | undefined
+) => {
+    if (!valor) return "Não informado";
+
+    const data = valor.slice(0, 10);
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+        return "Data inválida";
+    }
+
+    const [ano, mes, dia] = data.split("-");
+
+    return `${dia}/${mes}/${ano}`;
 };
 
 const formatarTelefone = (telefone: string | null) => {
@@ -115,31 +139,34 @@ export default function ModalRequisicao({
     onAtualizado
 }: ModalRequisicaoProps) {
 
+    const [status, setStatus] = useState<StatusRequisicao>(
+        requisicao?.status ?? "SOLICITADO"
+    );
+    const [obsStatus, setObsStatus] = useState("");
+    const [dataInicial, setDataInicial] = useState("");
+    const [dataFinal, setDataFinal] = useState("");
+
+    useEffect(() => {
+        if (!requisicao) return;
+
+        setStatus(requisicao.status);
+        setObsStatus("");
+        setDataInicial("");
+        setDataFinal("");
+    }, [requisicao]);
+
     if (!requisicao) {
         return null;
     }
 
-    const fotoLocal = requisicao.fotoLocalUrl
-        ? requisicao.fotoLocalUrl
-        : null;
-
-    const comprovanteResidencia = requisicao.comprovanteResidenciaUrl
-        ? requisicao.comprovanteResidenciaUrl
-        : null;
-
-    const [status, setStatus] = useState<StatusRequisicao>(requisicao.status);
-    const [obsStatus, setObsStatus] = useState('');
-    const [dataInicial, setDataInicial] = useState('');
-    const [dataFinal, setDataFinal] = useState('');
-
-    useEffect(() => {
-        if (requisicao) {
-            setStatus(requisicao.status);
-        }
-    }, [requisicao]);
+    const fotoLocal = requisicao.fotoLocalUrl ?? null;
+    const comprovanteResidencia = requisicao.comprovanteResidenciaUrl ?? null;
 
     const handleChangeStatus = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!requisicao) return;
+
         if (
             !status || (!obsStatus && status === 'RECUSADO') ||
             ((!dataInicial || !dataFinal) && status === 'AGENDADO_PLANTIO')
@@ -280,16 +307,30 @@ export default function ModalRequisicao({
                                     <div className="informacao">
                                         <span>Data inicial (estimada)</span>
                                         <strong>
-                                            {formatarData(requisicao.dataInicial)}
+                                            {formatarDataAgendamento(requisicao.dataInicial)}
                                         </strong>
                                     </div>
 
                                     <div className="informacao">
                                         <span>Data final (estimada)</span>
                                         <strong>
-                                            {formatarData(requisicao.dataFinal)}
+                                            {formatarDataAgendamento(requisicao.dataFinal)}
                                         </strong>
                                     </div>
+                                </>
+                                : ''
+                            }
+
+                            {requisicao.status === 'RECUSADO' ?
+                                <>
+
+                                    <div className="informacao">
+                                        <span>Motivo recusado</span>
+                                        <strong>
+                                            {requisicao.observacaoStatus}
+                                        </strong>
+                                    </div>
+
                                 </>
                                 : ''
                             }

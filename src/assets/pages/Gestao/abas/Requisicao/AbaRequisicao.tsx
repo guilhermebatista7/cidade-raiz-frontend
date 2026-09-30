@@ -25,6 +25,10 @@ interface Requisicao {
 
     tipoAtendimento: string;
 
+    dataInicial: string | null;
+    dataFinal: string | null;
+    observacaoStatus: string | null;
+
     rua: string;
     numero: string;
     bairro: string;
