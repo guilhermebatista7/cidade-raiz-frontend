@@ -96,8 +96,7 @@ export function AbaRequisicoes() {
                 (item.nomeBeneficiario ?? "").toLowerCase().includes(termo) ||
                 (item.arvore?.nomePopular ?? "").toLowerCase().includes(termo) ||
                 (item.bairro ?? "").toLowerCase().includes(termo) ||
-                (item.tipoAtendimento ?? "").toLowerCase().includes(termo) ||
-                (item.status ?? "").toLowerCase().includes(termo);
+                (item.tipoAtendimento ?? "").toLowerCase().includes(termo);
 
             const bateStatus =
                 statusFiltro === "TODOS" ||
@@ -164,7 +163,7 @@ export function AbaRequisicoes() {
                 {/* Input de Busca Textual */}
                 <input
                     type="text"
-                    placeholder="Buscar por cidadão, árvore ou bairro..."
+                    placeholder="Buscar por cidadão, árvore, bairro ou tipo..."
                     value={busca}
                     onChange={(e) => setBusca(e.target.value)}
                 />
@@ -226,7 +225,7 @@ export function AbaRequisicoes() {
                     <tbody>
                         {requisicoesFiltradas.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="mensagemVazio">
+                                <td colSpan={7} className="mensagemVazio">
                                     Nenhum resultado encontrado com os filtros atuais.
                                 </td>
                             </tr>
@@ -251,14 +250,6 @@ export function AbaRequisicoes() {
                 </table>
             </div>
             <div className="abaRequisicaoConteudo">
-
-                {/* seus filtros */}
-
-                <div className="listaResultado">
-                    <table className="table tableRequisicao">
-                        {/* ... */}
-                    </table>
-                </div>
 
                 <ModalRequisicao
                     aberto={modalAberto}

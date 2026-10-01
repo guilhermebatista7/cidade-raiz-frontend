@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faCamera, faCheck, faFileLines, faHandHoldingHeart, faLeaf,
-    faPaperPlane, faTrash, faClock, faCalendarCheck, faXmark
+    faPaperPlane, faTrash, faClock, faCalendarCheck, faXmark,
+    faListCheck
 } from "@fortawesome/free-solid-svg-icons";
 import { SectionContent } from "../../components/SectionContent/SectionContent";
 import { estados } from "../../dataInfo/estados";
@@ -11,9 +12,10 @@ import { listarArvoresCidade } from "../../../services/arvoreService";
 import { listarCidadesAtivas } from "../../../services/cidadeService";
 import { cadastrarRequisicao } from "../../../services/requisicaoService";
 import { obterUsuarioLogado } from "../../../services/authService";
-import type { Usuario } from "../../../types";
+import type { Requisicao, Usuario } from "../../../types";
 import { useAlert } from "../../components/hooks/useAlert";
 import Alert from "../../components/Alert/Alert";
+import ModalRequisicaoPlantar from "../../components/ModalRequisicaoPlantar/ModalRequisicaoPlantar";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
@@ -28,7 +30,8 @@ export const Plantar = () => {
     const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
     const { alert, showAlert, closeAlert } = useAlert();
 
-
+    const [modalAberto, setModalAberto] = useState(false);
+    const [requisicoes, setRequisicoes] = useState<Requisicao[]>([]);
 
     useEffect(() => {
         carregarDados();
@@ -175,6 +178,16 @@ export const Plantar = () => {
             );
         }
     }
+
+    const abrirModalRequisicao = () => {
+        //const dados = await listarMinhasRequisicoes();
+        //setRequisicoes(dados);
+        setModalAberto(true);
+    };
+
+    const fecharModalRequisicao = () => {
+        setModalAberto(false);
+    };
 
     return (
         <SectionContent className="sectionPlantar">
@@ -470,7 +483,11 @@ export const Plantar = () => {
                         </button>
                     </div>
 
+
                     <div className="statusColumn">
+                        <button type="button" className="btnEnviar" onClick={() => abrirModalRequisicao()}>
+                            <FontAwesomeIcon icon={faListCheck} /> Minhas requisições
+                        </button>
                         <div className="statusCard">
                             <div className="statusHeader">
                                 <div>
@@ -609,6 +626,12 @@ export const Plantar = () => {
                     </div>
                 </div>
             )}
+            <ModalRequisicaoPlantar
+                                aberto={modalAberto}
+                                fechar={fecharModalRequisicao}
+                                requisicoes={requisicoes}
+                                
+                            />
         </SectionContent>
     );
 };

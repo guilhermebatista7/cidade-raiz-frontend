@@ -229,7 +229,7 @@ export function AbaUsuarios() {
                 {/* Input de Busca Textual */}
                 <input
                     type="text"
-                    placeholder="Buscar por nome do usuário ou tipo"
+                    placeholder="Buscar por nome, email ou telefone"
                     value={busca}
                     onChange={(e) => setBusca(e.target.value)}
                 />
@@ -277,7 +277,7 @@ export function AbaUsuarios() {
                     <tbody>
                         {usuariosFiltrados.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="mensagemVazio">
+                                <td colSpan={7} className="mensagemVazio">
                                     Nenhum resultado encontrado com os filtros atuais.
                                 </td>
                             </tr>

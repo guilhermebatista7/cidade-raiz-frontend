@@ -182,7 +182,7 @@ export function AbaConfig() {
                     <tbody>
                         {cidadesFiltradas.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="mensagemVazio">
+                                <td colSpan={7} className="mensagemVazio">
                                     Nenhum resultado encontrado com os filtros atuais.
                                 </td>
                             </tr>
