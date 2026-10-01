@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faUserAlt } from "@fortawesome/free-solid-svg-icons";
 import { listarCidadesUsuario } from "../../../../../services/cidadeService";
 import { type Role, type Cidade, type Usuario } from "../../../../../types";
-import { ativarUsuario, atualizarUsuario, desativarUsuario, listarRoles, listarUsuarios } from "../../../../../services/usuarioService";
+import { ativarUsuario, atualizarUsuario, desativarUsuario, listarRoles, listarUsuarios, listarUsuariosCidade } from "../../../../../services/usuarioService";
 import { obterUsuarioLogado } from "../../../../../services/authService";
 
 export function AbaUsuarios() {
@@ -28,6 +28,8 @@ export function AbaUsuarios() {
     const [roles, setRoles] = useState<Role[]>([]);
 
     const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
+    const [cidadeFiltro, setCidadeFiltro] = useState("");
+    const [roleFiltro, setRoleFiltro] = useState<Role >("FUNCIONARIO");
 
     useEffect(() => {
         carregarDados();
@@ -36,21 +38,68 @@ export function AbaUsuarios() {
     const carregarDados = async () => {
         try {
             const dadosCidades = await listarCidadesUsuario();
-            setCidades([dadosCidades]);
+            setCidades(dadosCidades);
             console.log(dadosCidades);
 
             const dadosRoles = await listarRoles();
             setRoles(dadosRoles);
 
-            const dadosUsuarios = await listarUsuarios();
-            setUsuarios(dadosUsuarios);
-
             const dadosLogado = await obterUsuarioLogado();
             setUsuarioLogado(dadosLogado.usuario);
+
+            if (dadosLogado.usuario.role !== 'GLOBAL') {
+                const dadosUsuarios = await listarUsuarios();
+                setUsuarios(dadosUsuarios);
+                return;
+            }
+
+            // Se for usuário GLOBAL busca todas as cidades para fazer filtro no select
+
+            if (dadosCidades.length > 0) {
+
+                const primeiraCidadeId = dadosCidades[0].id;
+                setCidadeFiltro(primeiraCidadeId);
+
+                const dadosUsuario = await listarUsuariosCidade(primeiraCidadeId, roleFiltro);
+                setUsuarios(dadosUsuario);
+                console.log('aqui');
+
+                console.log(dadosUsuario);
+            }
+
         } catch (error) {
             console.log("Erro ao carregar dados: ", error);
         }
     }
+
+    const buscarUsuarios = async (cidade: string, role: Role) => {
+        try {
+            const dadosUsuarios = await listarUsuariosCidade(cidade, role);
+            setUsuarios(dadosUsuarios);
+        } catch (error) {
+            console.error("Erro ao buscar usuários:", error);
+        }
+    };
+
+    const buscarUsuarioCidade = async (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const cidade = e.target.value;
+
+        setCidadeFiltro(cidade);
+
+        await buscarUsuarios(cidade, roleFiltro);
+    };
+
+    const buscarUsuarioRole = async (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const role = e.target.value as Role;
+
+        setRoleFiltro(role);
+
+        await buscarUsuarios(cidadeFiltro, role);
+    };
 
     // Efeitos para controle do modal (mesmo padrão do seu código)
     useEffect(() => {
@@ -73,8 +122,8 @@ export function AbaUsuarios() {
         setTipo(undefined);
         setTelefone("");
         setCidadeId("");
-        
-        if(usuarioLogado?.role === 'ADMIN_LOCAL'){
+
+        if (usuarioLogado?.role === 'ADMIN_LOCAL') {
             setCidadeId(usuarioLogado.cidadeId || '');
         }
         setModalAberto(true);
@@ -110,7 +159,6 @@ export function AbaUsuarios() {
             const bateTexto =
                 item.nome.toLowerCase().includes(termo) ||
                 item.email.toLowerCase().includes(termo) ||
-                item.cidade?.nome.toLowerCase().includes(termo)||
                 item.telefone.toLowerCase().includes(termo);
 
             return bateTexto
@@ -186,6 +234,29 @@ export function AbaUsuarios() {
                     onChange={(e) => setBusca(e.target.value)}
                 />
 
+                {usuarioLogado?.role === 'GLOBAL' && (
+                    <select
+                        value={cidadeFiltro}
+                        onChange={buscarUsuarioCidade}
+                    >
+                        <option value="N">Nenhuma</option>
+                        {cidades.map((item) => (
+                            <option key={item.id} value={item.id}>{item.nome}</option>
+                        ))}
+                    </select>
+                )}
+
+                {usuarioLogado?.role === 'GLOBAL' && (
+                    <select
+                        value={roleFiltro}
+                        onChange={buscarUsuarioRole}
+                    >
+                        {roles.map((item) => (
+                            <option key={item} value={item}>{item}</option>
+                        ))}
+                    </select>
+                )}
+
                 <button className="btnPagination" onClick={abrirModalAdicionar}>Adicionar Usuário</button>
 
             </div>
@@ -213,7 +284,7 @@ export function AbaUsuarios() {
                         ) : (
                             usuariosFiltrados.map((item) => (
                                 <tr key={item.id}>
-                                    <td>{usuarioLogado?.id === item.id ? <FontAwesomeIcon icon={faUserAlt}/> : ""}<strong>{item.nome}</strong></td>
+                                    <td>{usuarioLogado?.id === item.id ? <FontAwesomeIcon icon={faUserAlt} /> : ""}<strong>{item.nome}</strong></td>
                                     <td>{item.email}</td>
                                     <td>{item.telefone}</td>
                                     <td>{item.role}</td>

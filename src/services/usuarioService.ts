@@ -25,6 +25,12 @@ export async function listarUsuarios(){
     })
 }
 
+export async function listarUsuariosCidade(cidadeId: string, role: Role ){
+    return await apiFetch(`/usuario/cidade/${cidadeId}/${role}`, {
+        method: "GET",
+    })
+}
+
 export async function ativarUsuario(id: string){
     return await apiFetch(`/usuario/ativar/${id}`, {
         method: "PUT",
