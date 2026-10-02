@@ -41,6 +41,10 @@
     margin-bottom: 25px;
 }
 
+.reqHeadButtons {
+    display: none;
+}
+
 .solicitacaoHeader h2 {
     margin: 0 0 7px;
     color: var(--cor-fundo-escuro);
@@ -794,6 +798,14 @@ body.modalAberto {
     .plantarLayout {
         grid-template-columns: 1fr;
     }
+
+    .reqHeadButtons {
+        display: flex;
+    }
+
+    .reqStatusButtons {
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {
@@ -833,6 +845,8 @@ body.modalAberto {
     .btnAlterarArvore {
         width: 100%;
     }
+
+    
 }
 
 @media (max-width: 650px) {

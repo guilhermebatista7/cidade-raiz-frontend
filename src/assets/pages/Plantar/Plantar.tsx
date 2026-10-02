@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faCamera, faCheck, faFileLines, faHandHoldingHeart, faLeaf, faPaperPlane, faTrash, faClock, faCalendarCheck, faXmark, faListCheck, faPlus
+    faCamera, faCheck, faFileLines, faHandHoldingHeart, faLeaf, faPaperPlane, faTrash, faClock, faCalendarCheck, faXmark, faListCheck
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SectionContent } from "../../components/SectionContent/SectionContent";
@@ -526,27 +526,57 @@ export const Plantar = () => {
                             CABEÇALHO
                         ====================================================== */}
 
-                        <div className="solicitacaoHeader">
-                            <div>
-                                <h2>
-                                    {modoVerificacao
-                                        ? `Verificar Requisição - ${requisicaoSelecionada?.nomeBeneficiario || ""}`
-                                        : "Nova Requisição de Plantio"}
-                                </h2>
-                                <p>
-                                    {modoVerificacao
-                                        ? podeEditar
-                                            ? "Confira os dados da requisição e faça as alterações necessárias."
-                                            : "Obs: Não é possível alterar os dados desta requisição."
-                                        : "Preencha os dados abaixo para solicitar o plantio de uma árvore."
+                        <div className="solicitacaoHeader d-flex flex-column">
+                            <div className="reqHeadButtons flex-row justify-content-end gap-2 w-100">
+                                <button
+                                    type="button"
+                                    className="btnEnviar"
+                                    onClick={
+                                        abrirModalRequisicao
                                     }
-                                </p>
+                                >
+                                    <FontAwesomeIcon
+                                        icon={faListCheck}
+                                    />
+
+                                    {" "}Minhas requisições
+                                </button>
+
+                                {modoVerificacao && (
+                                    <button
+                                        type="button"
+                                        className="btnEnviar"
+                                        onClick={novaRequisicao}
+                                        style={{
+                                            marginBottom: "10px"
+                                        }}
+                                    >
+                                        Nova requisição
+                                    </button>
+                                )}
                             </div>
 
-                            <div className="plantarHeaderIcon">
-                                <FontAwesomeIcon
-                                    icon={faHandHoldingHeart}
-                                />
+                            <div className="d-flex flex-row justify-content-between align-items-center w-100">
+                                <div>
+                                    <h2>
+                                        {modoVerificacao
+                                            ? `Verificar Requisição - ${requisicaoSelecionada?.nomeBeneficiario || ""}`
+                                            : "Nova Requisição de Plantio"}
+                                    </h2>
+                                    <p>
+                                        {modoVerificacao
+                                            ? podeEditar
+                                                ? "Confira os dados da requisição e faça as alterações necessárias."
+                                                : "Obs: Não é possível alterar os dados desta requisição."
+                                            : "Preencha os dados abaixo para solicitar o plantio de uma árvore."
+                                        }
+                                    </p>
+                                </div>
+                                <div className="plantarHeaderIcon">
+                                    <FontAwesomeIcon
+                                        icon={faHandHoldingHeart}
+                                    />
+                                </div>
                             </div>
 
                         </div>
@@ -1185,32 +1215,34 @@ export const Plantar = () => {
 
                     <div className="statusColumn">
 
-                        <button
-                            type="button"
-                            className="btnEnviar"
-                            onClick={
-                                abrirModalRequisicao
-                            }
-                        >
-                            <FontAwesomeIcon
-                                icon={faListCheck}
-                            />
-
-                            {" "}Minhas requisições
-                        </button>
-
-                        {modoVerificacao && (
+                        <div className="reqStatusButtons flex-row justify-content-end gap-2 w-100">
                             <button
                                 type="button"
-                                className="btnEnviar"
-                                onClick={novaRequisicao}
-                                style={{
-                                    marginBottom: "10px"
-                                }}
+                                className="btnEnviar mb-1"
+                                onClick={
+                                    abrirModalRequisicao
+                                }
                             >
-                                Nova requisição
+                                <FontAwesomeIcon
+                                    icon={faListCheck}
+                                />
+
+                                {" "}Minhas requisições
                             </button>
-                        )}
+
+                            {modoVerificacao && (
+                                <button
+                                    type="button"
+                                    className="btnEnviar"
+                                    onClick={novaRequisicao}
+                                    style={{
+                                        marginBottom: "10px"
+                                    }}
+                                >
+                                    Nova requisição
+                                </button>
+                            )}
+                        </div>
 
                         <div className="statusCard">
 

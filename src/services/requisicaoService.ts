@@ -59,7 +59,7 @@ export async function agendarPlantio(id:string, dataInicial: Date, dataFinal: Da
 }
 
 export async function alterarStatus(id:string, status:StatusRequisicao){
-  return await apiFetch(`/requisicao/alterarSituacao/${id}`, {
+  return await apiFetch(`/requisicao/alterarStatus/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
