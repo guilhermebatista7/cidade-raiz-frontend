@@ -8,6 +8,13 @@ export async function cadastrarRequisicao(formData: FormData) {
   })
 }
 
+export async function atualizarRequisicao(id: string, formData: FormData) {
+  return await apiFetch(`/requisicao/${id}`, {
+    method: "PUT",
+    body: formData,
+  })
+}
+
 export async function listarRequisicoes() {
   return await apiFetch("/requisicao", {
     method: "GET"
@@ -16,6 +23,12 @@ export async function listarRequisicoes() {
 
 export async function listarRequisicoesCidade(id: string) {
   return await apiFetch(`/requisicao/cidade/${id}`, {
+    method: "GET"
+  })
+}
+
+export async function listarMinhasRequisicoes(){
+  return await apiFetch('/requisicao/usuario', {
     method: "GET"
   })
 }
@@ -46,7 +59,7 @@ export async function agendarPlantio(id:string, dataInicial: Date, dataFinal: Da
 }
 
 export async function alterarStatus(id:string, status:StatusRequisicao){
-  return await apiFetch(`/requisicao/alterarStuacao/${id}`, {
+  return await apiFetch(`/requisicao/alterarSituacao/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

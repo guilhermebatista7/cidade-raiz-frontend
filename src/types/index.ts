@@ -48,6 +48,8 @@ export interface Requisicao {
   arvore?: Arvore;
   status: StatusRequisicao;
   observacaoStatus?: string; //OBS caso req seja negada 
+  nomeBeneficiario: string;
+  telefoneBeneficiario: string;
   tipoAtendimento: TipoAtendimento;
   rua: string;
   numero: string;

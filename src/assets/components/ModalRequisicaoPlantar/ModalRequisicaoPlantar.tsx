@@ -35,21 +35,6 @@ const formatarStatus = (status: string) => {
     }
 };
 
-const formatarTipoAtendimento = (tipo: string) => {
-    switch (tipo) {
-        case "PLANTIO_AGENDADO":
-        case "agendar":
-            return "Plantio agendado";
-
-        case "RETIRADA_LOCAL":
-        case "retirar":
-            return "Retirada no local";
-
-        default:
-            return tipo.replaceAll("_", " ");
-    }
-};
-
 const formatarData = (data: string | null | undefined) => {
     if (!data) return "Não informado";
 
@@ -118,27 +103,16 @@ export default function ModalRequisicaoPlantar({
 
                                             <td>
                                                 <strong>
-                                                    {item.arvore?.nomePopular ||
+                                                    {item.nomeBeneficiario ||
                                                         "Não informado"}
                                                 </strong>
                                             </td>
 
                                             <td>
-                                                {item.cidadeEndereco ||
-                                                    "Não informado"}
-                                            </td>
-
-                                            <td>
-                                                {item.bairro ||
-                                                    "Não informado"}
-                                            </td>
-
-                                            <td>
-                                                <span className="tipoTag">
-                                                    {formatarTipoAtendimento(
-                                                        item.tipoAtendimento
-                                                    )}
-                                                </span>
+                                                <strong>
+                                                    {item.arvore?.nomePopular ||
+                                                        "Não informado"}
+                                                </strong>
                                             </td>
 
                                             <td>
