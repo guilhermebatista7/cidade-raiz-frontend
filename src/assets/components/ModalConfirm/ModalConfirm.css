@@ -1,4 +1,5 @@
-/* src/assets/components/ModalConfirmacao/ModalConfirmacao.css */
+@import '../../../index.css';
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -13,7 +14,7 @@
 }
 
 .modalCard {
-  background: rgba(25, 55, 35, 0.95);
+  background: var(--cor-verde);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 20px;
   padding: 28px 24px;
@@ -29,12 +30,12 @@
   font-size: 1.3rem;
   margin-bottom: 12px;
   font-weight: 600;
-  color: #d8f3dc;
+  color: white;
 }
 
 .modalCard p {
   font-size: 0.95rem;
-  color: #e9ecef;
+  color: white;
   margin-bottom: 24px;
 }
 
@@ -46,7 +47,7 @@
 
 .btnModalCancelar {
   background: transparent;
-  color: #ffffff;
+  color: white;
   border: 1px solid rgba(255, 255, 255, 0.35);
   padding: 8px 18px;
   border-radius: 25px;
