@@ -1,0 +1,334 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { Requisicao, StatusRequisicao as Status } from "../../../types";
+import {
+    faCalendarCheck,
+    faCamera,
+    faCheck,
+    faClock,
+    faLeaf,
+    faLocationDot,
+} from "@fortawesome/free-solid-svg-icons";
+import "./StatusRequisicao.css";
+
+interface StatusRequisicaoProps {
+    requisicao: Requisicao | null;
+}
+
+type EtapaStatus = "concluida" | "atual" | "pendente" | "recusada";
+
+export const StatusRequisicao = ({
+    requisicao,
+}: StatusRequisicaoProps) => {
+
+    const status: Status = requisicao?.status ?? "SOLICITADO";
+    const id = requisicao?.id;
+
+    /*
+     * Define o estado visual de cada etapa
+     * baseado no status atual da requisição.
+     */
+    const getEtapaStatus = (etapa: string): EtapaStatus => {
+
+        /*
+         * Fluxo de RECUSADO
+         */
+        if (status === "RECUSADO") {
+
+            if (etapa === "solicitado") {
+                return "concluida";
+            }
+
+            if (etapa === "aprovado") {
+                return "recusada";
+            }
+
+            return "pendente";
+        }
+
+        /*
+         * Fluxo normal
+         */
+        
+        const fluxo: Record<Status, number> = {
+            SOLICITADO: 0,
+            APROVADO: 1,
+            AGUARDANDO_RETIRADA: 2,
+            AGENDADO_PLANTIO: 2,
+            CONCLUIDO: 3,
+            RECUSADO: 1,
+        };
+
+        const etapas: Record<string, number> = {
+            solicitado: 0,
+            aprovado: 1,
+            atendimento: 2,
+            concluido: 3,
+        };
+
+        const indiceAtual = fluxo[status];
+        const indiceEtapa = etapas[etapa];
+
+        if (indiceAtual === undefined || indiceEtapa === undefined) {
+            return "pendente";
+        }
+
+        if (indiceEtapa <= indiceAtual && status === "CONCLUIDO") {
+            return "concluida";
+        }
+
+        if (indiceEtapa < indiceAtual) {
+            return "concluida";
+        }
+
+        if (indiceEtapa === indiceAtual) {
+            return "atual";
+        }
+
+        return "pendente";
+    };
+
+    /*
+     * Define o ícone da etapa.
+     */
+    const getIcon = (
+        etapa: string,
+        icon: any
+    ) => {
+
+        const etapaStatus = getEtapaStatus(etapa);
+
+        if (etapaStatus === "concluida") {
+            return faCheck;
+        }
+
+        if (etapaStatus === "recusada") {
+            return faClock;
+        }
+
+        return icon;
+    };
+
+    /*
+     * Texto amigável do status.
+     */
+    const statusLabel: Record<Status, string> = {
+        SOLICITADO: "Solicitado",
+        APROVADO: "Aprovado",
+        RECUSADO: "Recusado",
+        AGUARDANDO_RETIRADA: "Aguardando retirada",
+        AGENDADO_PLANTIO: "Agendado para plantio",
+        CONCLUIDO: "Concluído",
+    };
+
+    /*
+     * A etapa de atendimento depende do tipo escolhido.
+     */
+    const etapaAtendimento =
+        requisicao?.tipoAtendimento === "RETIRADA_LOCAL"
+            ? "Retirada local"
+            : "Agendado para plantio";
+
+    const iconeAtendimento =
+        requisicao?.tipoAtendimento === "RETIRADA_LOCAL"
+            ? faLocationDot
+            : faCalendarCheck;
+
+    if (requisicao) {
+        const data = new Date(requisicao.dataInicial);
+    }
+
+    return (
+        <>
+            <div className="statusHeader">
+
+                <div>
+                    <h2>
+                        Acompanhe sua requisição
+                    </h2>
+
+                    {id && (
+                        <p>
+                            Protocolo: #{id.substring(0, 8).toUpperCase()}
+                        </p>
+                    )}
+                </div>
+
+                <span
+                    className={`statusBadge status-${status.toLowerCase()}`}
+                >
+                    {statusLabel[status]}
+                </span>
+
+            </div>
+
+            <div className="timeline">
+
+                {/* SOLICITADO */}
+
+                <div
+                    className={`timelineItem ${getEtapaStatus("solicitado")}`}
+                >
+
+                    <div className="timelineIcon">
+                        <FontAwesomeIcon
+                            icon={getIcon("solicitado", faClock)}
+                        />
+                    </div>
+
+                    <div className="timelineContent">
+
+                        <h3>
+                            Solicitado
+                        </h3>
+
+                        <p>
+                            Sua requisição foi recebida com sucesso.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {/* APROVADO / RECUSADO */}
+
+                <div
+                    className={`timelineItem ${getEtapaStatus("aprovado")}`}
+                >
+
+                    <div className="timelineIcon">
+
+                        <FontAwesomeIcon
+                            icon={
+                                status === "RECUSADO"
+                                    ? faClock
+                                    : getIcon("aprovado", faClock)
+                            }
+                        />
+
+                    </div>
+
+                    <div className="timelineContent">
+
+                        <h3>
+                            {status === "RECUSADO"
+                                ? "Recusado"
+                                : "Aprovado"
+                            }
+                        </h3>
+
+                        <p>
+                            {status === "RECUSADO"
+                                ? "Sua requisição foi recusada."
+                                : "Sua requisição foi aprovada."
+                            }
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {/* ATENDIMENTO */}
+
+                {requisicao && (
+                    <div
+                        className={`timelineItem ${getEtapaStatus("atendimento")}`}
+                    >
+
+                        <div className="timelineIcon">
+
+                            <FontAwesomeIcon
+                                icon={iconeAtendimento}
+                            />
+
+                        </div>
+
+                        <div className="timelineContent">
+
+                            <h3>
+                                {etapaAtendimento}
+                            </h3>
+
+                            <p>
+                                {requisicao.tipoAtendimento === "RETIRADA_LOCAL"
+                                    ? "Sua requisição está aguardando retirada."
+                                    : "Seu plantio será realizado no período de " + new Date(requisicao.dataInicial).toLocaleDateString("pt-BR", {
+                                        timeZone: "UTC"
+                                    }) + " a " + new Date(requisicao.dataFinal).toLocaleDateString("pt-BR", {
+                                        timeZone: "UTC"
+                                    })
+                                }
+                            </p>
+
+                        </div>
+
+                    </div>
+                )}
+
+
+                {/* CONCLUÍDO */}
+
+                <div
+                    className={`timelineItem ${getEtapaStatus("concluido")}`}
+                >
+
+                    <div className="timelineIcon">
+
+                        <FontAwesomeIcon
+                            icon={faLeaf}
+                        />
+
+                    </div>
+
+                    <div className="timelineContent">
+
+                        <h3>
+                            Concluído
+                        </h3>
+
+                        <p>
+                            Plantio realizado com sucesso!
+                        </p>
+
+                        <span>
+                            A foto será disponibilizada aqui.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {/* BOX DE CONCLUSÃO */}
+
+            <div className="conclusaoBox">
+
+                <div>
+
+                    <strong>
+                        Após a conclusão
+                    </strong>
+
+                    <p>
+                        Uma foto da árvore poderá ser adicionada aqui após o
+                        plantio. Caso você tenha optado por retirar e plantar
+                        por conta própria, você mesmo poderá inserir a imagem.
+                    </p>
+
+                </div>
+
+                <div className="conclusaoIcon">
+
+                    <FontAwesomeIcon
+                        icon={faCamera}
+                    />
+
+                </div>
+
+            </div>
+        </>
+    );
+};

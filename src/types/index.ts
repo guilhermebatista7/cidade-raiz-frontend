@@ -62,6 +62,17 @@ export interface Requisicao {
   comprovanteResidenciaUrl?: string | null;
   criadoEm: string;
   atualizadoEm: string;
+
+  historico: {
+    statusAnterior: StatusRequisicao;
+    statusNovo: StatusRequisicao;
+    observacao?: string;
+    criadoEm: string;
+  }[];
+  
+  dataInicial: string;
+  dataFinal: string;
+  
 }
 
 export interface Cidade {

@@ -22,6 +22,7 @@ import type { Requisicao, Usuario } from "../../../types";
 import { useAlert } from "../../components/hooks/useAlert";
 import Alert from "../../components/Alert/Alert";
 import ModalRequisicaoPlantar from "../../components/ModalRequisicaoPlantar/ModalRequisicaoPlantar";
+import { StatusRequisicao } from "../../components/StatusRequisicao/StatusRequisicao";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
@@ -429,6 +430,9 @@ export const Plantar = () => {
                 await listarMinhasRequisicoes();
 
             setRequisicoes(dados);
+
+            novaRequisicao();
+            carregarDados();
         } catch (error) {
             showAlert(
                 `Erro ao cadastrar requisição: ${error}`,
@@ -460,6 +464,8 @@ export const Plantar = () => {
                 "success"
             );
 
+            novaRequisicao();
+            carregarDados();
         } catch (error) {
             showAlert(
                 `Erro ao atualizar requisição: ${error}`,
@@ -578,6 +584,14 @@ export const Plantar = () => {
                                     />
                                 </div>
                             </div>
+
+                            {requisicaoSelecionada?.status === "RECUSADO" && (
+                                <div className="alert alert-danger mt-3 w-100" role="alert">
+                                    Esta requisição foi recusada, faça as alterações necessárias.
+                                    <br /><strong> Motivo</strong>: {requisicaoSelecionada.observacaoStatus || "Não informado."}
+                                </div>
+                            )}
+
 
                         </div>
 
@@ -1202,7 +1216,9 @@ export const Plantar = () => {
                             />
 
                             {modoVerificacao
-                                ? " Atualizar requisição"
+                                ? requisicaoSelecionada?.status === "RECUSADO"
+                                    ? " Reenviar requisição"
+                                    : " Atualizar requisição"
                                 : " Enviar requisição"}
 
                         </button>
@@ -1246,184 +1262,7 @@ export const Plantar = () => {
 
                         <div className="statusCard">
 
-                            <div className="statusHeader">
-
-                                <div>
-
-                                    <h2>
-                                        Acompanhe sua requisição
-                                    </h2>
-
-                                    <p>
-                                        Protocolo:{" "}
-                                        {requisicaoSelecionada?.id
-                                            ? `#${requisicaoSelecionada.id}`
-                                            : "#SRP-2024-0056"}
-                                    </p>
-
-                                </div>
-
-                                <span className="statusBadge">
-                                    {requisicaoSelecionada?.status ??
-                                        "Em andamento"}
-                                </span>
-
-                            </div>
-
-                            <div className="timeline">
-
-                                <div className="timelineItem active">
-
-                                    <div className="timelineIcon">
-                                        <FontAwesomeIcon
-                                            icon={faCheck}
-                                        />
-                                    </div>
-
-                                    <div className="timelineContent">
-
-                                        <h3>
-                                            Solicitado
-                                        </h3>
-
-                                        <p>
-                                            Sua requisição foi
-                                            recebida com sucesso.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                <div className="timelineItem active">
-
-                                    <div className="timelineIcon">
-                                        <FontAwesomeIcon
-                                            icon={faCheck}
-                                        />
-                                    </div>
-
-                                    <div className="timelineContent">
-
-                                        <h3>
-                                            Aprovado
-                                        </h3>
-
-                                        <p>
-                                            Sua requisição foi aprovada.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                <div className="timelineItem current">
-
-                                    <div className="timelineIcon">
-                                        <FontAwesomeIcon
-                                            icon={faClock}
-                                        />
-                                    </div>
-
-                                    <div className="timelineContent">
-
-                                        <h3>
-                                            Aguardando retirada
-                                        </h3>
-
-                                        <p>
-                                            Aguardamos a retirada
-                                            de algum item que possa
-                                            interferir no plantio.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                <div className="timelineItem">
-
-                                    <div className="timelineIcon">
-                                        <FontAwesomeIcon
-                                            icon={faCalendarCheck}
-                                        />
-                                    </div>
-
-                                    <div className="timelineContent">
-
-                                        <h3>
-                                            Agendado para plantio
-                                        </h3>
-
-                                        <p>
-                                            Em breve seu plantio
-                                            será agendado.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                <div className="timelineItem">
-
-                                    <div className="timelineIcon">
-                                        <FontAwesomeIcon
-                                            icon={faLeaf}
-                                        />
-                                    </div>
-
-                                    <div className="timelineContent">
-
-                                        <h3>
-                                            Concluído
-                                        </h3>
-
-                                        <p>
-                                            Plantio realizado com sucesso!
-                                        </p>
-
-                                        <span>
-                                            A foto será disponibilizada aqui.
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div className="conclusaoBox">
-
-                                <div>
-
-                                    <strong>
-                                        Após a conclusão
-                                    </strong>
-
-                                    <p>
-                                        Uma foto da árvore poderá
-                                        ser adicionada aqui após o
-                                        plantio. Caso você tenha optado
-                                        por retirar e plantar por conta
-                                        própria, você mesmo poderá inserir
-                                        a imagem.
-                                    </p>
-
-                                </div>
-
-                                <div className="conclusaoIcon">
-
-                                    <FontAwesomeIcon
-                                        icon={faCamera}
-                                    />
-
-                                    <FontAwesomeIcon
-                                        icon={faLeaf}
-                                    />
-
-                                </div>
-
-                            </div>
+                            <StatusRequisicao requisicao={requisicaoSelecionada} />
 
                         </div>
 
