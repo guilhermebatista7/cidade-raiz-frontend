@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faCamera, faCheck, faFileLines, faHandHoldingHeart, faLeaf, faPaperPlane, faTrash, faClock, faCalendarCheck, faXmark, faListCheck
+    faCamera, faCheck, faFileLines, faHandHoldingHeart, faLeaf, faPaperPlane, faTrash, faXmark, faListCheck
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SectionContent } from "../../components/SectionContent/SectionContent";

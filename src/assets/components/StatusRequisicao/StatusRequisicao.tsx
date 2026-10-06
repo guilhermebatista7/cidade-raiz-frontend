@@ -133,10 +133,6 @@ export const StatusRequisicao = ({
             ? faLocationDot
             : faCalendarCheck;
 
-    if (requisicao) {
-        const data = new Date(requisicao.dataInicial);
-    }
-
     return (
         <>
             <div className="statusHeader">

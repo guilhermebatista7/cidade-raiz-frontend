@@ -221,11 +221,16 @@ export default function ModalRequisicao({
                                     <option value="SOLICITADO">Solicitado</option>
                                     <option value="APROVADO">Aprovado</option>
                                     <option value="RECUSADO">Recusado</option>
-                                    <option value="AGUARDANDO_RETIRADA">Aguardando retirada</option>
-                                    <option value="AGENDADO_PLANTIO">Plantio agendado</option>
+                                    {requisicao.tipoAtendimento === "RETIRADA_LOCAL" && (
+                                        <option value="AGUARDANDO_RETIRADA">Aguardando retirada</option>
+                                    )}
+                                    {requisicao.tipoAtendimento === "PLANTIO_AGENDADO" && (
+                                        <option value="AGENDADO_PLANTIO">Plantio agendado</option>
+                                    )}
                                     <option value="CONCLUIDO">Concluído</option>
                                 </select>
                             </div>
+
                             {(status !== requisicao.status && status === 'RECUSADO') ? (
                                 <input value={obsStatus} className="w-50 mt-3" type="text" placeholder="Informe o motivo" onChange={(e) => setObsStatus(e.target.value)} />
                             ) : ''}
