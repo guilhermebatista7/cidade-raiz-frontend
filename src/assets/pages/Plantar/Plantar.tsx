@@ -1262,7 +1262,20 @@ export const Plantar = () => {
 
                         <div className="statusCard">
 
-                            <StatusRequisicao requisicao={requisicaoSelecionada} />
+                            <StatusRequisicao
+                                requisicao={requisicaoSelecionada}
+                                onFotoPlantioSalva={(requisicaoAtualizada) => {
+                                    setRequisicaoSelecionada(requisicaoAtualizada);
+
+                                    setRequisicoes(prev =>
+                                        prev.map(req =>
+                                            req.id === requisicaoAtualizada.id
+                                                ? requisicaoAtualizada
+                                                : req
+                                        )
+                                    );
+                                }}
+                            />
 
                         </div>
 

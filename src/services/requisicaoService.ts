@@ -15,6 +15,13 @@ export async function atualizarRequisicao(id: string, formData: FormData) {
   })
 }
 
+export async function salvarFotoPlantio(id: string, formData: FormData) {
+  return await apiFetch(`/requisicao/fotoPlantio/${id}`, {
+    method: "PUT",
+    body: formData,
+  })
+}
+
 export async function listarRequisicoes() {
   return await apiFetch("/requisicao", {
     method: "GET"

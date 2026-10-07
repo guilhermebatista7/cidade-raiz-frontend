@@ -9,19 +9,42 @@ import {
     faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import "./StatusRequisicao.css";
+import { useEffect, useState } from "react";
+import { salvarFotoPlantio } from "../../../services/requisicaoService";
 
 interface StatusRequisicaoProps {
     requisicao: Requisicao | null;
+    onFotoPlantioSalva?: (requisicao: Requisicao) => void;
 }
 
 type EtapaStatus = "concluida" | "atual" | "pendente" | "recusada";
 
 export const StatusRequisicao = ({
     requisicao,
+    onFotoPlantioSalva,
 }: StatusRequisicaoProps) => {
 
     const status: Status = requisicao?.status ?? "SOLICITADO";
     const id = requisicao?.id;
+
+    const [fotoPlantio, setFotoPlantio] = useState<File | null>(null);
+    const [fotoPlantioUrl, setFotoPlantioUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        setFotoPlantioUrl(requisicao?.fotoPlantioUrl ?? null);
+    }, [requisicao]);
+
+    const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (file) {
+            setFotoPlantio(file);
+        }
+    };
+
+    const abrirArquivoNovaGuia = (url: string) => {
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
 
     /*
      * Define o estado visual de cada etapa
@@ -48,7 +71,7 @@ export const StatusRequisicao = ({
         /*
          * Fluxo normal
          */
-        
+
         const fluxo: Record<Status, number> = {
             SOLICITADO: 0,
             APROVADO: 1,
@@ -132,6 +155,36 @@ export const StatusRequisicao = ({
         requisicao?.tipoAtendimento === "RETIRADA_LOCAL"
             ? faLocationDot
             : faCalendarCheck;
+
+    const handleSalvarFoto = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+
+        if (!id || !fotoPlantio) {
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append("fotoPlantio", fotoPlantio);
+
+        if (!id || !fotoPlantio) {
+            return;
+        }
+
+        try {
+            const resposta = await salvarFotoPlantio(id, formData);
+
+            console.log("Resposta:", resposta);
+
+            alert("Foto salva com sucesso!");
+
+            setFotoPlantioUrl(resposta.fotoPlantioUrl);
+            setFotoPlantio(null);
+            onFotoPlantioSalva?.(resposta);
+        } catch (error) {
+            alert(error);
+        }
+    };
 
     return (
         <>
@@ -316,15 +369,111 @@ export const StatusRequisicao = ({
 
                 </div>
 
-                <div className="conclusaoIcon">
+                {requisicao && requisicao.status !== "CONCLUIDO" && (
+                    <div className="conclusaoIcon">
 
-                    <FontAwesomeIcon
-                        icon={faCamera}
-                    />
+                        <FontAwesomeIcon
+                            icon={faCamera}
+                        />
 
-                </div>
+                    </div>
+                )}
+
 
             </div>
+            {requisicao && requisicao.status === "CONCLUIDO" && (
+                <div className="photoUpload mt-2 d-flex flex-column">
+
+                    <label
+                        htmlFor="fotoPlantio"
+                        className="addPhoto"
+                    >
+                        <div className="cameraIcon">
+                            <FontAwesomeIcon
+                                icon={faCamera}
+                            />
+                        </div>
+
+                        <strong>
+                            {fotoPlantio ? (
+                                <>
+                                    Foto adicionada com sucesso{" "}
+                                    <FontAwesomeIcon
+                                        className="successIcon"
+                                        icon={faCheck}
+                                    />
+                                </>
+                            ) : (
+                                "Adicionar foto do plantio"
+                            )}
+                        </strong>
+
+                        <span>
+                            {fotoPlantio
+                                ? "Clique para alterar a imagem"
+                                : "Clique para adicionar uma imagem"}
+                        </span>
+
+                        <input
+                            id="fotoPlantio"
+                            name="fotoPlantio"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFotoChange}
+                        />
+
+                    </label>
+
+                    {fotoPlantio && (
+                        <div className="photoPreview">
+
+                            <img
+                                src={URL.createObjectURL(
+                                    fotoPlantio
+                                )}
+                                alt="Preview da foto do plantio"
+                            />
+
+                        </div>
+                    )}
+
+                    {fotoPlantioUrl && !fotoPlantio && (
+                        <div
+                            className="photoPreview"
+                            onClick={() =>
+                                abrirArquivoNovaGuia(fotoPlantioUrl)
+                            }
+                            style={{ cursor: "pointer" }}
+                            title="Clique para abrir a foto em uma nova guia"
+                        >
+                            <img
+                                src={fotoPlantioUrl}
+                                alt="Foto do plantio"
+                            />
+                        </div>
+                    )}
+
+                    {fotoPlantio && (
+                        <button
+                            type="button"
+                            className="btnEnviar mt-1"
+                            onClick={(e) => handleSalvarFoto(e)}
+                        >
+                            Salvar
+                        </button>
+                    )}
+
+                    {fotoPlantio && (
+                        <button
+                            type="button"
+                            className="btnEnviar mt-1"
+                            //onClick={handlePublicarBlog}
+                        >
+                            Publicar no Blog
+                        </button>
+                    )}
+                </div>
+            )}
         </>
     );
 };

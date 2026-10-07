@@ -60,6 +60,7 @@ export interface Requisicao {
   pontoReferencia?: string | null;
   fotoLocalUrl?: string | null;
   comprovanteResidenciaUrl?: string | null;
+  fotoPlantioUrl?: string | null;
   criadoEm: string;
   atualizadoEm: string;
 
