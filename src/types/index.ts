@@ -87,3 +87,10 @@ export interface Cidade {
   atualizadoEm: string;
   ativa: boolean;
 }
+
+export interface Publicacao {
+  id: string;
+  idRequisicao: string;
+  titulo: string;
+  descricao: string;
+}

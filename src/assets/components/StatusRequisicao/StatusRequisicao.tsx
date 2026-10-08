@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { Requisicao, StatusRequisicao as Status } from "../../../types";
+import type { Publicacao, Requisicao, StatusRequisicao as Status } from "../../../types";
 import {
     faCalendarCheck,
     faCamera,
@@ -11,9 +11,11 @@ import {
 import "./StatusRequisicao.css";
 import { useEffect, useState } from "react";
 import { salvarFotoPlantio } from "../../../services/requisicaoService";
+import ModalPublicarBlog from "../ModalPublicarBlog/ModalPublicarBlog";
 
 interface StatusRequisicaoProps {
     requisicao: Requisicao | null;
+    publicacao: Publicacao | null;
     onFotoPlantioSalva?: (requisicao: Requisicao) => void;
 }
 
@@ -21,6 +23,7 @@ type EtapaStatus = "concluida" | "atual" | "pendente" | "recusada";
 
 export const StatusRequisicao = ({
     requisicao,
+    publicacao,
     onFotoPlantioSalva,
 }: StatusRequisicaoProps) => {
 
@@ -33,6 +36,8 @@ export const StatusRequisicao = ({
     useEffect(() => {
         setFotoPlantioUrl(requisicao?.fotoPlantioUrl ?? null);
     }, [requisicao]);
+
+    const possuiPubli = !!publicacao?.id;
 
     const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -184,6 +189,20 @@ export const StatusRequisicao = ({
         } catch (error) {
             alert(error);
         }
+    };
+
+    const [modalAberto, setModalAberto] = useState(false);
+    const [requisicaoSelecionada, setRequisicaoSelecionada] = useState<Requisicao | null>(null);
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    const abrirModalRequisicao = (requisicao: Requisicao) => {
+        setRequisicaoSelecionada(requisicao);
+        setModalAberto(true);
+    };
+
+    const fecharModalRequisicao = () => {
+        setModalAberto(false);
+        setRequisicaoSelecionada(null);
     };
 
     return (
@@ -384,45 +403,48 @@ export const StatusRequisicao = ({
             {requisicao && requisicao.status === "CONCLUIDO" && (
                 <div className="photoUpload mt-2 d-flex flex-column">
 
-                    <label
-                        htmlFor="fotoPlantio"
-                        className="addPhoto"
-                    >
-                        <div className="cameraIcon">
-                            <FontAwesomeIcon
-                                icon={faCamera}
+                    {!possuiPubli && (
+
+                        <label
+                            htmlFor="fotoPlantio"
+                            className="addPhoto"
+                        >
+                            <div className="cameraIcon">
+                                <FontAwesomeIcon
+                                    icon={faCamera}
+                                />
+                            </div>
+
+                            <strong>
+                                {fotoPlantio ? (
+                                    <>
+                                        Foto adicionada com sucesso{" "}
+                                        <FontAwesomeIcon
+                                            className="successIcon"
+                                            icon={faCheck}
+                                        />
+                                    </>
+                                ) : (
+                                    "Adicionar foto do plantio"
+                                )}
+                            </strong>
+
+                            <span>
+                                {fotoPlantioUrl
+                                    ? "Clique para alterar a imagem"
+                                    : "Clique para adicionar uma imagem"}
+                            </span>
+
+                            <input
+                                id="fotoPlantio"
+                                name="fotoPlantio"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFotoChange}
                             />
-                        </div>
+                        </label>
+                    )}
 
-                        <strong>
-                            {fotoPlantio ? (
-                                <>
-                                    Foto adicionada com sucesso{" "}
-                                    <FontAwesomeIcon
-                                        className="successIcon"
-                                        icon={faCheck}
-                                    />
-                                </>
-                            ) : (
-                                "Adicionar foto do plantio"
-                            )}
-                        </strong>
-
-                        <span>
-                            {fotoPlantioUrl
-                                ? "Clique para alterar a imagem"
-                                : "Clique para adicionar uma imagem"}
-                        </span>
-
-                        <input
-                            id="fotoPlantio"
-                            name="fotoPlantio"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFotoChange}
-                        />
-
-                    </label>
 
                     {fotoPlantio && (
                         <div className="photoPreview">
@@ -453,7 +475,17 @@ export const StatusRequisicao = ({
                         </div>
                     )}
 
-                    {(fotoPlantio && fotoPlantioUrl) && (
+                    {possuiPubli && (
+                        <button
+                            type="button"
+                            className="btnEnviar mt-1"
+                        //onClick={(e) => handleSalvarFoto(e)}
+                        >
+                            Ver publicação
+                        </button>
+                    )}
+
+                    {(fotoPlantio && fotoPlantioUrl && !possuiPubli) && (
                         <button
                             type="button"
                             className="btnEnviar mt-1"
@@ -463,17 +495,27 @@ export const StatusRequisicao = ({
                         </button>
                     )}
 
-                    {(fotoPlantioUrl && !fotoPlantio) && (
+                    {(fotoPlantioUrl && !fotoPlantio && !possuiPubli) && (
                         <button
                             type="button"
                             className="btnEnviar mt-1"
-                            //onClick={handlePublicarBlog}
+                            onClick={() => abrirModalRequisicao(requisicao)}
                         >
                             Publicar no Blog
                         </button>
                     )}
                 </div>
             )}
+            <div className="abaPostarBlog">
+
+                <ModalPublicarBlog
+                    aberto={modalAberto}
+                    fechar={fecharModalRequisicao}
+                    requisicao={requisicaoSelecionada}
+                    baseUrl={API_URL}
+                />
+
+            </div>
         </>
     );
 };

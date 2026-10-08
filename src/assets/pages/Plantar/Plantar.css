@@ -160,8 +160,8 @@
 }
 
 .photoPreview {
-    width: 180px;
-    height: 140px;
+    width: 210px;
+    height: 180px;
     flex-shrink: 0;
     overflow: hidden;
     border: 2px solid #d6d5d2;
@@ -729,7 +729,7 @@ body.modalAberto {
     }
 
     .photoPreview {
-        width: 100%;
+        width: 60%;
         height: 190px;
     }
 

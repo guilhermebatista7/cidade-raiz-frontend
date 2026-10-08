@@ -17,12 +17,13 @@ import {
 } from "../../../services/requisicaoService";
 import { obterUsuarioLogado } from "../../../services/authService";
 
-import type { Requisicao, Usuario } from "../../../types";
+import type { Publicacao, Requisicao, Usuario } from "../../../types";
 
 import { useAlert } from "../../components/hooks/useAlert";
 import Alert from "../../components/Alert/Alert";
 import ModalRequisicaoPlantar from "../../components/ModalRequisicaoPlantar/ModalRequisicaoPlantar";
 import { StatusRequisicao } from "../../components/StatusRequisicao/StatusRequisicao";
+import { verificarPublicacao } from "../../../services/blogService";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
@@ -47,7 +48,6 @@ export const Plantar = () => {
     const [fotoLocalUrl, setFotoLocalUrl] = useState<string | null>(null);
     const [comprovanteUrl, setComprovanteUrl] = useState<string | null>(null);
 
-
     /*
      * Quando null:
      * - estamos criando uma nova requisição.
@@ -56,6 +56,7 @@ export const Plantar = () => {
      * - estamos verificando/editando uma requisição existente.
      */
     const [requisicaoSelecionada, setRequisicaoSelecionada] = useState<Requisicao | null>(null);
+    const [publicacao, setPublicacao] = useState<Publicacao | null>(null);
 
     const modoVerificacao = requisicaoSelecionada !== null;
 
@@ -268,6 +269,9 @@ export const Plantar = () => {
                 requisicao.comprovanteResidenciaUrl ?? null
             );
             setComprovante(null);
+
+            const publicacaoExistente = await verificarPublicacao(requisicao.id);
+            setPublicacao(publicacaoExistente);
 
             setModalAberto(false);
 
@@ -1275,6 +1279,7 @@ export const Plantar = () => {
                                         )
                                     );
                                 }}
+                                publicacao={publicacao}
                             />
 
                         </div>
