@@ -409,7 +409,7 @@ export const StatusRequisicao = ({
                         </strong>
 
                         <span>
-                            {fotoPlantio
+                            {fotoPlantioUrl
                                 ? "Clique para alterar a imagem"
                                 : "Clique para adicionar uma imagem"}
                         </span>
@@ -437,7 +437,7 @@ export const StatusRequisicao = ({
                         </div>
                     )}
 
-                    {fotoPlantioUrl && !fotoPlantio && (
+                    {(fotoPlantioUrl && !fotoPlantio) && (
                         <div
                             className="photoPreview"
                             onClick={() =>
@@ -453,7 +453,7 @@ export const StatusRequisicao = ({
                         </div>
                     )}
 
-                    {fotoPlantio && (
+                    {(fotoPlantio && fotoPlantioUrl) && (
                         <button
                             type="button"
                             className="btnEnviar mt-1"
@@ -463,7 +463,7 @@ export const StatusRequisicao = ({
                         </button>
                     )}
 
-                    {fotoPlantio && (
+                    {(fotoPlantioUrl && !fotoPlantio) && (
                         <button
                             type="button"
                             className="btnEnviar mt-1"
