@@ -1,12 +1,30 @@
 import { apiFetch } from "./api";
 
-export async function listarPublicacoes(){
-    return await apiFetch('/cidades', {
-        method: "GET",
-    })
+import type {
+    CursorPublicacao,
+    RespostaPublicacoes,
+} from "../types";
+
+export async function listarPublicacoes(
+    limit = 10,
+    cursor?: CursorPublicacao | null,
+): Promise<RespostaPublicacoes> {
+    const params = new URLSearchParams({
+        limit: String(limit),
+    });
+
+    if (cursor) {
+        params.set("cursorDate", cursor.cursorDate);
+        params.set("cursorId", cursor.cursorId);
+    }
+
+    return apiFetch(
+        `/blog?${params.toString()}`,
+        { method: "GET" },
+    );
 }
 
-export async function publicar(idRequisicao: string, titulo: string, descricao: string){
+export async function publicar(idRequisicao: string, titulo: string, descricao: string) {
     return await apiFetch("/blog", {
         method: 'POST',
         headers: {
@@ -20,8 +38,8 @@ export async function publicar(idRequisicao: string, titulo: string, descricao: 
     })
 }
 
-export async function verificarPublicacao(idRequisicao: string){
-    return await apiFetch(`/blog/${idRequisicao}`, {
+export async function verificarPublicacao(idRequisicao: string) {
+    return await apiFetch(`/blog/buscarReq/${idRequisicao}`, {
         method: 'GET',
     })
 }

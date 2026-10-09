@@ -11,8 +11,91 @@ import imageTeste from '../../media/tree.png';
 import { CardInfo } from '../../components/CardInfo/CardInfo';
 import { DetailCard } from '../../components/DetailCard/DetailCard';
 import Pagination from '../../components/Pagination/Pagination';
+import { useCallback, useEffect, useState } from 'react';
+import { listarPublicacoes } from '../../../services/blogService';
+import type { CursorPublicacao, Publicacao } from '../../../types';
 
 export const BlogPage = () => {
+  const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
+  const [nextCursor, setNextCursor] =
+    useState<CursorPublicacao | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState("");
+
+  const buscarPublicacoes = useCallback(
+    async (cursor?: CursorPublicacao | null) => {
+      return listarPublicacoes(10, cursor);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarInicial() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const resultado = await buscarPublicacoes();
+        console.log(resultado);
+
+        if (!ativo) return;
+
+        setPublicacoes(resultado.items);
+        setNextCursor(resultado.nextCursor);
+        setHasMore(resultado.hasMore);
+      } catch {
+        if (ativo) {
+          setError("Não foi possível carregar as publicações.");
+        }
+      } finally {
+        if (ativo) setLoading(false);
+      }
+    }
+
+    carregarInicial();
+
+    return () => {
+      ativo = false;
+    };
+  }, [buscarPublicacoes]);
+
+  const carregarMais = async () => {
+    if (loading || loadingMore || !hasMore || !nextCursor) {
+      return;
+    }
+
+    setLoadingMore(true);
+    setError("");
+
+    try {
+      const resultado = await buscarPublicacoes(nextCursor);
+      
+      setPublicacoes((anteriores) => {
+        // Evita duplicações caso a API retorne algum ID repetido.
+        const idsExistentes = new Set(
+          anteriores.map((publicacao) => publicacao.id),
+        );
+
+        const novas = resultado.items.filter(
+          (publicacao) => !idsExistentes.has(publicacao.id),
+        );
+
+        return [...anteriores, ...novas];
+      });
+
+      setNextCursor(resultado.nextCursor);
+      setHasMore(resultado.hasMore);
+    } catch {
+      setError("Não foi possível carregar mais publicações.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   return (
     <>
       <div className="header">
@@ -35,54 +118,53 @@ export const BlogPage = () => {
 
               <SectionContent className='publication'>
 
-                <CardBlog
-                  imageUrl={imageTeste}
-                  perfilImg={imageTeste}
-                  title='Árvore plantada'
-                  message='Árvore plantada na localização informada e já está se desenvolvendo!'
-                  nome='user teste'
-                  date='hoje, 10:24'
-                />
-                <CardBlog
-                  imageUrl={imageTeste}
-                  perfilImg={imageTeste}
-                  title='Árvore plantada'
-                  message='Árvore plantada na localização informada e já está se desenvolvendo!'
-                  nome='user teste'
-                  date='hoje, 10:24'
-                />
-                <CardBlog
-                  imageUrl={imageTeste}
-                  perfilImg={imageTeste}
-                  title='Árvore plantada'
-                  message='Árvore plantada na localização informada e já está se desenvolvendo!'
-                  nome='user teste'
-                  date='hoje, 10:24'
-                />
-                <CardBlog
-                  imageUrl={imageTeste}
-                  perfilImg={imageTeste}
-                  title='Árvore plantada'
-                  message='Árvore plantada na localização informada e já está se desenvolvendo!'
-                  nome='user teste'
-                  date='hoje, 10:24'
-                />
-                <CardBlog
-                  imageUrl={imageTeste}
-                  perfilImg={imageTeste}
-                  title='Árvore plantada'
-                  message='Árvore plantada na localização informada e já está se desenvolvendo!'
-                  nome='user teste'
-                  date='hoje, 10:24'
-                />
-                <CardBlog
-                  imageUrl={imageTeste}
-                  perfilImg={imageTeste}
-                  title='Árvore plantada'
-                  message='Árvore plantada na localização informada e já está se desenvolvendo!'
-                  nome='user teste'
-                  date='hoje, 10:24'
-                />
+                {publicacoes.map((publicacao) => (
+                  <CardBlog
+                    key={publicacao.id}
+                    imageUrl={imageTeste}
+                    perfilImg={imageTeste}
+                    title={publicacao.titulo}
+                    message={publicacao.descricao}
+                    nome={publicacao.requisicao?.nomeBeneficiario ?? ''}
+                    date={new Date(publicacao.criadoEm).toLocaleString()}
+                  />
+                ))}
+
+                {loading && <p>Carregando publicações...</p>}
+
+                {!loading && error && (
+                  <div role="alert">
+                    <p>{error}</p>
+                    <button
+                      type="button"
+                      onClick={() => window.location.reload()}
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
+                )}
+
+                {!loading && !error && publicacoes.length === 0 && (
+                  <p>Nenhuma publicação encontrada.</p>
+                )}
+
+                {error && !loadingMore && publicacoes.length > 0 && (
+                  <p role="alert">{error}</p>
+                )}
+
+                {hasMore && !loading && (
+                  <button
+                    type="button"
+                    onClick={carregarMais}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? "Carregando..." : "Carregar mais"}
+                  </button>
+                )}
+
+                {!hasMore && publicacoes.length > 0 && (
+                  <p>Você chegou ao fim das publicações.</p>
+                )}
 
               </SectionContent>
             </div>

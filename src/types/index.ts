@@ -93,4 +93,20 @@ export interface Publicacao {
   idRequisicao: string;
   titulo: string;
   descricao: string;
+  criadoEm: string;
+
+  requisicao?: {
+    nomeBeneficiario: string | null;
+  };
+}
+
+export interface CursorPublicacao {
+  cursorDate: string;
+  cursorId: string;
+}
+
+export interface RespostaPublicacoes {
+  items: Publicacao[];
+  nextCursor: CursorPublicacao | null;
+  hasMore: boolean;
 }

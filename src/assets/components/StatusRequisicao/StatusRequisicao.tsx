@@ -485,7 +485,7 @@ export const StatusRequisicao = ({
                         </button>
                     )}
 
-                    {(fotoPlantio && fotoPlantioUrl && !possuiPubli) && (
+                    {(fotoPlantio && !possuiPubli) && (
                         <button
                             type="button"
                             className="btnEnviar mt-1"
