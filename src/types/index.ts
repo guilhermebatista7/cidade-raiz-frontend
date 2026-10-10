@@ -97,6 +97,7 @@ export interface Publicacao {
 
   requisicao?: {
     nomeBeneficiario: string | null;
+    fotoPlantioUrl: string | null;
   };
 }
 

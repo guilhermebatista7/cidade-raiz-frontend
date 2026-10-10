@@ -1,9 +1,15 @@
-import { useEffect, useRef, type ImgHTMLAttributes } from "react";
+import {
+  useEffect,
+  useRef,
+  type ReactNode,
+  type VideoHTMLAttributes,
+} from "react";
 import "./HeaderVideo.css";
-import type { ReactNode } from "react";
 
-interface VideoProps extends ImgHTMLAttributes<HTMLVideoElement> {
-  src: string;
+interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {
+  src?: string;
+  imgSrc?: string;
+  imgAlt?: string;
   title?: string;
   icon?: ReactNode;
   playbackRate?: number;
@@ -11,6 +17,8 @@ interface VideoProps extends ImgHTMLAttributes<HTMLVideoElement> {
 
 export function HeaderVideo({
   src,
+  imgSrc,
+  imgAlt = "",
   title,
   icon,
   playbackRate = 0.7,
@@ -22,14 +30,12 @@ export function HeaderVideo({
     if (videoRef.current) {
       videoRef.current.playbackRate = playbackRate;
     }
-  }, [playbackRate]);
+  }, [playbackRate, src, imgSrc]);
 
   useEffect(() => {
     const video = videoRef.current;
 
-    if (!video) {
-      return;
-    }
+    if (!video) return;
 
     const resumePlayback = () => {
       if (video.paused) {
@@ -44,12 +50,26 @@ export function HeaderVideo({
       video.removeEventListener("canplay", resumePlayback);
       video.removeEventListener("stalled", resumePlayback);
     };
-  }, [src]);
+  }, [src, imgSrc]);
+
+  const firstSpace = title?.indexOf(" ") ?? -1;
+  const firstPart =
+    firstSpace === -1 ? title : title?.slice(0, firstSpace);
+  const secondPart =
+    firstSpace === -1 ? "" : title?.slice(firstSpace + 1);
 
   return (
-    <>
-      <div className="headerVideo">
+    <div className="headerVideo">
+      {imgSrc ? (
+        <img
+          className="headerVideoMedia"
+          src={imgSrc}
+          alt={imgAlt}
+        />
+      ) : src ? (
         <video
+          {...props}
+          className={`headerVideoMedia ${props.className ?? ""}`}
           ref={videoRef}
           src={src}
           preload="auto"
@@ -57,22 +77,19 @@ export function HeaderVideo({
           loop
           muted
           playsInline
-          {...props}
         />
+      ) : null}
 
-        {title && (
-          <h1 className="splitTextContainer">
-            <span className="textPart left">
-              {title.slice(0, title.indexOf(" "))}
-            </span>
+      {title && (
+        <h1 className="splitTextContainer">
+          <span className="textPart left">{firstPart}</span>
 
-            <span className="textPart right">
-              {icon}
-              {title.slice(title.indexOf(" ") + 1)}
-            </span>
-          </h1>
-        )}
-      </div>
-    </>
-  )
+          <span className="textPart right">
+            {icon}
+            {secondPart}
+          </span>
+        </h1>
+      )}
+    </div>
+  );
 }
