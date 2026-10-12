@@ -8,6 +8,9 @@ import type {
 export async function listarPublicacoes(
     limit = 10,
     cursor?: CursorPublicacao | null,
+    cidadeId?: string | null,
+    minhasPublicacoes = false,
+    signal?: AbortSignal,
 ): Promise<RespostaPublicacoes> {
     const params = new URLSearchParams({
         limit: String(limit),
@@ -18,10 +21,18 @@ export async function listarPublicacoes(
         params.set("cursorId", cursor.cursorId);
     }
 
-    return apiFetch(
-        `/blog?${params.toString()}`,
-        { method: "GET" },
-    );
+    if (cidadeId) {
+        params.set("cidadeId", cidadeId);
+    }
+
+    if (minhasPublicacoes) {
+        params.set("minhasPublicacoes", "true");
+    }
+
+    return apiFetch(`/blog?${params.toString()}`, {
+        method: "GET",
+        ...(signal ? { signal } : {}),
+    });
 }
 
 export async function publicar(idRequisicao: string, titulo: string, descricao: string) {
@@ -38,6 +49,7 @@ export async function publicar(idRequisicao: string, titulo: string, descricao: 
     })
 }
 
+//Verifica se requisição já possui publicação de fot de plantio
 export async function verificarPublicacao(idRequisicao: string) {
     return await apiFetch(`/blog/buscarReq/${idRequisicao}`, {
         method: 'GET',
