@@ -257,7 +257,7 @@ export function AbaUsuarios() {
                     </select>
                 )}
 
-                <button className="btnPagination" onClick={abrirModalAdicionar}>Adicionar Usuário</button>
+                <button className="btnGestaoGlobal" onClick={abrirModalAdicionar}>Adicionar Usuário</button>
 
             </div>
 
@@ -296,12 +296,12 @@ export function AbaUsuarios() {
                                             </button>
                                         ) : (
 
-                                            <button type="button" className="btnPagination btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
+                                            <button type="button" className="btnGestaoGlobal btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
                                                 Ativar
                                             </button>
                                         )}
                                         <button
-                                            className="btnPagination btn-light m-1"
+                                            className="btnGestaoGlobal btn-light m-1"
                                             onClick={() => abrirModalEditar(item.id)}
                                         >
                                             Editar
@@ -436,7 +436,7 @@ export function AbaUsuarios() {
                         <div className="d-flex justify-content-end gap-2 mt-4">
                             <button
                                 type="button"
-                                className="btnPagination btn-secondary"
+                                className="btn btn-secondary"
                                 onClick={fecharModal}
                             >
                                 Cancelar
@@ -444,7 +444,7 @@ export function AbaUsuarios() {
 
                             <button
                                 type="submit"
-                                className="btnPagination btn-success"
+                                className="btnGestaoGlobal btn-success"
                             >
                                 <FontAwesomeIcon icon={faCheck} />
 

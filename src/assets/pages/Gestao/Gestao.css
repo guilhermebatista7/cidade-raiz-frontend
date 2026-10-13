@@ -188,6 +188,26 @@
     font-size: 13px;
 }
 
+/* Botão Verificar */
+.btnGestaoGlobal {
+    background-color: var(--cor-verde);
+    color: #ffffff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btnGestaoGlobal:hover {
+    background-color: #5f8218;
+    box-shadow: 0 2px 8px rgba(115, 157, 30, 0.35);
+    transform: translateY(-1px);
+}
+
 /* Animação suave entre abas */
 @keyframes fadeInGestao {
   from {

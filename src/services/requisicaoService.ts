@@ -22,15 +22,27 @@ export async function salvarFotoPlantio(id: string, formData: FormData) {
   })
 }
 
-export async function listarRequisicoes() {
-  return await apiFetch("/requisicao", {
+export async function listarRequisicoes(dataInicio: string, dataFim: string) {
+  
+  const params = new URLSearchParams({
+    dataInicial: dataInicio,
+    dataFinal: dataFim,
+  });
+
+  return await apiFetch(`/requisicao?${params.toString()}`, {
     method: "GET"
   })
 }
 
-export async function listarRequisicoesCidade(id: string) {
-  return await apiFetch(`/requisicao/cidade/${id}`, {
-    method: "GET"
+export async function listarRequisicoesCidade(id: string, dataInicio: string, dataFim: string) {
+
+  const params = new URLSearchParams({
+    dataInicial: dataInicio,
+    dataFinal: dataFim,
+  });
+
+  return await apiFetch(`/requisicao/cidade/${id}?${params.toString()}`, {
+    method: "GET",
   })
 }
 

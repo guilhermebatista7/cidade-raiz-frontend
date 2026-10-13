@@ -5,7 +5,7 @@ import './AbaArvores.css';
 
 import { atualizarArvore, cadastrarArvore, excluirArvore, listarArvores, listarArvoresCidade } from "../../../../../services/arvoreService";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
-import { listarCidades, listarCidadesUsuario } from "../../../../../services/cidadeService";
+import { listarCidades } from "../../../../../services/cidadeService";
 import type { Cidade, Usuario } from "../../../../../types";
 import { obterUsuarioLogado } from "../../../../../services/authService";
 
@@ -219,7 +219,7 @@ export function AbaArvores() {
 
                 <button
                     type="button"
-                    className="btnPagination btn-light"
+                    className="btnGestaoGlobal btn-light"
                     onClick={abrirModalAdicionar}
                 >
                     Adicionar
@@ -251,12 +251,12 @@ export function AbaArvores() {
 
                                         {/* Passamos o ID da árvore para o botão de editar */}
                                         <button
-                                            className="btnPagination btn-light m-1"
+                                            className="btnGestaoGlobal btn-light m-1"
                                             onClick={() => abrirModalEditar(arvore.id)}
                                         >
                                             Editar
                                         </button>
-                                        <button className="btnPagination btn-light" onClick={() => handleExcluir(arvore.id)}>Excluir</button>
+                                        <button className="btnGestaoGlobal btn-light" onClick={() => handleExcluir(arvore.id)}>Excluir</button>
                                     </div>
                                 </article>
                             );

@@ -75,6 +75,18 @@ export function AbaRequisicoes() {
     const [modalAberto, setModalAberto] = useState(false);
     const [requisicaoSelecionada, setRequisicaoSelecionada] = useState<Requisicao | null>(null);
 
+    const formatDate = (date: Date) => {
+        return date.toISOString().split('T')[0];
+    };
+
+    const hoje = new Date();
+
+    const umMesAtras = new Date();
+    umMesAtras.setMonth(hoje.getMonth() - 1);
+
+    const [dataInicio, setDataInicio] = useState(formatDate(umMesAtras));
+    const [dataFim, setDataFim] = useState(formatDate(hoje));
+
     const API_URL = import.meta.env.VITE_API_URL;
 
     const abrirModalRequisicao = (requisicao: Requisicao) => {
@@ -116,7 +128,7 @@ export function AbaRequisicoes() {
             setUsuarioLogado(dadosLogado.usuario);
 
             if (dadosLogado.usuario.role !== 'GLOBAL') {
-                const dadosReq = await listarRequisicoes();
+                const dadosReq = await listarRequisicoes(dataInicio, dataFim);
                 setRequisicoes(dadosReq);
                 console.log(dadosReq);
                 return;
@@ -132,7 +144,7 @@ export function AbaRequisicoes() {
                 const primeiraCidadeId = dadosCidades[0].id;
                 setCidadeFiltro(primeiraCidadeId);
 
-                const dadosReq = await listarRequisicoesCidade(primeiraCidadeId);
+                const dadosReq = await listarRequisicoesCidade(primeiraCidadeId, dataInicio, dataFim);
                 setRequisicoes(dadosReq);
                 console.log(dadosReq);
             }
@@ -147,9 +159,31 @@ export function AbaRequisicoes() {
 
         setCidadeFiltro(cidadeId);
 
-        const dadosReq = await listarRequisicoesCidade(cidadeId);
+        const dadosReq = await listarRequisicoesCidade(cidadeId, dataInicio, dataFim);
         console.log(dadosReq);
         setRequisicoes(dadosReq);
+    }
+
+    const buscarReqData = async (inicio: string, fim: string) => {
+        try {
+            if (usuarioLogado?.role === "GLOBAL") {
+                if (!cidadeFiltro) return;
+
+                const dadosReq = await listarRequisicoesCidade(
+                    cidadeFiltro,
+                    inicio,
+                    fim
+                );
+
+                setRequisicoes(dadosReq);
+            } else {
+                const dadosReq = await listarRequisicoes(inicio, fim);
+                setRequisicoes(dadosReq);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar requisições por data:", error);
+
+        }
     }
 
     const atualizarRequisicoes = async () => {
@@ -159,14 +193,28 @@ export function AbaRequisicoes() {
     return (
         <div className="abaRequisicaoConteudo">
             {/* BARRA VISUAL DE FILTROS */}
-            <div className="barraFiltros">
-                {/* Input de Busca Textual */}
-                <input
-                    type="text"
-                    placeholder="Buscar por cidadão, árvore, bairro ou tipo..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                />
+            <div className="barraFiltros d-flex justify-content-between">
+
+                <div className="d-flex flex-column datas">
+                    <span>Data inicial</span>
+                    <input className="dataInicial " type="date" value={dataInicio} onChange={(e) => {
+                        const novaData = e.target.value;
+
+                        setDataInicio(novaData);
+                        buscarReqData(novaData, dataFim);
+                    }} />
+                </div>
+
+                <div className="d-flex flex-column">
+                    <span>Data final</span>
+                    <input className="dataFinal " type="date" value={dataFim} onChange={(e) => {
+                        const novaData = e.target.value;
+
+                        setDataFim(novaData);
+
+                        buscarReqData(dataInicio, novaData);
+                    }} />
+                </div>
 
                 {/* Select de Status */}
                 <select
@@ -192,6 +240,13 @@ export function AbaRequisicoes() {
                         ))}
                     </select>
                 )}
+
+                <input
+                    type="text"
+                    placeholder="Buscar por cidadão, árvore, bairro ou tipo..."
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                />
 
                 {/* Botão para limpar filtros (caso algum esteja ativo) */}
                 {(busca || statusFiltro !== "TODOS") && (

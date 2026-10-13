@@ -21,11 +21,14 @@
     padding: 14px 18px;
 }
 
-.barraFiltros input {
+.barraFiltros input[type=text] {
     flex: 1;
     min-width: 240px;
     height: 42px;
     padding: 0 14px;
+}
+
+.barraFiltros input {
     background-color: #ffffff;
     border: 1px solid #d6d5d2;
     border-radius: 8px;
@@ -57,6 +60,12 @@
     outline: none;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.barraFiltros .dataInicial, .barraFiltros .dataFinal {
+    padding: 8px;
+    margin-bottom: 20px;
+    width: 140px;
 }
 
 .barraFiltros select:focus {
@@ -96,7 +105,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-.tableSRequisicao {
+.tableRequisicao {
     width: 100%;
     margin-bottom: 0 !important;
     border-collapse: collapse;
