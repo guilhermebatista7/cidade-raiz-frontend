@@ -25,6 +25,9 @@ import ModalRequisicaoPlantar from "../../components/ModalRequisicaoPlantar/Moda
 import { StatusRequisicao } from "../../components/StatusRequisicao/StatusRequisicao";
 import { verificarPublicacao } from "../../../services/blogService";
 
+import { buscarCep } from "../../../services/viaCepService";
+import { formatarCep, formatarTelefone } from "../../../utils/formatadores";
+
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
     const [comprovante, setComprovante] = useState<File | null>(null);
@@ -36,6 +39,16 @@ export const Plantar = () => {
 
     const [arvores, setArvores] = useState<any[]>([]);
     const [arvoreSelecionada, setArvoreSelecionada] = useState<string | null>(null);
+
+    const [cep, setCep] = useState("");
+    const [rua, setRua] = useState("");
+    const [bairro, setBairro] = useState("");
+    const [numero, setNumero] = useState("");
+    const [pontoReferencia, setPontoReferencia] = useState("");
+    const [telefone, setTelefone] = useState("");
+
+    const [cepConsultado, setCepConsultado] = useState(false);
+    const [buscandoCep, setBuscandoCep] = useState(false);
 
     const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
 
@@ -147,6 +160,68 @@ export const Plantar = () => {
         }
     };
 
+    const handleBuscarCep = async () => {
+        const cepLimpo = cep.replace(/\D/g, "");
+
+        if (cepLimpo.length !== 8) {
+            showAlert("Informe um CEP válido.", "warning");
+            return;
+        }
+
+        setBuscandoCep(true);
+        setCepConsultado(false);
+
+        try {
+            const dados = await buscarCep(cepLimpo);
+
+            const cidadeAtual = cidades.find(
+                cidade => cidade.id === cidadeSelecionada
+            );
+
+            const normalizar = (texto: string) =>
+                texto.normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                cidadeAtual &&
+                normalizar(cidadeAtual.nome) !==
+                normalizar(dados.localidade)
+            ) {
+                showAlert(
+                    `O CEP pertence a ${dados.localidade}/${dados.uf}, ` +
+                    `não a ${cidadeAtual.nome}.`,
+                    "warning"
+                );
+                return;
+            }
+
+            if (!dados.bairro) {
+                showAlert(
+                    "O ViaCEP não retornou um bairro para esse CEP.",
+                    "warning"
+                );
+                return;
+            }
+
+            setRua(dados.logradouro ?? "");
+            setBairro(dados.bairro);
+            setEstadoSelecionado(dados.uf);
+            setCepConsultado(true);
+
+        } catch (error) {
+            showAlert(
+                error instanceof Error
+                    ? error.message
+                    : "Erro ao buscar o CEP.",
+                "danger"
+            );
+        } finally {
+            setBuscandoCep(false);
+        }
+    };
+
     /*
      * ============================================================
      * SELEÇÃO DE CIDADE
@@ -239,6 +314,20 @@ export const Plantar = () => {
     const selecionarRequisicao = async (requisicao: Requisicao) => {
         try {
             setRequisicaoSelecionada(requisicao);
+
+            setCep(formatarCep(requisicao.cep ?? ""));
+            setRua(requisicao.rua ?? "");
+            setNumero(requisicao.numero ?? "");
+            setBairro(requisicao.bairro ?? "");
+            setPontoReferencia(requisicao.pontoReferencia ?? "");
+
+            setTelefone(
+                formatarTelefone(requisicao.telefoneBeneficiario ?? "")
+            );
+
+            setCepConsultado(
+                (requisicao.cep ?? "").replace(/\D/g, "").length === 8
+            );
 
             const cidadeId = requisicao.cidade?.id ?? requisicao.cidadeId ?? "";
             setCidadeSelecionada(cidadeId);
@@ -500,6 +589,17 @@ export const Plantar = () => {
 
     const novaRequisicao = () => {
         setRequisicaoSelecionada(null);
+
+        setCep("");
+        setRua("");
+        setBairro("");
+        setNumero("");
+        setPontoReferencia("");
+        setTelefone("");
+
+        setCepConsultado(false);
+        setBuscandoCep(false);
+        setEstadoSelecionado("");
 
         setFotoLocal(null);
         setComprovante(null);
@@ -954,125 +1054,165 @@ export const Plantar = () => {
 
                             <div className="row g-3">
 
-                                {[
-                                    ["rua", "Rua / Avenida *", "Digite o nome da rua", "col-md-6"],
-                                    ["numero", "Número *", "Nº", "col-md-2"],
-                                    ["bairro", "Bairro *", "Digite o bairro", "col-md-4"],
-                                    ["cep", "CEP *", "00000-000", "col-md-3"]
-                                ].map(
-                                    ([id, label, placeholder, col]) => (
-                                        <div
-                                            className={col}
-                                            key={id}
-                                        >
-
-                                            <div className="inputGroup">
-                                                <label
-                                                    htmlFor={id}
-                                                >
-                                                    {label}
-                                                </label>
-
-                                                <input
-                                                    id={id}
-                                                    name={id}
-                                                    type="text"
-                                                    placeholder={placeholder}
-                                                    defaultValue={
-                                                        requisicaoSelecionada?.[
-                                                        id as keyof Requisicao
-                                                        ] as string ?? ""
-                                                    }
-                                                    required
-                                                    disabled={modoVerificacao && !podeEditar}
-                                                />
-                                            </div>
-                                        </div>
-                                    )
-                                )}
-
+                                {/* CIDADE */}
                                 <div className="col-md-5">
-
                                     <div className="inputGroup">
-
-                                        <label htmlFor="cidadeEndereco">
-                                            Cidade *
-                                        </label>
+                                        <label htmlFor="cidadeEndereco">Cidade *</label>
 
                                         <input
                                             id="cidadeEndereco"
                                             name="cidadeEndereco"
                                             type="text"
-                                            value={cidadeEscolhida?.nome ?? requisicaoSelecionada?.cidade?.nome ?? ""}
+                                            value={
+                                                cidadeEscolhida?.nome ??
+                                                requisicaoSelecionada?.cidade?.nome ??
+                                                ""
+                                            }
                                             readOnly
                                         />
-
                                     </div>
-
                                 </div>
 
-                                <div className="col-md-4">
 
+                                {/* CEP */}
+                                <div className="col-md-7">
                                     <div className="inputGroup">
+                                        <label htmlFor="cep">CEP *</label>
 
-                                        <label htmlFor="estado">
-                                            Estado *
-                                        </label>
+                                        <div className="cepInputGroup">
+                                            <input
+                                                id="cep"
+                                                name="cep"
+                                                type="text"
+                                                inputMode="numeric"
+                                                placeholder="00000-000"
+                                                maxLength={9}
+                                                value={cep}
+                                                onChange={e => {
+                                                    setCep(formatarCep(e.target.value));
+                                                    setCepConsultado(false);
+                                                    setRua("");
+                                                    setBairro("");
+                                                    setNumero("");
+                                                    setEstadoSelecionado("");
+                                                }}
+                                                required
+                                                disabled={modoVerificacao && !podeEditar}
+                                            />
 
-                                        <select
-                                            id="estado"
-                                            name="estado"
-                                            value={estadoSelecionado}
-                                            onChange={(e) => setEstadoSelecionado(e.target.value)}
-                                            required
-                                            disabled={modoVerificacao && !podeEditar}
-                                        >
-
-                                            <option
-                                                value=""
-                                                disabled
+                                            <button
+                                                type="button"
+                                                className="btnBuscarCep"
+                                                onClick={handleBuscarCep}
+                                                disabled={
+                                                    buscandoCep ||
+                                                    cep.replace(/\D/g, "").length !== 8 ||
+                                                    (modoVerificacao && !podeEditar)
+                                                }
                                             >
-                                                Selecione o estado
-                                            </option>
-
-                                            {estados.map(
-                                                estado => (
-                                                    <option
-                                                        key={estado.sigla}
-                                                        value={estado.sigla}
-                                                    >
-                                                        {estado.nome}
-                                                    </option>
-                                                )
-                                            )}
-
-                                        </select>
-
+                                                {buscandoCep ? "Buscando..." : "Buscar CEP"}
+                                            </button>
+                                        </div>
                                     </div>
-
                                 </div>
 
-                                <div className="col-12">
+                                {/* CAMPOS EXIBIDOS APÓS A CONSULTA */}
+                                {cepConsultado && (
+                                    <>
 
-                                    <div className="inputGroup">
+                                        {/* RUA */}
+                                        <div className="col-md-8">
+                                            <div className="inputGroup">
+                                                <label htmlFor="rua">
+                                                    Rua / Avenida *
+                                                </label>
 
-                                        <label htmlFor="pontoReferencia">
-                                            Ponto de referência
-                                            (opcional)
-                                        </label>
+                                                <input
+                                                    id="rua"
+                                                    name="rua"
+                                                    type="text"
+                                                    value={rua}
+                                                    onChange={e => setRua(e.target.value)}
+                                                    placeholder="Digite a rua"
+                                                    required
+                                                    disabled={modoVerificacao && !podeEditar}
+                                                />
+                                            </div>
+                                        </div>
 
-                                        <input
-                                            id="pontoReferencia"
-                                            name="pontoReferencia"
-                                            type="text"
-                                            placeholder="Ex: próximo ao ponto de ônibus..."
-                                            defaultValue={requisicaoSelecionada?.pontoReferencia ?? ""}
-                                            disabled={modoVerificacao && !podeEditar}
-                                        />
+                                        {/* NÚMERO */}
+                                        <div className="col-md-4">
+                                            <div className="inputGroup">
+                                                <label htmlFor="numero">Número *</label>
 
-                                    </div>
+                                                <input
+                                                    id="numero"
+                                                    name="numero"
+                                                    type="text"
+                                                    value={numero}
+                                                    onChange={e => setNumero(e.target.value)}
+                                                    placeholder="Nº"
+                                                    required
+                                                    disabled={modoVerificacao && !podeEditar}
+                                                />
+                                            </div>
+                                        </div>
 
-                                </div>
+                                        {/* BAIRRO */}
+                                        <div className="col-md-8">
+                                            <div className="inputGroup">
+                                                <label htmlFor="bairro">Bairro *</label>
+
+                                                <input
+                                                    id="bairro"
+                                                    name="bairro"
+                                                    type="text"
+                                                    value={bairro}
+                                                    readOnly
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* ESTADO */}
+                                        <div className="col-md-4">
+                                            <div className="inputGroup">
+                                                <label htmlFor="estado">Estado *</label>
+
+                                                <input
+                                                    id="estado"
+                                                    name="estado"
+                                                    type="text"
+                                                    value={estadoSelecionado}
+                                                    readOnly
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* PONTO DE REFERÊNCIA */}
+                                        <div className="col-12">
+                                            <div className="inputGroup">
+                                                <label htmlFor="pontoReferencia">
+                                                    Ponto de referência (opcional)
+                                                </label>
+
+                                                <input
+                                                    id="pontoReferencia"
+                                                    name="pontoReferencia"
+                                                    type="text"
+                                                    value={pontoReferencia}
+                                                    onChange={e =>
+                                                        setPontoReferencia(e.target.value)
+                                                    }
+                                                    placeholder="Ex: próximo ao ponto de ônibus..."
+                                                    disabled={modoVerificacao && !podeEditar}
+                                                />
+                                            </div>
+                                        </div>
+
+                                    </>
+                                )}
 
                             </div>
 

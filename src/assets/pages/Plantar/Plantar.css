@@ -660,6 +660,50 @@ body.modalAberto {
     cursor: not-allowed;
 }
 
+
+.cepInputGroup {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.cepInputGroup input {
+    flex: 1;
+    min-width: 0;
+}
+
+.btnBuscarCep {
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--cor-verde);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.btnBuscarCep:hover:not(:disabled) {
+    background: #5f8218;
+}
+
+.btnBuscarCep:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .cepInputGroup {
+        flex-direction: column;
+    }
+
+    .btnBuscarCep {
+        padding: 12px;
+    }
+}
+
+
 @media (max-width: 1000px) {
     .plantarLayout {
         grid-template-columns: 1fr;
