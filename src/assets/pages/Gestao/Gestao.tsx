@@ -16,6 +16,7 @@ import { AbaConfig } from "./abas/ConfigAdmin/AbaConfig";
 import { AbaUsuarios } from "./abas/Usuarios/AbaUsuarios";
 import { obterUsuarioLogado } from "../../../services/authService";
 import { type Usuario } from "../../../types";
+import { AbaRelatorio } from "./abas/Relatorio/AbaRelatorio";
 
 // Definição das abas disponíveis
 export type AbaGestao = "requisicoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
@@ -159,11 +160,7 @@ export function Gestao() {
                             <div className="cardHeaderAba">
                                 <h3>Relatórios</h3>
                             </div>
-                            <p>
-                                Administre os papéis dos usuários (Cidadão, Funcionário, Admin Local, Global)
-                                e vincule funcionários às respectivas cidades.
-                            </p>
-                            {/* Em breve: Gestão de permissões e cidades */}
+                            <AbaRelatorio/>
                         </section>
                     )}
 
@@ -174,7 +171,6 @@ export function Gestao() {
                                 <h3>Gestão de Usuários e Permissões</h3>
                             </div>
                             <AbaUsuarios />
-                            {/* Em breve: Gestão de permissões e cidades */}
                         </section>
                     )}
 
@@ -185,7 +181,6 @@ export function Gestao() {
                                 <h3>Configurações Administrador</h3>
                             </div>
                             <AbaConfig />
-                            {/* Em breve: Gestão de permissões e cidades */}
                         </section>
                     )}
 
