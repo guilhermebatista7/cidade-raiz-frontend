@@ -216,7 +216,7 @@ export const StatusRequisicao = ({
 
                     {id && (
                         <p>
-                            Protocolo: #{id.substring(0, 8).toUpperCase()}
+                            Código: #{id.substring(0, 8).toUpperCase()}
                         </p>
                     )}
                 </div>
