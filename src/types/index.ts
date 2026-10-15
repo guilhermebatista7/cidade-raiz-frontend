@@ -50,6 +50,7 @@ export interface Requisicao {
   observacaoStatus?: string; //OBS caso req seja negada 
   nomeBeneficiario: string;
   telefoneBeneficiario: string;
+  emailBeneficiario: string;
   tipoAtendimento: TipoAtendimento;
   rua: string;
   numero: string;

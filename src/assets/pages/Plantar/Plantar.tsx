@@ -5,7 +5,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SectionContent } from "../../components/SectionContent/SectionContent";
-import { estados } from "../../dataInfo/estados";
 import "./Plantar.css";
 
 import { listarArvoresCidade } from "../../../services/arvoreService";
@@ -46,6 +45,8 @@ export const Plantar = () => {
     const [numero, setNumero] = useState("");
     const [pontoReferencia, setPontoReferencia] = useState("");
     const [telefone, setTelefone] = useState("");
+    //Email do beneficiário
+    const [email, setEmail] = useState("");
 
     const [cepConsultado, setCepConsultado] = useState(false);
     const [buscandoCep, setBuscandoCep] = useState(false);
@@ -325,6 +326,8 @@ export const Plantar = () => {
                 formatarTelefone(requisicao.telefoneBeneficiario ?? "")
             );
 
+            setEmail(requisicao?.emailBeneficiario);
+
             setCepConsultado(
                 (requisicao.cep ?? "").replace(/\D/g, "").length === 8
             );
@@ -596,6 +599,7 @@ export const Plantar = () => {
         setNumero("");
         setPontoReferencia("");
         setTelefone("");
+        setEmail("");
 
         setCepConsultado(false);
         setBuscandoCep(false);
@@ -930,30 +934,32 @@ export const Plantar = () => {
 
                         <div className="formSection">
 
-                            <div className="sectionTitle">
+                            <div className="sectionTitle mb-1">
                                 <span>2.</span>
                                 <h3>Informações pessoais</h3>
                             </div>
 
-                            <p className="sectionDescription">
-                                Informe os dados do solicitante.
-                            </p>
+                            {usuarioLogado?.role !== 'CIDADAO' && (
+                                <p className="sectionDescription">
+                                    <strong>Atenção</strong>: Caso esteja realizando esta requisição em nome de outra pessoa, informe os dados do beneficiário para que ele possa receber as atualizações sobre o andamento da solicitação.
+                                </p>
+                            )}
 
-                            <div className="row g-3">
+                            <div className="row g-3 mt-2">
 
-                                <div className="col-md-12">
+                                <div className={(usuarioLogado?.role !== 'CIDADAO' && usuarioLogado) ? 'col-md-12' : 'col-md-8'}>
 
                                     <div className="inputGroup">
 
                                         <label htmlFor="nomeBeneficiario">
-                                            Nome
+                                            Nome {usuarioLogado?.role !== 'CIDADAO' && 'Beneficiário'}
                                         </label>
 
                                         <input
                                             id="nomeBeneficiario"
                                             name="nomeBeneficiario"
                                             type="text"
-                                            placeholder="Digite seu nome"
+                                            placeholder="Ex: João da Silva"
                                             defaultValue={requisicaoSelecionada?.nomeBeneficiario ?? ""}
                                             required
                                             disabled={modoVerificacao && !podeEditar}
@@ -961,12 +967,33 @@ export const Plantar = () => {
                                     </div>
                                 </div>
 
-                                <div className="col-md-4">
+                                {(usuarioLogado?.role !== 'CIDADAO' && usuarioLogado) && (
+                                    <div className="col-md-6">
+
+                                        <div className="inputGroup">
+
+                                            <label htmlFor="emailBeneficiario">
+                                                Email Beneficiário
+                                            </label>
+
+                                            <input
+                                                id="emailBeneficiario"
+                                                name="emailBeneficiario"
+                                                type="text"
+                                                placeholder="Ex: teste@gmail.com"
+                                                defaultValue={requisicaoSelecionada?.emailBeneficiario ?? ""}
+                                                disabled={modoVerificacao && !podeEditar}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className={(usuarioLogado?.role !== 'CIDADAO' && usuarioLogado) ? 'col-md-6' : 'col-md-4'}>
 
                                     <div className="inputGroup">
 
                                         <label htmlFor="telefoneBeneficiario">
-                                            Telefone
+                                            Telefone {usuarioLogado?.role !== 'CIDADAO' && 'Beneficiário'}
                                         </label>
 
                                         <input
@@ -977,12 +1004,14 @@ export const Plantar = () => {
                                             defaultValue={requisicaoSelecionada?.telefoneBeneficiario ?? ""}
                                             required
                                             disabled={modoVerificacao && !podeEditar}
+                                            value={telefone}
+                                            onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
                                         />
 
                                     </div>
                                 </div>
 
-                                <div className="col-md-8">
+                                <div className="col-md-12">
 
                                     <div className="inputGroup">
 
@@ -992,42 +1021,69 @@ export const Plantar = () => {
                                             nossa conta?
                                         </label>
 
-                                        <div className="tipoSolicitacao d-flex align-items-center gap-3">
+                                        <div className="tipoSolicitacao">
+                                            <label className="tipoSolicitacaoTitulo">
+                                                Como deseja receber a árvore?
+                                            </label>
 
-                                            <div className="d-flex align-items-center gap-1">
+                                            <div className="tipoSolicitacaoOpcoes">
 
-                                                <input
-                                                    type="radio"
-                                                    className="radio"
-                                                    id="retirar"
-                                                    name="tipoAtendimento"
-                                                    value="RETIRADA_LOCAL"
-                                                    checked={tipoAtendimento === "RETIRADA_LOCAL"}
-                                                    onChange={(e) => setTipoAtendimento(e.target.value)}
-                                                    disabled={modoVerificacao && !podeEditar}
-                                                />
+                                                <label
+                                                    htmlFor="retirar"
+                                                    className={`tipoSolicitacaoCard ${tipoAtendimento === "RETIRADA_LOCAL"
+                                                            ? "selecionado"
+                                                            : ""
+                                                        }`}
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        id="retirar"
+                                                        name="tipoAtendimento"
+                                                        value="RETIRADA_LOCAL"
+                                                        checked={tipoAtendimento === "RETIRADA_LOCAL"}
+                                                        onChange={(e) => setTipoAtendimento(e.target.value)}
+                                                        disabled={modoVerificacao && !podeEditar}
+                                                    />
 
-                                                <label htmlFor="retirar">
-                                                    Retirar no local
+                                                    <span className="tipoSolicitacaoTexto">
+                                                        <strong>Retirar no local</strong>
+                                                        <small>
+                                                            Você retira a muda no local indicado.
+                                                        </small>
+                                                    </span>
+
+                                                    <span className="tipoSolicitacaoCheck">
+                                                        <FontAwesomeIcon icon={faCheck} />
+                                                    </span>
                                                 </label>
 
-                                            </div>
+                                                <label
+                                                    htmlFor="agendar"
+                                                    className={`tipoSolicitacaoCard ${tipoAtendimento === "PLANTIO_AGENDADO"
+                                                            ? "selecionado"
+                                                            : ""
+                                                        }`}
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        id="agendar"
+                                                        name="tipoAtendimento"
+                                                        value="PLANTIO_AGENDADO"
+                                                        checked={tipoAtendimento === "PLANTIO_AGENDADO"}
+                                                        onChange={(e) => setTipoAtendimento(e.target.value)}
+                                                        disabled={modoVerificacao && !podeEditar}
+                                                    />
 
-                                            <div className="d-flex align-items-center gap-1">
+                                                    <span className="tipoSolicitacaoTexto">
+                                                        <strong>Agendar plantio</strong>
+                                                        <small>
+                                                            Nossa equipe realiza o plantio mediante agendamento.
+                                                        </small>
+                                                    </span>
 
-                                                <input
-                                                    type="radio"
-                                                    className="radio"
-                                                    id="agendar"
-                                                    name="tipoAtendimento"
-                                                    value="PLANTIO_AGENDADO"
-                                                    checked={tipoAtendimento === "PLANTIO_AGENDADO"}
-                                                    onChange={(e) => setTipoAtendimento(e.target.value)}
-                                                    disabled={modoVerificacao && !podeEditar}
-                                                />
-
-                                                <label htmlFor="agendar">
-                                                    Agendar plantio
+                                                    <span className="tipoSolicitacaoCheck">
+                                                        <FontAwesomeIcon icon={faCheck} />
+                                                    </span>
                                                 </label>
 
                                             </div>
@@ -1349,6 +1405,7 @@ export const Plantar = () => {
                                 modoVerificacao &&
                                 !podeEditar
                             }
+                            hidden = {requisicaoSelecionada?.status !== 'SOLICITADO' && requisicaoSelecionada?.status !== 'RECUSADO'}
                         >
 
                             <FontAwesomeIcon

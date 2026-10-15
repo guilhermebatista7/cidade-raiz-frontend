@@ -200,7 +200,7 @@
     gap: 14px;
 }
 
-.arvoresOptionInfo > div:last-child,
+.arvoresOptionInfo>div:last-child,
 .arvoreSelecionadaInfo {
     display: flex;
     flex-direction: column;
@@ -214,7 +214,7 @@
 }
 
 .arvoresOptionInfo span,
-.arvoreSelecionadaInfo > span {
+.arvoreSelecionadaInfo>span {
     color: var(--cor-cinza);
     font-size: 13px;
 }
@@ -660,6 +660,117 @@ body.modalAberto {
     cursor: not-allowed;
 }
 
+.tipoSolicitacao {
+    width: 100%;
+}
+
+.tipoSolicitacaoTitulo {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.tipoSolicitacaoOpcoes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.tipoSolicitacaoCard {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px;
+    border: 1px solid #dce5dd;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.tipoSolicitacaoCard:hover:not(:has(input:disabled)) {
+    border-color: var(--cor-verde);
+    box-shadow: 0 3px 12px rgb(39 91 49 / 8%);
+}
+
+.tipoSolicitacaoCard.selecionado {
+    border: 2px solid var(--cor-verde);
+    padding: 17px;
+    background: #f0f8f0;
+    box-shadow: 0 3px 10px rgb(39 91 49 / 7%);
+}
+
+.tipoSolicitacaoCard input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.tipoSolicitacaoCard:has(input:focus-visible) {
+    outline: 3px solid #9bcba2;
+    outline-offset: 3px;
+}
+
+.tipoSolicitacaoTexto {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.tipoSolicitacaoTexto strong {
+    color: #2e4132;
+    font-size: 15px;
+}
+
+.tipoSolicitacaoTexto small {
+    color: #6b786d;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.tipoSolicitacaoCheck {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 23px;
+    height: 23px;
+    border: 1px solid #cbd6cc;
+    border-radius: 50%;
+    color: transparent;
+    font-size: 12px;
+}
+
+.tipoSolicitacaoCard.selecionado .tipoSolicitacaoCheck {
+    border-color: #438451;
+    background: var(--cor-verde);
+    color: #fff;
+}
+
+.tipoSolicitacaoCard:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+@media (max-width: 576px) {
+    .tipoSolicitacaoOpcoes {
+        grid-template-columns: 1fr;
+    }
+
+    .tipoSolicitacaoCard {
+        padding: 15px;
+    }
+
+    .tipoSolicitacaoCard.selecionado {
+        padding: 14px;
+    }
+}
 
 .cepInputGroup {
     display: flex;
