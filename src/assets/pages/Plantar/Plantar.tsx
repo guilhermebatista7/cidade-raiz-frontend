@@ -982,6 +982,7 @@ export const Plantar = () => {
                                                 type="text"
                                                 placeholder="Ex: teste@gmail.com"
                                                 defaultValue={requisicaoSelecionada?.emailBeneficiario ?? ""}
+                                                value={email}
                                                 disabled={modoVerificacao && !podeEditar}
                                             />
                                         </div>
