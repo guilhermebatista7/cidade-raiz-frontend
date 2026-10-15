@@ -45,6 +45,9 @@ export const Plantar = () => {
     const [numero, setNumero] = useState("");
     const [pontoReferencia, setPontoReferencia] = useState("");
     const [telefone, setTelefone] = useState("");
+
+    const [nome, setNome] = useState("");
+
     //Email do beneficiário
     const [email, setEmail] = useState("");
 
@@ -322,6 +325,8 @@ export const Plantar = () => {
             setBairro(requisicao.bairro ?? "");
             setPontoReferencia(requisicao.pontoReferencia ?? "");
 
+            setNome(requisicao.nomeBeneficiario ?? "");
+
             setTelefone(
                 formatarTelefone(requisicao.telefoneBeneficiario ?? "")
             );
@@ -598,6 +603,7 @@ export const Plantar = () => {
         setBairro("");
         setNumero("");
         setPontoReferencia("");
+        setNome("");
         setTelefone("");
         setEmail("");
 
@@ -961,6 +967,8 @@ export const Plantar = () => {
                                             type="text"
                                             placeholder="Ex: João da Silva"
                                             defaultValue={requisicaoSelecionada?.nomeBeneficiario ?? ""}
+                                            value={nome}
+                                            onChange={(e) => setNome(e.target.value)}
                                             required
                                             disabled={modoVerificacao && !podeEditar}
                                         />
@@ -984,6 +992,7 @@ export const Plantar = () => {
                                                 defaultValue={requisicaoSelecionada?.emailBeneficiario ?? ""}
                                                 value={email}
                                                 disabled={modoVerificacao && !podeEditar}
+                                                onChange={(e) => setEmail(e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -1032,8 +1041,8 @@ export const Plantar = () => {
                                                 <label
                                                     htmlFor="retirar"
                                                     className={`tipoSolicitacaoCard ${tipoAtendimento === "RETIRADA_LOCAL"
-                                                            ? "selecionado"
-                                                            : ""
+                                                        ? "selecionado"
+                                                        : ""
                                                         }`}
                                                 >
                                                     <input
@@ -1061,8 +1070,8 @@ export const Plantar = () => {
                                                 <label
                                                     htmlFor="agendar"
                                                     className={`tipoSolicitacaoCard ${tipoAtendimento === "PLANTIO_AGENDADO"
-                                                            ? "selecionado"
-                                                            : ""
+                                                        ? "selecionado"
+                                                        : ""
                                                         }`}
                                                 >
                                                     <input
@@ -1406,7 +1415,7 @@ export const Plantar = () => {
                                 modoVerificacao &&
                                 !podeEditar
                             }
-                            hidden = {requisicaoSelecionada?.status !== 'SOLICITADO' && requisicaoSelecionada?.status !== 'RECUSADO'}
+                            hidden={!podeEditar}
                         >
 
                             <FontAwesomeIcon

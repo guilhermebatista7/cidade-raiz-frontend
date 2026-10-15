@@ -35,16 +35,17 @@ type DadosRelatorio = {
     requisicoes: Requisicao[];
     requisicoesPorDia?: { data: string; quantidade: number }[];
     arvoresMaisSolicitadas?: { id: string; nomePopular: string; quantidade: number }[];
+    requisicoesPorBairro?: { bairro: string; quantidade: number; status: Record<Status, number>; }[];
 };
 
 type FiltroStatus = Status | 'TODOS';
 const STATUS: { key: Status; label: string; color: string }[] = [
-    { key: 'SOLICITADO', label: 'Solicitado', color: '#856404' },
-    { key: 'APROVADO', label: 'Aprovado', color: '#155724' },
-    { key: 'RECUSADO', label: 'Recusado', color: '#721c24' },
-    { key: 'AGUARDANDO_RETIRADA', label: 'Aguardando retirada', color: '#004085' },
-    { key: 'AGENDADO_PLANTIO', label: 'Plantio agendado', color: '#0c5460' },
-    { key: 'CONCLUIDO', label: 'Concluído', color: '#155724' },
+    { key: 'SOLICITADO', label: 'Solicitado', color: '#E6C77A' },
+    { key: 'APROVADO', label: 'Aprovado', color: '#9BC7A5' },
+    { key: 'RECUSADO', label: 'Recusado', color: '#E33636' },
+    { key: 'AGUARDANDO_RETIRADA', label: 'Aguardando retirada', color: '#A8C7E3' },
+    { key: 'AGENDADO_PLANTIO', label: 'Plantio agendado', color: '#B8ADE0' },
+    { key: 'CONCLUIDO', label: 'Concluído', color: '#67C965' },
 ];
 
 // Trabalhamos com datas YYYY-MM-DD, sem conversões implícitas para o fuso local.
@@ -154,6 +155,7 @@ export function AbaRelatorio() {
         (async () => {
             try {
                 const resposta: DadosRelatorio = await buscarDadosCidade(datas.inicio, datas.fim, role === 'GLOBAL' ? cidadeFiltro : undefined);
+                console.log(resposta);
                 if (ativo) { setDados(resposta); setPagina(1); }
             } catch {
                 if (ativo) { setDados(null); setErro('Não foi possível carregar o relatório. Tente novamente.'); }
@@ -166,6 +168,7 @@ export function AbaRelatorio() {
 
     const diarios = useMemo(() => dados ? serieDiaria(dados) : [], [dados]);
     const arvores = useMemo(() => dados ? rankingArvores(dados) : [], [dados]);
+    const bairros = useMemo(() => dados?.requisicoesPorBairro ?? [], [dados]);
     const linhas = useMemo(() => {
         if (!dados) return [];
         const termo = busca.toLocaleLowerCase('pt-BR').trim();
@@ -273,6 +276,67 @@ export function AbaRelatorio() {
                 <Painel titulo="Como a cidade participa" subtitulo="Tipos de atendimento escolhidos">
                     {tipoPie.length ? <div className="cr-attendance"><PieChart series={[{ data: tipoPie, innerRadius: 55, outerRadius: 88, paddingAngle: 3, cornerRadius: 5 }]} height={205} hideLegend /><div className="cr-attendance-list">{tipoPie.map(t => <div key={t.id}><span className="cr-color" style={{ background: t.color }} /> <span>{t.label}</span><strong>{t.value}</strong></div>)}</div></div> : <p className="cr-chart-empty">Sem atendimentos registrados.</p>}
                 </Painel>
+                <div className="cr-wide-bairro">
+                    <Painel
+                        titulo="Requisições por bairro"
+                        subtitulo="Distribuição das solicitações por status"
+                    >
+                        {bairros.length > 0 ? (
+                            <div className="cr-bairros-chart">
+                                <BarChart
+                                    layout="vertical"
+
+                                    height={400}
+
+                                    xAxis={[
+                                        {
+                                            data: bairros.map(item => item.bairro),
+                                            scaleType: "band",
+                                            tickLabelStyle: {
+                                                fontSize: 11,
+                                                angle: -35,
+                                                textAnchor: "end",
+                                            },
+                                            height: 115,
+                                        },
+                                    ]}
+
+                                    yAxis={[
+                                        {
+                                            min: 0,
+                                            tickMinStep: 1,
+                                        },
+                                    ]}
+
+                                    series={STATUS.map(status => ({
+                                        id: status.key,
+                                        data: bairros.map(
+                                            bairro => bairro.status[status.key]
+                                        ),
+                                        label: status.label,
+                                        color: status.color,
+                                        stack: "total",
+                                        valueFormatter: (value) =>
+                                            `${value ?? 0} requisição(ões)`,
+                                    }))}
+
+                                    grid={{ horizontal: true }}
+
+                                    margin={{
+                                        left: 45,
+                                        right: 20,
+                                        top: 20,
+                                        bottom: 10,
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <p className="cr-chart-empty">
+                                Nenhum bairro cadastrado para exibição.
+                            </p>
+                        )}
+                    </Painel>
+                </div>
             </div>
 
             <section className="cr-panel cr-table-panel">
