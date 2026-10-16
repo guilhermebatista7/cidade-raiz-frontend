@@ -10,6 +10,7 @@ import { type Arvore, type Cidade } from "../../../../../types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../../../contexts/AuthContext";
 import { queryKeys } from "../../../../../services/queryKeys";
+import { SkeletonCard } from "../../../../components/Skeletons/SkeletonCard";
 
 export function AbaArvores() {
 
@@ -33,7 +34,7 @@ export function AbaArvores() {
     const cidadeAtivaId = isGlobal ? (cidadeFiltro || cidades[0]?.id || "") : "";
 
     // 3. BUSCA DE ÁRVORES VIA REACT QUERY (Reativo: busca troca sozinha ao mudar a cidade!)
-    const { data: arvores = [] } = useQuery<Arvore[]>({
+    const { data: arvores = [], isLoading: carregandoArvores } = useQuery<Arvore[]>({
         queryKey: isGlobal && cidadeAtivaId
             ? queryKeys.arvores.porCidade(cidadeAtivaId)
             : queryKeys.arvores.todas,
@@ -132,7 +133,7 @@ export function AbaArvores() {
             formData.append("descricao", descricao);
             formData.append("quantidade", quantidade);
             if (cidadeId) formData.append("cidadeId", cidadeId);
-            
+
             if (imagem) {
                 formData.append("imagem", imagem); // Nova imagem opcional
             }
@@ -225,37 +226,45 @@ export function AbaArvores() {
             <div className="listaResultado">
                 <div className="arvoresContainer">
                     <div className="arvoresGrid">
-                        {arvoresFiltradas.map(arvore => {
-                            const disponivel = arvore.quantidade > 0;
 
-                            return (
-                                <article key={arvore.id} className="arvoreCard">
-                                    <div className="arvoreImagem">
-                                        <img src={arvore.imagemUrl || ""} alt={arvore.nomePopular} />
-                                    </div>
+                        {carregandoArvores ? (
+                            /* Enquanto carrega, mostra 6 cards pulsantes */
+                            <SkeletonCard quantidade={6} />
+                        ) : arvoresFiltradas.length === 0 ? (
+                            <p className="p-3 text-muted">Nenhuma árvore encontrada.</p>
+                        ) : (
+                            arvoresFiltradas.map(arvore => {
+                                const disponivel = arvore.quantidade > 0;
 
-                                    <div className="arvoreCardContent">
-                                        <div className="arvoreCardTitle">
-                                            <h3>{arvore.nomePopular}</h3>
-                                            <span className={disponivel ? "disponivel" : "indisponivel"}>
-                                                {disponivel ? `${arvore.quantidade} disponíveis` : "0 disponíveis"}
-                                            </span>
+                                return (
+                                    <article key={arvore.id} className="arvoreCard">
+                                        <div className="arvoreImagem">
+                                            <img src={arvore.imagemUrl || ""} alt={arvore.nomePopular} />
                                         </div>
 
-                                        <p>{arvore.descricao}</p>
+                                        <div className="arvoreCardContent">
+                                            <div className="arvoreCardTitle">
+                                                <h3>{arvore.nomePopular}</h3>
+                                                <span className={disponivel ? "disponivel" : "indisponivel"}>
+                                                    {disponivel ? `${arvore.quantidade} disponíveis` : "0 disponíveis"}
+                                                </span>
+                                            </div>
 
-                                        {/* Passamos o ID da árvore para o botão de editar */}
-                                        <button
-                                            className="btnGestaoGlobal btn-light m-1"
-                                            onClick={() => abrirModalEditar(arvore.id)}
-                                        >
-                                            Editar
-                                        </button>
-                                        <button className="btnGestaoGlobal btn-light" onClick={() => handleExcluir(arvore.id)}>Excluir</button>
-                                    </div>
-                                </article>
-                            );
-                        })}
+                                            <p>{arvore.descricao}</p>
+
+                                            {/* Passamos o ID da árvore para o botão de editar */}
+                                            <button
+                                                className="btnGestaoGlobal btn-light m-1"
+                                                onClick={() => abrirModalEditar(arvore.id)}
+                                            >
+                                                Editar
+                                            </button>
+                                            <button className="btnGestaoGlobal btn-light" onClick={() => handleExcluir(arvore.id)}>Excluir</button>
+                                        </div>
+                                    </article>
+                                );
+                            })
+                        )}
                     </div>
                 </div>
             </div>

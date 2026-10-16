@@ -1,0 +1,79 @@
+/* Animação suave de pulso */
+@keyframes skeletonPulse {
+    0% {
+        background-color: #e2e8f0;
+    }
+    50% {
+        background-color: #c1c2c4;
+    }
+    100% {
+        background-color: #e2e8f0;
+    }
+}
+
+.skeletonBox {
+    animation: skeletonPulse 1.5s ease-in-out infinite;
+    border-radius: 6px;
+}
+
+/* Skeleton do Card de Árvore */
+.skeletonCard {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.skeletonImagem {
+    width: 100%;
+    height: 180px;
+}
+
+.skeletonContent {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeletonTitulo {
+    width: 60%;
+    height: 24px;
+}
+
+.skeletonTextoLongo {
+    width: 100%;
+    height: 14px;
+}
+
+.skeletonTextoCurto {
+    width: 80%;
+    height: 14px;
+}
+
+.skeletonBotoes {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.skeletonBotao {
+    width: 80px;
+    height: 32px;
+}
+
+/* Skeleton de Tabela */
+.skeletonTableContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.skeletonTableRow {
+    width: 100%;
+    height: 48px;
+}

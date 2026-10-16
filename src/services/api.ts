@@ -11,7 +11,8 @@ export async function apiFetch(
     options?: ApiOptions
 ) {
     const isFormData = options?.body instanceof FormData;
-    const isSilent = options?.silent ?? false;
+    const method = options?.method?.toUpperCase() || "GET";
+    const isSilent = options?.silent ?? (method === "GET");
 
     const headers: Record<string, string> = {
         ...((options?.headers as Record<string, string>) || {})
