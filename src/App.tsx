@@ -17,6 +17,9 @@ import { RotaProtegida } from './assets/components/RotaProtegida/RotaProtegida'
 import { LoadingProvider } from './contexts/LoadingContext'
 import { LoadingOverlay } from './assets/components/LoadingOverlay/LoadingOverlay'
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
 function ScrollToHash() {
   const { hash, pathname } = useLocation()
 
@@ -46,35 +49,49 @@ function Page({ title, description }: PageProps) {
   )
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, //5 minutos frescos - quanto tempo posso confiar nos dados sem precisar perguntar ao servidor
+      gcTime: 1000 * 60 * 30,   //Usuário sai da página - quanto tempo info fica salva na memória cache
+      refetchOnWindowFocus: false,
+      retry: 1,
+    }
+  }
+})
+
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <LoadingProvider>
-          <ScrollToHash />
-          <LoadingOverlay />
-          <Menu />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/plantar" element={<Plantar />} />
-            <Route
-              path="/gestao"
-              element={
-                <RotaProtegida>
-                  <Gestao />
-                </RotaProtegida>
-              }
-            />
-            <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
-          </Routes>
-          <Footer>
-            <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
-          </Footer>
-        </LoadingProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <LoadingProvider>
+            <ScrollToHash />
+            <LoadingOverlay />
+            <Menu />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/plantar" element={<Plantar />} />
+              <Route
+                path="/gestao"
+                element={
+                  <RotaProtegida>
+                    <Gestao />
+                  </RotaProtegida>
+                }
+              />
+              <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
+            </Routes>
+            <Footer>
+              <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
+            </Footer>
+          </LoadingProvider>
+        </AuthProvider>
+      </BrowserRouter>
+      <ReactQueryDevtools initialIsOpen={false}/>
+    </QueryClientProvider>
   )
 }
 

@@ -2,11 +2,16 @@ import { finalizarLoading, iniciarLoading } from "./loadingService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+interface ApiOptions extends RequestInit {
+    silent?: boolean; // Nova flag opcional
+}
+
 export async function apiFetch(
     endpoint: string,
-    options?: RequestInit
+    options?: ApiOptions
 ) {
     const isFormData = options?.body instanceof FormData;
+    const isSilent = options?.silent ?? false;
 
     const headers: Record<string, string> = {
         ...((options?.headers as Record<string, string>) || {})
@@ -16,7 +21,9 @@ export async function apiFetch(
         headers["Content-Type"] = "application/json";
     }
 
-    iniciarLoading();
+    if (!isSilent) {
+        iniciarLoading();
+    }
 
     try {
         const response = await fetch(
@@ -29,10 +36,7 @@ export async function apiFetch(
         );
 
         const text = await response.text();
-
-        const data = text
-            ? JSON.parse(text)
-            : null;
+        const data = text ? JSON.parse(text) : null;
 
         if (!response.ok) {
             throw new Error(
@@ -43,6 +47,8 @@ export async function apiFetch(
         return data;
 
     } finally {
-        finalizarLoading();
+        if(!isSilent){
+            finalizarLoading();
+        }
     }
 }

@@ -23,7 +23,7 @@ export function RotaProtegida({ children }: RotaProtegidaProps) {
 
   // 3. Usuário logado mas com role CIDADAO -> vai para a Home
   if (!podeAcessarGestao(usuario)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/plantar" replace />;
   }
 
   // 4. Usuário autorizado (FUNCIONARIO, ADMIN_LOCAL ou GLOBAL)
