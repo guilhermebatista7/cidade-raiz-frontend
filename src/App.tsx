@@ -66,31 +66,35 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <LoadingProvider>
-            <ScrollToHash />
-            <LoadingOverlay />
-            <Menu />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/plantar" element={<Plantar />} />
-              <Route
-                path="/gestao"
-                element={
-                  <RotaProtegida>
-                    <Gestao />
-                  </RotaProtegida>
-                }
-              />
-              <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
-            </Routes>
-            <Footer>
-              <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
-            </Footer>
+            <div className="appLayout">
+              <ScrollToHash />
+              <LoadingOverlay />
+              <Menu />
+              <main className="appMainContent">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/blog" element={<BlogPage />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/plantar" element={<Plantar />} />
+                  <Route
+                    path="/gestao"
+                    element={
+                      <RotaProtegida>
+                        <Gestao />
+                      </RotaProtegida>
+                    }
+                  />
+                  <Route path="*" element={<Page title="Página não encontrada" description="O endereço acessado não existe." />} />
+                </Routes>
+              </main>
+              <Footer>
+                <div className="imgLogo"><img src={imgLogo} alt="Logo Cidade Raiz" /></div>
+              </Footer>
+            </div>
           </LoadingProvider>
         </AuthProvider>
       </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false}/>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }

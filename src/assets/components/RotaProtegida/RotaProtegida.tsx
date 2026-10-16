@@ -13,7 +13,13 @@ export function RotaProtegida({ children }: RotaProtegidaProps) {
 
   // 1. Enquanto valida o cookie com o backend, não redireciona
   if (carregando) {
-    return null; // ou um componente de spinner
+    return (
+      <div className="paginaSkeletonContainer">
+        <div className="skeletonBox paginaSkeletonHeader" />
+        <div className="skeletonBox paginaSkeletonAbas" />
+        <div className="skeletonBox paginaSkeletonConteudo" />
+      </div>
+    );
   }
 
   // 2. Não está autenticado -> vai para o Login

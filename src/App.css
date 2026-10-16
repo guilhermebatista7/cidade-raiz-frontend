@@ -37,3 +37,14 @@
   margin: 0 auto;
   font-size: 1.1rem;
 }
+
+.appLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ocupa no mínimo 100% da altura da tela */
+}
+.appMainContent {
+  flex: 1; /* Preenche todo o espaço que sobra, empurrando o Footer para baixo */
+  display: flex;
+  flex-direction: column;
+}

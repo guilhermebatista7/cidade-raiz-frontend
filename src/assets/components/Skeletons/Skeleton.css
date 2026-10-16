@@ -77,3 +77,29 @@
     width: 100%;
     height: 48px;
 }
+
+/* Skeleton de Tela Inteira / Rota Protegida */
+.paginaSkeletonContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 120px auto 40px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.paginaSkeletonHeader {
+  width: 100%;
+  height: 100px;
+}
+
+.paginaSkeletonAbas {
+  width: 70%;
+  height: 40px;
+}
+
+.paginaSkeletonConteudo {
+  width: 100%;
+  height: 400px;
+}
