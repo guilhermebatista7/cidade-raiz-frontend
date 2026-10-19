@@ -8,6 +8,7 @@ import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../../../../services/queryKeys";
 import { useAuth } from "../../../../../contexts/AuthContext";
+import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
 
 interface CidadeConfig {
     id: string;
@@ -37,7 +38,7 @@ export function AbaConfig() {
     const [nome, setNome] = useState("");
     const [uf, setUf] = useState("");
 
-    const { data: cidades = [] } = useQuery<CidadeConfig[]>({
+    const { data: cidades = [], isFetching: carregandoCidades } = useQuery<CidadeConfig[]>({
         queryKey: queryKeys.cidades.todas,
         queryFn: listarCidades,
         enabled: isGlobal, // Só executa se for admin Global
@@ -123,7 +124,7 @@ export function AbaConfig() {
                 alert("Cidade cadastrada com sucesso!");
             }
 
-            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas});
+            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas });
             fecharModal();
         } catch (error: any) {
             alert(`Erro ao salvar: ${error.message}`);
@@ -139,7 +140,7 @@ export function AbaConfig() {
         try {
             await ativarCidade(id);
             alert("Cidade ativada com sucesso");
-            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas});
+            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas });
         } catch (error) {
             alert(`Erro ao ativar cidade: ${error}`);
         }
@@ -155,7 +156,7 @@ export function AbaConfig() {
             // Certifique-se de importar e usar a função correta do seu service, ex: desativarCidade(id)
             await desativarCidade(id);
             alert("Cidade desativada com sucesso!");
-            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas});
+            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas });
         } catch (error: any) {
             alert(`Erro ao desativar cidade: ${error.message || error}`);
         }
@@ -179,55 +180,59 @@ export function AbaConfig() {
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
             <div className="listaResultado">
-                <table className="table tableRequisicao">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nome Cidade</th>
-                            <th scope="col">UF</th>
-                            <th scope="col">N° árvores</th>
-                            <th scope="col">N° requisições</th>
-                            <th scope="col">N° usuários</th>
-                            <th scope="col" className="text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {cidadesFiltradas.length === 0 ? (
+                {carregandoCidades ? (
+                    <SkeletonTable linhas={4} />
+                ) : (
+                    <table className="table tableRequisicao">
+                        <thead>
                             <tr>
-                                <td colSpan={7} className="mensagemVazio">
-                                    Nenhum resultado encontrado com os filtros atuais.
-                                </td>
+                                <th scope="col">Nome Cidade</th>
+                                <th scope="col">UF</th>
+                                <th scope="col">N° árvores</th>
+                                <th scope="col">N° requisições</th>
+                                <th scope="col">N° usuários</th>
+                                <th scope="col" className="text-center">Ações</th>
                             </tr>
-                        ) : (
-                            cidadesFiltradas.map((item) => (
-                                <tr key={item.id}>
-                                    <td><strong>{item.nome}</strong></td>
-                                    <td>{item.uf}</td>
-                                    <td>{item._count?.arvores ?? 0}</td>
-                                    <td>{item._count?.requisicoes ?? 0}</td>
-                                    <td>{item._count?.usuarios ?? 0}</td>
-                                    <td className="text-center">
-                                        {item.ativa ? (
-                                            <button type="button" className="btn btn-light btnStatusCidade" onClick={() => handleDesativar(item.id)}>
-                                                Desativar
-                                            </button>
-                                        ) : (
-
-                                            <button type="button" className="btnGestaoGlobal btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
-                                                Ativar
-                                            </button>
-                                        )}
-                                        <button
-                                            className="btnGestaoGlobal btn-light m-1"
-                                            onClick={() => abrirModalEditar(item.id)}
-                                        >
-                                            Editar
-                                        </button>
+                        </thead>
+                        <tbody>
+                            {cidadesFiltradas.length === 0 ? (
+                                <tr>
+                                    <td colSpan={7} className="mensagemVazio">
+                                        Nenhum resultado encontrado com os filtros atuais.
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : (
+                                cidadesFiltradas.map((item) => (
+                                    <tr key={item.id}>
+                                        <td><strong>{item.nome}</strong></td>
+                                        <td>{item.uf}</td>
+                                        <td>{item._count?.arvores ?? 0}</td>
+                                        <td>{item._count?.requisicoes ?? 0}</td>
+                                        <td>{item._count?.usuarios ?? 0}</td>
+                                        <td className="text-center">
+                                            {item.ativa ? (
+                                                <button type="button" className="btn btn-light btnStatusCidade" onClick={() => handleDesativar(item.id)}>
+                                                    Desativar
+                                                </button>
+                                            ) : (
+
+                                                <button type="button" className="btnGestaoGlobal btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
+                                                    Ativar
+                                                </button>
+                                            )}
+                                            <button
+                                                className="btnGestaoGlobal btn-light m-1"
+                                                onClick={() => abrirModalEditar(item.id)}
+                                            >
+                                                Editar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
             {/* MODAL HÍBRIDO (ADICIONAR / EDITAR) */}
             <ModalForm
