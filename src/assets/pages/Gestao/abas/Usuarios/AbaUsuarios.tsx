@@ -46,7 +46,7 @@ export function AbaUsuarios() {
     // Se for global e não escolheu cidade ainda, pega a primeira cidade da lista
     const cidadeAtivaId = isGlobal ? (cidadeFiltro || cidades[0]?.id || "") : "";
 
-    const { data: usuarios = [], isLoading: carregandoUsuarios } = useQuery<Usuario[]>({
+    const { data: usuarios = [], isFetching: carregandoUsuarios } = useQuery<Usuario[]>({
         queryKey: isGlobal && cidadeAtivaId
             ? queryKeys.usuarios.porCidade(cidadeFiltro, roleFiltro)
             : queryKeys.usuarios.todos,
@@ -169,7 +169,6 @@ export function AbaUsuarios() {
 
         try {
             await ativarUsuario(id);
-            alert("Usuário ativado com sucesso");
 
             // Invalida o cache do React Query 
             queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
@@ -186,7 +185,6 @@ export function AbaUsuarios() {
 
         try {
             await desativarUsuario(id);
-            alert("Uusário desativado com sucesso!");
 
             // Invalida o cache do React Query 
             queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });

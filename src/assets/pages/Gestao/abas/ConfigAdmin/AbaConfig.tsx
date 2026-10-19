@@ -5,11 +5,29 @@ import { estados } from "../../../../dataInfo/estados";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../../../../../services/queryKeys";
+import { useAuth } from "../../../../../contexts/AuthContext";
+
+interface CidadeConfig {
+    id: string;
+    nome: string;
+    uf: string;
+    ativa: boolean;
+    _count?: {
+        arvores?: number;
+        requisicoes?: number;
+        usuarios?: number;
+    };
+}
 
 export function AbaConfig() {
 
+    const queryClient = useQueryClient();
+    const { usuario } = useAuth(); //Pega contexto fazer nova req na API
+    const isGlobal = usuario?.role === 'GLOBAL';
+
     // 1. ESTADOS DE DADOS E CONTROLE DO MODAL
-    const [cidades, setCidades] = useState<any[]>([]);
     const [modalAberto, setModalAberto] = useState(false);
 
     // Armazena o ID da cidade que está sendo editada (null = modo Adicionar)
@@ -19,18 +37,11 @@ export function AbaConfig() {
     const [nome, setNome] = useState("");
     const [uf, setUf] = useState("");
 
-    useEffect(() => {
-        carregarDados();
-    }, []);
-
-    const carregarDados = async () => {
-        try {
-            const dados = await listarCidades();
-            setCidades(dados);
-        } catch (error) {
-            console.log("Erro ao carregar árvores");
-        }
-    }
+    const { data: cidades = [] } = useQuery<CidadeConfig[]>({
+        queryKey: queryKeys.cidades.todas,
+        queryFn: listarCidades,
+        enabled: isGlobal, // Só executa se for admin Global
+    })
 
     // Efeitos para controle do modal (mesmo padrão do seu código)
     useEffect(() => {
@@ -112,7 +123,7 @@ export function AbaConfig() {
                 alert("Cidade cadastrada com sucesso!");
             }
 
-            await carregarDados(); // Atualiza a listagem do banco
+            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas});
             fecharModal();
         } catch (error: any) {
             alert(`Erro ao salvar: ${error.message}`);
@@ -121,14 +132,14 @@ export function AbaConfig() {
     };
 
     const handleAtivar = async (id: string) => {
-        if(!id){
+        if (!id) {
             alert('ID inválido');
         }
 
         try {
             await ativarCidade(id);
             alert("Cidade ativada com sucesso");
-            await carregarDados();
+            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas});
         } catch (error) {
             alert(`Erro ao ativar cidade: ${error}`);
         }
@@ -142,12 +153,12 @@ export function AbaConfig() {
 
         try {
             // Certifique-se de importar e usar a função correta do seu service, ex: desativarCidade(id)
-            await desativarCidade(id); 
+            await desativarCidade(id);
             alert("Cidade desativada com sucesso!");
-            await carregarDados(); // Atualiza a tabela
+            queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas});
         } catch (error: any) {
             alert(`Erro ao desativar cidade: ${error.message || error}`);
-        } 
+        }
     };
 
     return (
@@ -162,7 +173,7 @@ export function AbaConfig() {
                     onChange={(e) => setBusca(e.target.value)}
                 />
 
-                <button className="btnPagination" onClick={abrirModalAdicionar}>Adicionar Cidade</button>
+                <button className="btnGestaoGlobal" onClick={abrirModalAdicionar}>Adicionar Cidade</button>
 
             </div>
 
@@ -196,17 +207,17 @@ export function AbaConfig() {
                                     <td>{item._count?.usuarios ?? 0}</td>
                                     <td className="text-center">
                                         {item.ativa ? (
-                                            <button type="button" className="btn btn-light btnStatusCidade" style={{ backgroundColor: "#", }} onClick={() => handleDesativar(item.id)}>
+                                            <button type="button" className="btn btn-light btnStatusCidade" onClick={() => handleDesativar(item.id)}>
                                                 Desativar
                                             </button>
                                         ) : (
 
-                                            <button type="button" className="btnPagination btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
+                                            <button type="button" className="btnGestaoGlobal btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
                                                 Ativar
                                             </button>
                                         )}
                                         <button
-                                            className="btnPagination btn-light m-1"
+                                            className="btnGestaoGlobal btn-light m-1"
                                             onClick={() => abrirModalEditar(item.id)}
                                         >
                                             Editar
@@ -292,8 +303,8 @@ export function AbaConfig() {
                                 <FontAwesomeIcon icon={faCheck} />
 
                                 {cidadeEmEdicaoId !== null
-                                        ? "Salvar Alterações"
-                                        : "Adicionar Cidade"}
+                                    ? "Salvar Alterações"
+                                    : "Adicionar Cidade"}
                             </button>
                         </div>
                     </form>
