@@ -2,19 +2,61 @@ import { useEffect, useMemo, useState } from "react";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faUserAlt } from "@fortawesome/free-solid-svg-icons";
-import { listarCidadesUsuario } from "../../../../../services/cidadeService";
+import { listarCidades, listarCidadesUsuario } from "../../../../../services/cidadeService";
 import { type Role, type Cidade, type Usuario } from "../../../../../types";
 import { ativarUsuario, atualizarUsuario, desativarUsuario, listarRoles, listarUsuarios, listarUsuariosCidade } from "../../../../../services/usuarioService";
-import { obterUsuarioLogado } from "../../../../../services/authService";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../../../../contexts/AuthContext";
+import { queryKeys } from "../../../../../services/queryKeys";
+import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
 
 export function AbaUsuarios() {
 
+    const queryClient = useQueryClient();
+    const { usuario } = useAuth(); //Pega contexto fazer nova req na API
+
+    const isGlobal = usuario?.role === 'GLOBAL';
+
+    const [cidadeFiltro, setCidadeFiltro] = useState("N");
+    const [roleFiltro, setRoleFiltro] = useState<Role>("FUNCIONARIO");
+
     // 1. ESTADOS DE DADOS E CONTROLE DO MODAL
-    const [usuarios, setUsuarios] = useState<any[]>([]);
     const [modalAberto, setModalAberto] = useState(false);
 
     // Armazena o ID do usuário que está sendo editada (null = modo Adicionar)
     const [usuarioEmEdicaoId, setUsuarioEmEdicaoId] = useState<string | null>(null);
+
+    const { data: cidades = [] } = useQuery<Cidade[]>({
+        queryKey: isGlobal ? queryKeys.cidades.todas : queryKeys.cidades.porUsuario,
+        queryFn: () => {
+            if (isGlobal) {
+                return listarCidades();
+            }
+
+            return listarCidadesUsuario();
+        },
+        enabled: isGlobal, // Só executa se for admin Global
+    })
+
+    const { data: roles = [] } = useQuery<Role[]>({
+        queryKey: queryKeys.usuarios.roles,
+        queryFn: listarRoles,
+    })
+
+    // Se for global e não escolheu cidade ainda, pega a primeira cidade da lista
+    const cidadeAtivaId = isGlobal ? (cidadeFiltro || cidades[0]?.id || "") : "";
+
+    const { data: usuarios = [], isLoading: carregandoUsuarios } = useQuery<Usuario[]>({
+        queryKey: isGlobal && cidadeAtivaId
+            ? queryKeys.usuarios.porCidade(cidadeFiltro, roleFiltro)
+            : queryKeys.usuarios.todos,
+        queryFn: () => {
+            if (isGlobal && cidadeAtivaId) {
+                return listarUsuariosCidade(cidadeFiltro, roleFiltro);
+            }
+            return listarUsuarios();
+        },
+    });
 
     // Campos do formulário
     const [nome, setNome] = useState("");
@@ -22,84 +64,6 @@ export function AbaUsuarios() {
     const [telefone, setTelefone] = useState("");
     const [tipo, setTipo] = useState<Role | undefined>(undefined);
     const [cidadeId, setCidadeId] = useState("");
-
-    //dados do select do form
-    const [cidades, setCidades] = useState<Cidade[]>([]);
-    const [roles, setRoles] = useState<Role[]>([]);
-
-    const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
-    const [cidadeFiltro, setCidadeFiltro] = useState("");
-    const [roleFiltro, setRoleFiltro] = useState<Role >("FUNCIONARIO");
-
-    useEffect(() => {
-        carregarDados();
-    }, []);
-
-    const carregarDados = async () => {
-        try {
-            const dadosCidades = await listarCidadesUsuario();
-            setCidades(dadosCidades);
-            console.log(dadosCidades);
-
-            const dadosRoles = await listarRoles();
-            setRoles(dadosRoles);
-
-            const dadosLogado = await obterUsuarioLogado();
-            setUsuarioLogado(dadosLogado.usuario);
-
-            if (dadosLogado.usuario.role !== 'GLOBAL') {
-                const dadosUsuarios = await listarUsuarios();
-                setUsuarios(dadosUsuarios);
-                return;
-            }
-
-            // Se for usuário GLOBAL busca todas as cidades para fazer filtro no select
-
-            if (dadosCidades.length > 0) {
-
-                const primeiraCidadeId = dadosCidades[0].id;
-                setCidadeFiltro(primeiraCidadeId);
-
-                const dadosUsuario = await listarUsuariosCidade(primeiraCidadeId, roleFiltro);
-                setUsuarios(dadosUsuario);
-                console.log('aqui');
-
-                console.log(dadosUsuario);
-            }
-
-        } catch (error) {
-            console.log("Erro ao carregar dados: ", error);
-        }
-    }
-
-    const buscarUsuarios = async (cidade: string, role: Role) => {
-        try {
-            const dadosUsuarios = await listarUsuariosCidade(cidade, role);
-            setUsuarios(dadosUsuarios);
-        } catch (error) {
-            console.error("Erro ao buscar usuários:", error);
-        }
-    };
-
-    const buscarUsuarioCidade = async (
-        e: React.ChangeEvent<HTMLSelectElement>
-    ) => {
-        const cidade = e.target.value;
-
-        setCidadeFiltro(cidade);
-
-        await buscarUsuarios(cidade, roleFiltro);
-    };
-
-    const buscarUsuarioRole = async (
-        e: React.ChangeEvent<HTMLSelectElement>
-    ) => {
-        const role = e.target.value as Role;
-
-        setRoleFiltro(role);
-
-        await buscarUsuarios(cidadeFiltro, role);
-    };
 
     // Efeitos para controle do modal (mesmo padrão do seu código)
     useEffect(() => {
@@ -123,8 +87,8 @@ export function AbaUsuarios() {
         setTelefone("");
         setCidadeId("");
 
-        if (usuarioLogado?.role === 'ADMIN_LOCAL') {
-            setCidadeId(usuarioLogado.cidadeId || '');
+        if (usuario?.role === 'ADMIN_LOCAL') {
+            setCidadeId(usuario.cidadeId || '');
         }
         setModalAberto(true);
     };
@@ -137,7 +101,7 @@ export function AbaUsuarios() {
         setUsuarioEmEdicaoId(id);
         setNome(usuarioAlvo.nome || "");
         setEmail(usuarioAlvo.email || "");
-        setTipo(usuarioAlvo.tipo || usuarioAlvo.role || undefined);
+        setTipo(usuarioAlvo.role || undefined);
         setTelefone(usuarioAlvo.telefone || "");
         setCidadeId(usuarioAlvo.cidadeId || usuarioAlvo.cidade?.id || "");
         setModalAberto(true);
@@ -159,7 +123,7 @@ export function AbaUsuarios() {
             const bateTexto =
                 item.nome.toLowerCase().includes(termo) ||
                 item.email.toLowerCase().includes(termo) ||
-                item.telefone.toLowerCase().includes(termo);
+                (item.telefone ?? '').toLowerCase().includes(termo);
 
             return bateTexto
         });
@@ -185,7 +149,12 @@ export function AbaUsuarios() {
                 //await cadastrarCidade(nome,uf);
             }
 
-            await carregarDados(); // Atualiza a listagem do banco
+            // Invalida o cache do React Query 
+            queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
+            if (cidadeAtivaId) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.porCidade(cidadeFiltro, roleFiltro) });
+            }
+
             fecharModal();
         } catch (error: any) {
             alert(`Erro ao salvar: ${error.message}`);
@@ -200,8 +169,10 @@ export function AbaUsuarios() {
 
         try {
             await ativarUsuario(id);
-            alert("Usuário ativada com sucesso");
-            await carregarDados();
+            alert("Usuário ativado com sucesso");
+
+            // Invalida o cache do React Query 
+            queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
         } catch (error) {
             alert(`Erro ao ativar usuário: ${error}`);
         }
@@ -216,7 +187,9 @@ export function AbaUsuarios() {
         try {
             await desativarUsuario(id);
             alert("Uusário desativado com sucesso!");
-            await carregarDados(); // Atualiza a tabela
+
+            // Invalida o cache do React Query 
+            queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
         } catch (error: any) {
             alert(`Erro ao desativar usuário: ${error.message || error}`);
         }
@@ -234,10 +207,10 @@ export function AbaUsuarios() {
                     onChange={(e) => setBusca(e.target.value)}
                 />
 
-                {usuarioLogado?.role === 'GLOBAL' && (
+                {usuario?.role === 'GLOBAL' && (
                     <select
                         value={cidadeFiltro}
-                        onChange={buscarUsuarioCidade}
+                        onChange={(e) => setCidadeFiltro(e.target.value)}
                     >
                         <option value="N">Nenhuma</option>
                         {cidades.map((item) => (
@@ -246,10 +219,10 @@ export function AbaUsuarios() {
                     </select>
                 )}
 
-                {usuarioLogado?.role === 'GLOBAL' && (
+                {usuario?.role === 'GLOBAL' && (
                     <select
                         value={roleFiltro}
-                        onChange={buscarUsuarioRole}
+                        onChange={(e) => setRoleFiltro(e.target.value as Role)}
                     >
                         {roles.map((item) => (
                             <option key={item} value={item}>{item}</option>
@@ -263,55 +236,77 @@ export function AbaUsuarios() {
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
             <div className="listaResultado">
-                <table className="table tableRequisicao">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nome Usuário</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Telefone</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Cidade</th>
-                            <th scope="col" className="text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {usuariosFiltrados.length === 0 ? (
+                {carregandoUsuarios ? (
+                    <SkeletonTable linhas={4} />
+                
+                ) : (
+                    <table className="table tableRequisicao">
+                        <thead>
                             <tr>
-                                <td colSpan={7} className="mensagemVazio">
-                                    Nenhum resultado encontrado com os filtros atuais.
-                                </td>
+                                <th scope="col">Nome Usuário</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Telefone</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Cidade</th>
+                                <th scope="col" className="text-center">Ações</th>
                             </tr>
-                        ) : (
-                            usuariosFiltrados.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{usuarioLogado?.id === item.id ? <FontAwesomeIcon icon={faUserAlt} /> : ""}<strong>{item.nome}</strong></td>
-                                    <td>{item.email}</td>
-                                    <td>{item.telefone}</td>
-                                    <td>{item.role}</td>
-                                    <td>{item.cidade?.nome}</td>
-                                    <td className="text-center">
-                                        {item.ativo ? (
-                                            <button type="button" className="btn btn-light btnStatusCidade" style={{ backgroundColor: "#", }} onClick={() => handleDesativar(item.id)}>
-                                                Desativar
-                                            </button>
-                                        ) : (
+                        </thead>
 
-                                            <button type="button" className="btnGestaoGlobal btnAtivar btnStatusCidade" onClick={() => handleAtivar(item.id)}>
-                                                Ativar
-                                            </button>
-                                        )}
-                                        <button
-                                            className="btnGestaoGlobal btn-light m-1"
-                                            onClick={() => abrirModalEditar(item.id)}
-                                        >
-                                            Editar
-                                        </button>
+                        <tbody>
+                            {usuariosFiltrados.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="mensagemVazio">
+                                        Nenhum resultado encontrado com os filtros atuais.
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : (
+                                usuariosFiltrados.map((item) => (
+                                    <tr key={item.id}>
+                                        <td>
+                                            {usuario?.id === item.id && (
+                                                <FontAwesomeIcon icon={faUserAlt} />
+                                            )}
+                                            <strong>{item.nome}</strong>
+                                        </td>
+
+                                        <td>{item.email}</td>
+                                        <td>{item.telefone}</td>
+                                        <td>{item.role}</td>
+                                        <td>{item.cidade?.nome}</td>
+
+                                        <td className="text-center">
+                                            {item.ativo ? (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light btnStatusCidade"
+                                                    onClick={() => handleDesativar(item.id)}
+                                                >
+                                                    Desativar
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="btnGestaoGlobal btnAtivar btnStatusCidade"
+                                                    onClick={() => handleAtivar(item.id)}
+                                                >
+                                                    Ativar
+                                                </button>
+                                            )}
+
+                                            <button
+                                                type="button"
+                                                className="btnGestaoGlobal btn-light m-1"
+                                                onClick={() => abrirModalEditar(item.id)}
+                                            >
+                                                Editar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
             {/* MODAL HÍBRIDO (ADICIONAR / EDITAR) */}
             <ModalForm
@@ -414,8 +409,8 @@ export function AbaUsuarios() {
                                 id="cidade"
                                 value={cidadeId}
                                 onChange={(e) => setCidadeId(e.target.value)}
-                                disabled={usuarioLogado?.role === "ADMIN_LOCAL"}
-                                className={usuarioLogado?.role === "ADMIN_LOCAL" ? "bg-light" : ""}
+                                disabled={usuario?.role === "ADMIN_LOCAL"}
+                                className={usuario?.role === "ADMIN_LOCAL" ? "bg-light" : ""}
 
                             >
                                 <option value="">
