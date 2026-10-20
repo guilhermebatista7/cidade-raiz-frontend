@@ -35,7 +35,6 @@ export function AbaUsuarios() {
 
             return listarCidadesUsuario();
         },
-        enabled: isGlobal, // Só executa se for admin Global
     })
 
     const { data: roles = [] } = useQuery<Role[]>({

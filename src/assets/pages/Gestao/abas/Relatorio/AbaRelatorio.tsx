@@ -1,15 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
-import { obterUsuarioLogado } from '../../../../../services/authService';
 import { buscarDadosCidade } from '../../../../../services/relatorio.service';
-import { listarCidades } from '../../../../../services/cidadeService';
+import { listarCidades, listarCidadesUsuario } from '../../../../../services/cidadeService';
 import type { Cidade } from '../../../../../types';
 import './AbaRelatorio.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faFileLines, faNewspaper, faTree, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../../../../../contexts/AuthContext';
+import { queryKeys } from '../../../../../services/queryKeys';
+import { SkeletonCard } from '../../../../components/Skeletons/SkeletonCard';
+import { SkeletonTable } from '../../../../components/Skeletons/SkeletonTable';
 
 type Status = 'SOLICITADO' | 'APROVADO' | 'RECUSADO' | 'AGUARDANDO_RETIRADA' | 'AGENDADO_PLANTIO' | 'CONCLUIDO';
 type Atendimento = 'RETIRADA_LOCAL' | 'PLANTIO_AGENDADO';
@@ -108,63 +112,36 @@ function Painel({ titulo, subtitulo, children, extra }: { titulo: string; subtit
 export function AbaRelatorio() {
     const [datas, setDatas] = useState(periodoInicial);
     const [cidadeFiltro, setCidadeFiltro] = useState('');
-    const [cidades, setCidades] = useState<Cidade[]>([]);
     const [role, setRole] = useState('');
-    const [dados, setDados] = useState<DadosRelatorio | null>(null);
     const [statusFiltro, setStatusFiltro] = useState<FiltroStatus>('TODOS');
     const [busca, setBusca] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [erro, setErro] = useState('');
     const [pagina, setPagina] = useState(1);
     const porPagina = 6;
 
-    useEffect(() => {
-        let ativo = true;
-        (async () => {
-            try {
-                const resposta = await obterUsuarioLogado();
-                if (!ativo) return;
-                const perfil = resposta.usuario.role as string;
-                setRole(perfil);
-                if (perfil === 'GLOBAL') {
-                    const lista = await listarCidades();
-                    if (!ativo) return;
-                    setCidades(lista);
-                    setCidadeFiltro(lista[0]?.id ?? '');
-                }
-            } catch {
-                if (ativo) { setErro('Não foi possível identificar o usuário.'); setLoading(false); }
-            }
-        })();
-        return () => { ativo = false; };
-    }, []);
+    const queryClient = useQueryClient();
+    const { usuario } = useAuth(); //Pega contexto fazer nova req na API
 
-    useEffect(() => {
-        if (!role || (role === 'GLOBAL' && !cidadeFiltro)) {
-            if (role === 'GLOBAL') setLoading(false);
-            return;
-        }
-        if (!datas.inicio || !datas.fim || datas.inicio > datas.fim) {
-            setErro('Selecione um período válido.');
-            setLoading(false);
-            return;
-        }
-        let ativo = true;
-        setLoading(true);
-        setErro('');
-        (async () => {
-            try {
-                const resposta: DadosRelatorio = await buscarDadosCidade(datas.inicio, datas.fim, role === 'GLOBAL' ? cidadeFiltro : undefined);
-                console.log(resposta);
-                if (ativo) { setDados(resposta); setPagina(1); }
-            } catch {
-                if (ativo) { setDados(null); setErro('Não foi possível carregar o relatório. Tente novamente.'); }
-            } finally {
-                if (ativo) setLoading(false);
+    const isGlobal = usuario?.role === 'GLOBAL';
+
+    const { data: cidades = [] } = useQuery<Cidade[]>({
+        queryKey: isGlobal ? queryKeys.cidades.todas : queryKeys.cidades.porUsuario,
+        queryFn: () => {
+            if (isGlobal) {
+                return listarCidades();
             }
-        })();
-        return () => { ativo = false; };
-    }, [role, cidadeFiltro, datas.inicio, datas.fim]);
+
+            return listarCidadesUsuario();
+        },
+        enabled: isGlobal, // Só executa se for admin Global
+    })
+
+    // Se for global e não escolheu cidade ainda, pega a primeira cidade da lista
+    const cidadeAtivaId = isGlobal ? (cidadeFiltro || cidades[0]?.id || "") : "";
+
+    const { data: dados, isLoading: loading, error } = useQuery<DadosRelatorio>({
+        queryKey: queryKeys.relatorios.porCidade(datas.inicio, datas.fim, isGlobal ? cidadeAtivaId : undefined),
+        queryFn: () => buscarDadosCidade(datas.inicio, datas.fim, isGlobal ? cidadeAtivaId : undefined),
+    })
 
     const diarios = useMemo(() => dados ? serieDiaria(dados) : [], [dados]);
     const arvores = useMemo(() => dados ? rankingArvores(dados) : [], [dados]);
@@ -232,13 +209,13 @@ export function AbaRelatorio() {
         <div className="cr-filterbar">
             <div className="cr-field"><label htmlFor="cr-inicio">De</label><input id="cr-inicio" type="date" value={datas.inicio} max={datas.fim} onChange={e => setDatas(d => ({ ...d, inicio: e.target.value }))} /></div>
             <div className="cr-field"><label htmlFor="cr-fim">Até</label><input id="cr-fim" type="date" min={datas.inicio} value={datas.fim} onChange={e => setDatas(d => ({ ...d, fim: e.target.value }))} /></div>
-            {role === 'GLOBAL' && <div className="cr-field cr-city"><label htmlFor="cr-cidade">Cidade</label><select id="cr-cidade" value={cidadeFiltro} onChange={e => setCidadeFiltro(e.target.value)}>{cidades.map(c => <option key={c.id} value={c.id}>{c.nome} / {c.uf}</option>)}</select></div>}
+            {isGlobal && <div className="cr-field cr-city"><label htmlFor="cr-cidade">Cidade</label><select id="cr-cidade" value={cidadeAtivaId} onChange={e => setCidadeFiltro(e.target.value)}>{cidades.map(c => <option key={c.id} value={c.id}>{c.nome} / {c.uf}</option>)}</select></div>}
             <div className="cr-filter-hint">Os indicadores consideram o período selecionado</div>
         </div>
 
-        {erro && <div className="cr-alert" role="alert">{erro}</div>}
-        {loading && <div className="cr-loading" role="status">Carregando dados do relatório…</div>}
-        {!loading && !dados && !erro && <div className="cr-empty">Selecione uma cidade para visualizar o relatório.</div>}
+        {error && <div className="cr-alert" role="alert">{error.message}</div>}
+        {loading && <SkeletonTable linhas={6} />}
+        {!loading && !dados && !error && <div className="cr-empty">Selecione uma cidade para visualizar o relatório.</div>}
 
         {dados && <div className={loading ? 'cr-body cr-dimmed' : 'cr-body'}>
             <div className="cr-kpis">
