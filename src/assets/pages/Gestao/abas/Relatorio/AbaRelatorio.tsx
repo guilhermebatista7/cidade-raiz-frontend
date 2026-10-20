@@ -141,6 +141,7 @@ export function AbaRelatorio() {
     const { data: dados, isLoading: loading, error } = useQuery<DadosRelatorio>({
         queryKey: queryKeys.relatorios.porCidade(datas.inicio, datas.fim, isGlobal ? cidadeAtivaId : undefined),
         queryFn: () => buscarDadosCidade(datas.inicio, datas.fim, isGlobal ? cidadeAtivaId : undefined),
+        staleTime: 1000 * 60 * 20,
     })
 
     const diarios = useMemo(() => dados ? serieDiaria(dados) : [], [dados]);
