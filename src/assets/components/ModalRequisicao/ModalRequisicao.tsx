@@ -9,7 +9,7 @@ import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone
 interface ModalRequisicaoProps {
     aberto: boolean;
     fechar: () => void;
-    requisicao: Requisicao  | null;
+    requisicao: Requisicao | null;
     baseUrl: string;
     onAtualizado: () => Promise<void>;
 }
@@ -96,43 +96,101 @@ export default function ModalRequisicao({
                     <section className="secaoRequisicao">
                         <h3>Resumo da requisição</h3>
 
-                        <div className="d-flex align-items-center gap-3 flex-wrap">
-                            <div className="select d-flex flex-column">
-                                <span>Situação</span>
-                                <select name="requisicaoStatus" id="requisicaoStatus" value={status} onChange={(e) => setStatus(e.target.value as StatusRequisicao)}>
+                        <div className="controlesStatus">
+                            <div className="select">
+                                <label htmlFor="requisicaoStatus">
+                                    Alterar situação
+                                </label>
+
+                                <select
+                                    name="requisicaoStatus"
+                                    id="requisicaoStatus"
+                                    value={status}
+                                    onChange={(e) =>
+                                        setStatus(e.target.value as StatusRequisicao)
+                                    }
+                                >
                                     <option value="SOLICITADO">Solicitado</option>
                                     <option value="APROVADO">Aprovado</option>
                                     <option value="RECUSADO">Recusado</option>
+
                                     {requisicao.tipoAtendimento === "RETIRADA_LOCAL" && (
-                                        <option value="AGUARDANDO_RETIRADA">Aguardando retirada</option>
+                                        <option value="AGUARDANDO_RETIRADA">
+                                            Aguardando retirada
+                                        </option>
                                     )}
+
                                     {requisicao.tipoAtendimento === "PLANTIO_AGENDADO" && (
-                                        <option value="AGENDADO_PLANTIO">Plantio agendado</option>
+                                        <option value="AGENDADO_PLANTIO">
+                                            Plantio agendado
+                                        </option>
                                     )}
+
                                     <option value="CONCLUIDO">Concluído</option>
                                 </select>
                             </div>
 
-                            {(status !== requisicao.status && status === 'RECUSADO') ? (
-                                <input value={obsStatus} className="w-50 mt-3" type="text" placeholder="Informe o motivo" onChange={(e) => setObsStatus(e.target.value)} />
-                            ) : ''}
-                            {(status !== requisicao.status && status === 'AGENDADO_PLANTIO') ? (
+                            {status !== requisicao.status && (
                                 <>
+                                    {status === "RECUSADO" && (
+                                        <div className="campoStatus">
+                                            <label htmlFor="obsStatus">
+                                                Motivo da recusa
+                                            </label>
 
-                                    <div className="d-flex flex-column">
-                                        <span>Data inicial (estimada)</span>
-                                        <input className="w-auto dataInicial " type="date" value={dataInicial} onChange={(e) => (setDataInicial(e.target.value))} />
-                                    </div>
+                                            <input
+                                                id="obsStatus"
+                                                type="text"
+                                                value={obsStatus}
+                                                placeholder="Informe o motivo da recusa"
+                                                required
+                                                onChange={(e) => setObsStatus(e.target.value)}
+                                            />
+                                        </div>
+                                    )}
 
-                                    <div className="d-flex flex-column">
-                                        <span>Data final (estimada)</span>
-                                        <input className="w-auto dataFinal " type="date" value={dataFinal} onChange={(e) => setDataFinal(e.target.value)} />
-                                    </div>
+                                    {status === "AGENDADO_PLANTIO" && (
+                                        <>
+                                            <div className="campoStatus">
+                                                <label htmlFor="dataInicial">
+                                                    Data inicial estimada
+                                                </label>
+
+                                                <input
+                                                    id="dataInicial"
+                                                    type="date"
+                                                    value={dataInicial}
+                                                    required
+                                                    onChange={(e) =>
+                                                        setDataInicial(e.target.value)
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="campoStatus">
+                                                <label htmlFor="dataFinal">
+                                                    Data final estimada
+                                                </label>
+
+                                                <input
+                                                    id="dataFinal"
+                                                    type="date"
+                                                    value={dataFinal}
+                                                    min={dataInicial || undefined}
+                                                    required
+                                                    onChange={(e) =>
+                                                        setDataFinal(e.target.value)
+                                                    }
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <button type="submit" className="btnRequisicao btnSalvar">
+                                        Salvar alterações
+                                    </button>
                                 </>
-                            ) : ''}
-                            {status !== requisicao.status ? (
-                                <button type="submit" className={`btnRequisicao w-auto mt-3`}>Salvar</button>
-                            ) : ''}
+                            )}
                         </div>
 
                         <div className="gridInformacoes">
