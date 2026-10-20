@@ -9,10 +9,9 @@ import './AbaRelatorio.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faFileLines, faNewspaper, faTree, faUsers } from '@fortawesome/free-solid-svg-icons';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../../../contexts/AuthContext';
 import { queryKeys } from '../../../../../services/queryKeys';
-import { SkeletonCard } from '../../../../components/Skeletons/SkeletonCard';
 import { SkeletonTable } from '../../../../components/Skeletons/SkeletonTable';
 
 type Status = 'SOLICITADO' | 'APROVADO' | 'RECUSADO' | 'AGUARDANDO_RETIRADA' | 'AGENDADO_PLANTIO' | 'CONCLUIDO';
@@ -112,13 +111,11 @@ function Painel({ titulo, subtitulo, children, extra }: { titulo: string; subtit
 export function AbaRelatorio() {
     const [datas, setDatas] = useState(periodoInicial);
     const [cidadeFiltro, setCidadeFiltro] = useState('');
-    const [role, setRole] = useState('');
     const [statusFiltro, setStatusFiltro] = useState<FiltroStatus>('TODOS');
     const [busca, setBusca] = useState('');
     const [pagina, setPagina] = useState(1);
     const porPagina = 6;
 
-    const queryClient = useQueryClient();
     const { usuario } = useAuth(); //Pega contexto fazer nova req na API
 
     const isGlobal = usuario?.role === 'GLOBAL';
