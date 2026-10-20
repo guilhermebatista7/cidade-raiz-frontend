@@ -1,136 +1,18 @@
 import ModalForm from "../ModalForm/ModalForm";
-import type { Arvore, StatusRequisicao } from "../../../types";
+import type { Requisicao, StatusRequisicao } from "../../../types";
 
 import "./ModalRequisicao.css";
 import { useEffect, useState } from "react";
 import { agendarPlantio, alterarStatus, recusarRequisicao } from "../../../services/requisicaoService";
-
-interface RequisicaoModal {
-    id: string;
-    nomeBeneficiario: string | null;
-    telefoneBeneficiario: string | null;
-
-    status: StatusRequisicao;
-    tipoAtendimento: string;
-
-    dataInicial: string | null;
-    dataFinal: string | null;
-    observacaoStatus: string | null;
-
-    rua: string;
-    numero: string;
-    bairro: string;
-    cidadeEndereco: string;
-    cep: string;
-    estado: string;
-    pontoReferencia: string;
-
-    fotoLocalUrl: string | null;
-    comprovanteResidenciaUrl: string | null;
-
-    criadoEm: string;
-
-    arvore: Arvore;
-}
+import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone, formatarTipoAtendimento } from "../../../utils/formatadores";
 
 interface ModalRequisicaoProps {
     aberto: boolean;
     fechar: () => void;
-    requisicao: RequisicaoModal | null;
+    requisicao: Requisicao  | null;
     baseUrl: string;
     onAtualizado: () => Promise<void>;
 }
-
-const formatarData = (data: string | null | undefined) => {
-    if (!data) return "Não informado";
-
-    const dataConvertida = new Date(data);
-
-    if (Number.isNaN(dataConvertida.getTime())) {
-        return "Data inválida";
-    }
-
-    return dataConvertida.toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-    });
-};
-
-const formatarDataAgendamento = (
-    valor: string | null | undefined
-) => {
-    if (!valor) return "Não informado";
-
-    const data = valor.slice(0, 10);
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
-        return "Data inválida";
-    }
-
-    const [ano, mes, dia] = data.split("-");
-
-    return `${dia}/${mes}/${ano}`;
-};
-
-const formatarTelefone = (telefone: string | null) => {
-    if (!telefone) return "Não informado";
-
-    const numeros = telefone.replace(/\D/g, "");
-
-    if (numeros.length === 10) {
-        return numeros.replace(
-            /^(\d{2})(\d{4})(\d{4})$/,
-            "($1) $2-$3"
-        );
-    }
-
-    if (numeros.length === 11) {
-        return numeros.replace(
-            /^(\d{2})(\d{5})(\d{4})$/,
-            "($1) $2-$3"
-        );
-    }
-
-    return telefone;
-};
-
-const formatarTipoAtendimento = (tipo: string) => {
-    switch (tipo) {
-        case "PLANTIO_AGENDADO":
-            return "Plantio agendado";
-
-        case "RETIRADA_LOCAL":
-            return "Retirada no local";
-
-        default:
-            return tipo.replaceAll("_", " ");
-    }
-};
-
-const formatarStatus = (status: string) => {
-    switch (status) {
-        case "SOLICITADO":
-            return "Solicitado";
-
-        case "APROVADO":
-            return "Aprovado";
-
-        case "RECUSADO":
-            return "Recusado";
-
-        case "CONCLUIDO":
-            return "Concluído";
-
-        case "AGUARDANDO_RETIRADA":
-            return "Aguardando retirada";
-
-        case "AGENDADO_PLANTIO":
-            return "Plantio agendado";
-
-        default:
-            return status;
-    }
-};
 
 export default function ModalRequisicao({
     aberto,

@@ -1,79 +1,38 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import './AbaRequisicao.css';
-import { obterUsuarioLogado } from "../../../../../services/authService";
-import type { Arvore, Cidade, Usuario } from "../../../../../types";
+import type { Cidade, Requisicao } from "../../../../../types";
 import { listarRequisicoes, listarRequisicoesCidade } from "../../../../../services/requisicaoService";
-import { listarCidades } from "../../../../../services/cidadeService";
+import { listarCidades, listarCidadesUsuario } from "../../../../../services/cidadeService";
 import ModalRequisicao from "../../../../components/ModalRequisicao/ModalRequisicao";
-
-// 1. Tipagem dos dados da aba
-interface Requisicao {
-    id: string;
-    criadoPorId: string | null;
-    nomeBeneficiario: string | null;
-    telefoneBeneficiario: string | null;
-    cidadeId: string;
-    arvoreId: string;
-
-    status:
-    | "SOLICITADO"
-    | "APROVADO"
-    | "RECUSADO"
-    | "CONCLUIDO"
-    | "AGUARDANDO_RETIRADA"
-    | "AGENDADO_PLANTIO";
-
-    tipoAtendimento: string;
-
-    dataInicial: string | null;
-    dataFinal: string | null;
-    observacaoStatus: string | null;
-
-    rua: string;
-    numero: string;
-    bairro: string;
-    cidadeEndereco: string;
-    cep: string;
-    estado: string;
-    pontoReferencia: string;
-
-    fotoLocalUrl: string | null;
-    comprovanteResidenciaUrl: string | null;
-
-    criadoEm: string;
-    atualizadoEm: string;
-
-    cidade?: {
-        id: string;
-        nome: string;
-        uf: string;
-    };
-
-    criadoPor?: {
-        id: string;
-        nome: string;
-        email: string;
-    } | null;
-
-    arvore: Arvore;
-}
+import { useAuth } from "../../../../../contexts/AuthContext";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../../../../../services/queryKeys";
+import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
 
 export function AbaRequisicoes() {
-    // Dados vindos da API (ou lista inicial)
 
-
-    // 2. ESTADOS DOS FILTROS
+    // ESTADOS DOS FILTROS
     const [busca, setBusca] = useState("");
     const [statusFiltro, setStatusFiltro] = useState("TODOS");
     const [cidadeFiltro, setCidadeFiltro] = useState("");
 
+    const { usuario } = useAuth();
+    const isGlobal = usuario?.role === 'GLOBAL';
 
-    const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
-    const [requisicoes, setRequisicoes] = useState<Requisicao[]>([]);
-    const [cidades, setCidades] = useState<Cidade[]>([]);
+    const { data: cidades = [] } = useQuery<Cidade[]>({
+        queryKey: isGlobal ? queryKeys.cidades.todas : queryKeys.cidades.porUsuario,
+        queryFn: () => {
+            if (isGlobal) {
+                return listarCidades();
+            }
 
-    const [modalAberto, setModalAberto] = useState(false);
-    const [requisicaoSelecionada, setRequisicaoSelecionada] = useState<Requisicao | null>(null);
+            return listarCidadesUsuario();
+        },
+        enabled: isGlobal, // Só executa se for admin Global
+    })
+
+    // Se for global e não escolheu cidade ainda, pega a primeira cidade da lista
+    const cidadeAtivaId = isGlobal ? (cidadeFiltro || cidades[0]?.id || "") : "";
 
     const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
@@ -86,6 +45,41 @@ export function AbaRequisicoes() {
 
     const [dataInicio, setDataInicio] = useState(formatDate(umMesAtras));
     const [dataFim, setDataFim] = useState(formatDate(hoje));
+
+    const queryClient = useQueryClient();
+
+    const atualizarRequisicoes = async () => {
+        await queryClient.invalidateQueries({
+            queryKey: isGlobal && cidadeAtivaId
+                ? queryKeys.requisicoes.porCidade(
+                    cidadeAtivaId,
+                    dataInicio,
+                    dataFim
+                )
+                : queryKeys.requisicoes.todas(
+                    dataInicio,
+                    dataFim
+                ),
+        });
+    };
+
+    const { data: requisicoes = [], isFetching: carregandoRequisicoes } = useQuery<Requisicao[]>({
+        queryKey: isGlobal && cidadeAtivaId
+            ? queryKeys.requisicoes.porCidade(cidadeAtivaId, dataInicio, dataFim)
+            : queryKeys.requisicoes.todas(dataInicio, dataFim),
+        queryFn: () => {
+            if (isGlobal && cidadeAtivaId) {
+                return listarRequisicoesCidade(cidadeAtivaId, dataInicio, dataFim);
+            }
+            return listarRequisicoes(dataInicio, dataFim);
+        },
+        staleTime: 2 * 60 * 1000,
+        gcTime: 5 * 60 * 1000,
+    })
+
+    const [modalAberto, setModalAberto] = useState(false);
+    const [requisicaoSelecionada, setRequisicaoSelecionada] = useState<Requisicao | null>(null);
+
 
     const API_URL = import.meta.env.VITE_API_URL;
 
@@ -118,78 +112,6 @@ export function AbaRequisicoes() {
         });
     }, [requisicoes, busca, statusFiltro]);
 
-    useEffect(() => {
-        carregarDados();
-    }, []);
-
-    const carregarDados = async () => {
-        try {
-            const dadosLogado = await obterUsuarioLogado();
-            setUsuarioLogado(dadosLogado.usuario);
-
-            if (dadosLogado.usuario.role !== 'GLOBAL') {
-                const dadosReq = await listarRequisicoes(dataInicio, dataFim);
-                setRequisicoes(dadosReq);
-                console.log(dadosReq);
-                return;
-            }
-
-            // Se for usuário GLOBAL busca todas as cidades para fazer filtro no select
-            const dadosCidades = await listarCidades();
-            setCidades(dadosCidades);
-
-
-            if (dadosCidades.length > 0) {
-
-                const primeiraCidadeId = dadosCidades[0].id;
-                setCidadeFiltro(primeiraCidadeId);
-
-                const dadosReq = await listarRequisicoesCidade(primeiraCidadeId, dataInicio, dataFim);
-                setRequisicoes(dadosReq);
-                console.log(dadosReq);
-            }
-
-        } catch (error) {
-            console.log("Erro ao carregar dados: ", error);
-        }
-    }
-
-    const buscarReqCidade = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const cidadeId = e.target.value;
-
-        setCidadeFiltro(cidadeId);
-
-        const dadosReq = await listarRequisicoesCidade(cidadeId, dataInicio, dataFim);
-        console.log(dadosReq);
-        setRequisicoes(dadosReq);
-    }
-
-    const buscarReqData = async (inicio: string, fim: string) => {
-        try {
-            if (usuarioLogado?.role === "GLOBAL") {
-                if (!cidadeFiltro) return;
-
-                const dadosReq = await listarRequisicoesCidade(
-                    cidadeFiltro,
-                    inicio,
-                    fim
-                );
-
-                setRequisicoes(dadosReq);
-            } else {
-                const dadosReq = await listarRequisicoes(inicio, fim);
-                setRequisicoes(dadosReq);
-            }
-        } catch (error) {
-            console.error("Erro ao buscar requisições por data:", error);
-
-        }
-    }
-
-    const atualizarRequisicoes = async () => {
-        await carregarDados();
-    };
-
     return (
         <div className="abaRequisicaoConteudo">
             {/* BARRA VISUAL DE FILTROS */}
@@ -199,9 +121,7 @@ export function AbaRequisicoes() {
                     <span>Data inicial</span>
                     <input className="dataInicial " type="date" value={dataInicio} onChange={(e) => {
                         const novaData = e.target.value;
-
                         setDataInicio(novaData);
-                        buscarReqData(novaData, dataFim);
                     }} />
                 </div>
 
@@ -209,10 +129,7 @@ export function AbaRequisicoes() {
                     <span>Data final</span>
                     <input className="dataFinal " type="date" value={dataFim} onChange={(e) => {
                         const novaData = e.target.value;
-
                         setDataFim(novaData);
-
-                        buscarReqData(dataInicio, novaData);
                     }} />
                 </div>
 
@@ -230,10 +147,10 @@ export function AbaRequisicoes() {
                     <option value="AGUARDANDO_RETIRADA">Aguardando Retirada</option>
                 </select>
 
-                {usuarioLogado?.role === 'GLOBAL' && (
+                {usuario?.role === 'GLOBAL' && (
                     <select
                         value={cidadeFiltro}
-                        onChange={buscarReqCidade}
+                        onChange={(e) => setCidadeFiltro(e.target.value)}
                     >
                         {cidades.map((item) => (
                             <option key={item.id} value={item.id}>{item.nome}</option>
@@ -265,44 +182,49 @@ export function AbaRequisicoes() {
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
             <div className="listaResultado">
-                <table className="table tableRequisicao">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nome cidadão</th>
-                            <th scope="col">Árvore</th>
-                            <th scope="col">Cidade</th>
-                            <th scope="col">Bairro</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Status</th>
-                            <th scope="col" className="text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {requisicoesFiltradas.length === 0 ? (
+                {carregandoRequisicoes ? (
+                    <SkeletonTable linhas={4} />
+
+                ) : (
+                    <table className="table tableRequisicao">
+                        <thead>
                             <tr>
-                                <td colSpan={7} className="mensagemVazio">
-                                    Nenhum resultado encontrado com os filtros atuais.
-                                </td>
+                                <th scope="col">Nome cidadão</th>
+                                <th scope="col">Árvore</th>
+                                <th scope="col">Cidade</th>
+                                <th scope="col">Bairro</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Status</th>
+                                <th scope="col" className="text-center">Ações</th>
                             </tr>
-                        ) : (
-                            requisicoesFiltradas.map((item) => (
-                                <tr key={item.id}>
-                                    <td><strong>{item.nomeBeneficiario}</strong></td>
-                                    <td>{item?.arvore?.nomePopular}</td>
-                                    <td>{item?.cidadeEndereco}</td>
-                                    <td>{item.bairro}</td>
-                                    <td><span className="tipoTag">{item.tipoAtendimento}</span></td>
-                                    <td><span className={`statusTag ${item.status.toLowerCase()}`}>{item.status}</span></td>
-                                    <td className="text-center">
-                                        <button type="button" className="btnVerificar" onClick={() => abrirModalRequisicao(item)}>
-                                            Verificar
-                                        </button>
+                        </thead>
+                        <tbody>
+                            {requisicoesFiltradas.length === 0 ? (
+                                <tr>
+                                    <td colSpan={7} className="mensagemVazio">
+                                        Nenhum resultado encontrado com os filtros atuais.
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : (
+                                requisicoesFiltradas.map((item) => (
+                                    <tr key={item.id}>
+                                        <td><strong>{item.nomeBeneficiario}</strong></td>
+                                        <td>{item?.arvore?.nomePopular}</td>
+                                        <td>{item?.cidadeEndereco}</td>
+                                        <td>{item.bairro}</td>
+                                        <td><span className="tipoTag">{item.tipoAtendimento}</span></td>
+                                        <td><span className={`statusTag ${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                        <td className="text-center">
+                                            <button type="button" className="btnVerificar" onClick={() => abrirModalRequisicao(item)}>
+                                                Verificar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
             <div className="abaRequisicaoConteudo">
 

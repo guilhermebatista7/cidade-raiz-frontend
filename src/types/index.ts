@@ -47,7 +47,7 @@ export interface Requisicao {
   arvoreId: string;
   arvore?: Arvore;
   status: StatusRequisicao;
-  observacaoStatus?: string; //OBS caso req seja negada 
+  observacaoStatus?: string | null; //OBS caso req seja negada 
   nomeBeneficiario: string;
   telefoneBeneficiario: string;
   emailBeneficiario: string;
@@ -72,8 +72,8 @@ export interface Requisicao {
     criadoEm: string;
   }[];
   
-  dataInicial: string;
-  dataFinal: string;
+  dataInicial?: string | null;
+  dataFinal?: string | null;
   
 }
 
