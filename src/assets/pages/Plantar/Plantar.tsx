@@ -26,6 +26,7 @@ import { verificarPublicacao } from "../../../services/blogService";
 
 import { buscarCep } from "../../../services/viaCepService";
 import { formatarCep, formatarTelefone } from "../../../utils/formatadores";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
@@ -59,11 +60,23 @@ export const Plantar = () => {
     const { alert, showAlert, closeAlert } = useAlert();
 
     const [modalAberto, setModalAberto] = useState(false);
-    const [requisicoes, setRequisicoes] = useState<Requisicao[]>([]);
     const [tipoAtendimento, setTipoAtendimento] = useState("");
     const [estadoSelecionado, setEstadoSelecionado] = useState("");
     const [fotoLocalUrl, setFotoLocalUrl] = useState<string | null>(null);
     const [comprovanteUrl, setComprovanteUrl] = useState<string | null>(null);
+
+    const queryClient = useQueryClient();
+
+    const {
+        data: requisicoes = [],
+        isFetching: carregandoRequisicoes,
+    } = useQuery<Requisicao[]>({
+        queryKey: ["requisicoes", "minhas"],
+        queryFn: listarMinhasRequisicoes,
+        enabled: modalAberto,
+        staleTime: 10 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+    });
 
     /*
      * Quando null:
@@ -131,10 +144,6 @@ export const Plantar = () => {
 
             const cidadesAtivas = await listarCidadesAtivas();
             setCidades(cidadesAtivas);
-
-            const dadosRequisicoes = await listarMinhasRequisicoes();
-
-            setRequisicoes(dadosRequisicoes);
 
             if (cidadesAtivas.length > 0) {
                 const primeiraCidade = cidadesAtivas[0];
@@ -524,13 +533,9 @@ export const Plantar = () => {
              */
             setRequisicaoSelecionada(null);
 
-            /*
-             * Atualiza a lista.
-             */
-            const dados =
-                await listarMinhasRequisicoes();
-
-            setRequisicoes(dados);
+            await queryClient.invalidateQueries({
+                queryKey: ["requisicoes", "minhas"],
+            });
 
             novaRequisicao();
             carregarDados();
@@ -1478,12 +1483,14 @@ export const Plantar = () => {
                                 onFotoPlantioSalva={(requisicaoAtualizada) => {
                                     setRequisicaoSelecionada(requisicaoAtualizada);
 
-                                    setRequisicoes(prev =>
-                                        prev.map(req =>
-                                            req.id === requisicaoAtualizada.id
-                                                ? requisicaoAtualizada
-                                                : req
-                                        )
+                                    queryClient.setQueryData<Requisicao[]>(
+                                        ["requisicoes", "minhas"],
+                                        (requisicoesAtuais = []) =>
+                                            requisicoesAtuais.map((req) =>
+                                                req.id === requisicaoAtualizada.id
+                                                    ? requisicaoAtualizada
+                                                    : req
+                                            )
                                     );
                                 }}
                                 publicacao={publicacao}
@@ -1683,6 +1690,7 @@ export const Plantar = () => {
                 aberto={modalAberto}
                 fechar={fecharModalRequisicao}
                 requisicoes={requisicoes}
+                carregando={carregandoRequisicoes}
                 onSelecionar={selecionarRequisicao}
             />
 

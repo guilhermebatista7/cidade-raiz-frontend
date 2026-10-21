@@ -7,7 +7,6 @@ import { agendarPlantio, alterarStatus, buscarUrlComprovante, recusarRequisicao 
 import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone, formatarTipoAtendimento } from "../../../utils/formatadores";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SkeletonTable } from "../Skeletons/SkeletonTable";
-import { queryKeys } from "../../../services/queryKeys";
 
 interface ModalRequisicaoProps {
     aberto: boolean;

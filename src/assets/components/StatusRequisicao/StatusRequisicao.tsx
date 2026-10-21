@@ -321,11 +321,15 @@ export const StatusRequisicao = ({
                             <p>
                                 {requisicao.tipoAtendimento === "RETIRADA_LOCAL"
                                     ? "Sua requisição está aguardando retirada."
-                                    : "Seu plantio será realizado no período de " + new Date(requisicao.dataInicial).toLocaleDateString("pt-BR", {
-                                        timeZone: "UTC"
-                                    }) + " a " + new Date(requisicao.dataFinal).toLocaleDateString("pt-BR", {
-                                        timeZone: "UTC"
-                                    })
+                                    : requisicao.dataInicial && requisicao.dataFinal
+                                        ? `Seu plantio será realizado no período de ${new Date(requisicao.dataInicial).toLocaleDateString("pt-BR", {
+                                            timeZone: "UTC"
+                                        })
+                                        } a ${new Date(requisicao.dataFinal).toLocaleDateString("pt-BR", {
+                                            timeZone: "UTC"
+                                        })
+                                        }`
+                                        : "Aguardando definição do período de plantio."
                                 }
                             </p>
 
