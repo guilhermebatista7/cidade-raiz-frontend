@@ -74,7 +74,7 @@ export function AbaRequisicoes() {
             return listarRequisicoes(dataInicio, dataFim);
         },
         staleTime: 2 * 60 * 1000,
-        gcTime: 5 * 60 * 1000,
+        gcTime: 4 * 60 * 1000,
     })
 
     const [modalAberto, setModalAberto] = useState(false);

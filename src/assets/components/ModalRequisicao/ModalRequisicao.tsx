@@ -3,8 +3,10 @@ import type { Requisicao, StatusRequisicao } from "../../../types";
 
 import "./ModalRequisicao.css";
 import { useEffect, useState } from "react";
-import { agendarPlantio, alterarStatus, recusarRequisicao } from "../../../services/requisicaoService";
+import { agendarPlantio, alterarStatus, buscarUrlComprovante, recusarRequisicao } from "../../../services/requisicaoService";
 import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone, formatarTipoAtendimento } from "../../../utils/formatadores";
+import { useQuery } from "@tanstack/react-query";
+import { SkeletonTable } from "../Skeletons/SkeletonTable";
 
 interface ModalRequisicaoProps {
     aberto: boolean;
@@ -20,6 +22,28 @@ export default function ModalRequisicao({
     requisicao,
     onAtualizado
 }: ModalRequisicaoProps) {
+
+    const requisicaoId = requisicao?.id;
+
+    const {
+        data: comprovanteResidencia,
+        isLoading: carregandoComprovante,
+        isError: erroComprovante,
+        refetch: renovarComprovante,
+    } = useQuery<string>({
+        queryKey: ["comprovante-residencia", requisicaoId],
+        queryFn: () => {
+            if (!requisicaoId) {
+                throw new Error("Requisição não selecionada");
+            }
+
+            return buscarUrlComprovante(requisicaoId);
+        },
+        enabled: aberto && !!requisicaoId,
+        staleTime: 0,
+        refetchInterval: aberto ? 4 * 60 * 1000 : false,
+        refetchIntervalInBackground: false,
+    });
 
     const [status, setStatus] = useState<StatusRequisicao>(
         requisicao?.status ?? "SOLICITADO"
@@ -42,7 +66,6 @@ export default function ModalRequisicao({
     }
 
     const fotoLocal = requisicao.fotoLocalUrl ?? null;
-    const comprovanteResidencia = requisicao.comprovanteResidenciaUrl ?? null;
 
     const handleChangeStatus = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -345,9 +368,22 @@ export default function ModalRequisicao({
                         <div className="documentoCard">
                             <h4>Comprovante de residência</h4>
 
-                            {comprovanteResidencia ? (
-                                <div className="comprovanteContainer">
+                            {carregandoComprovante ? (
+                                <SkeletonTable linhas={4}/>
+                            ) : erroComprovante ? (
+                                <div className="arquivoIndisponivel">
+                                    <p>Não foi possível carregar o comprovante.</p>
 
+                                    <button
+                                        type="button"
+                                        className="btnRequisicao"
+                                        onClick={() => renovarComprovante()}
+                                    >
+                                        Tentar novamente
+                                    </button>
+                                </div>
+                            ) : comprovanteResidencia ? (
+                                <div className="comprovanteContainer">
                                     <div className="iconeDocumento">
                                         PDF
                                     </div>
@@ -360,7 +396,6 @@ export default function ModalRequisicao({
                                     >
                                         Visualizar comprovante
                                     </a>
-
                                 </div>
                             ) : (
                                 <div className="arquivoIndisponivel">

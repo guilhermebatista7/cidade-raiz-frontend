@@ -52,6 +52,14 @@ export async function listarMinhasRequisicoes(){
   })
 }
 
+export async function buscarUrlComprovante(requisicaoId: string){
+  const resposta = await apiFetch(`/requisicao/${requisicaoId}/comprovante`, {
+    method: "GET",
+  })
+
+  return resposta.url;
+}
+
 export async function recusarRequisicao(id: string, observacaoStatus: string) {
   return await apiFetch(`/requisicao/recusar/${id}`, {
     method: 'PUT',
