@@ -14,6 +14,12 @@ import { useAuth } from '../../../../../contexts/AuthContext';
 import { queryKeys } from '../../../../../services/queryKeys';
 import { SkeletonTable } from '../../../../components/Skeletons/SkeletonTable';
 
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+import { faFileExcel, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+
 type Status = 'SOLICITADO' | 'APROVADO' | 'RECUSADO' | 'AGUARDANDO_RETIRADA' | 'AGENDADO_PLANTIO' | 'CONCLUIDO';
 type Atendimento = 'RETIRADA_LOCAL' | 'PLANTIO_AGENDADO';
 type UsuarioResumo = { id: string; nome: string; email: string } | null;
@@ -198,10 +204,422 @@ export function AbaRelatorio() {
             },
         ];
 
+    const exportarExcel = () => {
+        if (!dados) return;
+
+        const wb = XLSX.utils.book_new();
+
+        // Aba 1: resumo dos indicadores
+        const resumo = [
+            ['RELATÓRIO DE ATIVIDADES'],
+            ['Período inicial', datas.inicio],
+            ['Período final', datas.fim],
+            ['Total de usuários', n?.totalUsuarios ?? 0],
+            ['Total de árvores', n?.totalArvores ?? 0],
+            ['Total de requisições', n?.totalRequisicoes ?? 0],
+            ['Total de publicações', n?.totalPublicacoes ?? 0],
+        ];
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.aoa_to_sheet(resumo),
+            'Resumo'
+        );
+
+        // Aba 2: requisições, respeitando busca e status selecionados
+        const requisicoes = linhas.map(r => ({
+            Código: r.id,
+            Cidadão: r.nomeBeneficiario ?? r.criadoPor?.nome ?? 'Não informado',
+            Email: r.criadoPor?.email ?? '',
+            Espécie: r.arvore?.nomePopular ?? '',
+            Bairro: r.bairro ?? '',
+            Cidade: r.cidadeEndereco ?? '',
+            Atendimento:
+                r.tipoAtendimento === 'RETIRADA_LOCAL'
+                    ? 'Retirada local'
+                    : 'Plantio agendado',
+            Status:
+                STATUS.find(s => s.key === r.status)?.label ?? r.status,
+            Data: r.criadoEm.slice(0, 10),
+        }));
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.json_to_sheet(requisicoes),
+            'Requisições'
+        );
+
+        // Aba 3: distribuição por status
+        const porStatus = STATUS.map(s => ({
+            Status: s.label,
+            Quantidade: dados.requisicoesPorStatus[s.key] ?? 0,
+        }));
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.json_to_sheet(porStatus),
+            'Por status'
+        );
+
+        // Aba 4: requisições por bairro
+        const porBairro = bairros.map(b => ({
+            Bairro: b.bairro,
+            Total: b.quantidade,
+            ...Object.fromEntries(
+                STATUS.map(s => [
+                    s.label,
+                    b.status[s.key] ?? 0,
+                ])
+            ),
+        }));
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.json_to_sheet(porBairro),
+            'Por bairro'
+        );
+
+        // Aba 5: espécies mais solicitadas
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.json_to_sheet(
+                arvores.map(a => ({
+                    Espécie: a.nomePopular,
+                    Quantidade: a.quantidade,
+                }))
+            ),
+            'Espécies'
+        );
+
+        // Aba 6: evolução diária
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.json_to_sheet(
+                diarios.map(d => ({
+                    Data: d.data,
+                    Requisições: d.quantidade,
+                }))
+            ),
+            'Por dia'
+        );
+
+        const nomeArquivo =
+            `relatorio_${datas.inicio}_${datas.fim}.xlsx`;
+
+        XLSX.writeFile(wb, nomeArquivo);
+    };
+
+
+    const gerarPDF = () => {
+        if (!dados) return;
+
+        const pdf = new jsPDF('l', 'mm', 'a4');
+
+        const margem = 12;
+        const largura = pdf.internal.pageSize.getWidth();
+        const altura = pdf.internal.pageSize.getHeight();
+        const larguraUtil = largura - margem * 2;
+
+        const tituloSecao = (titulo: string) => {
+            let y = (pdf as any).lastAutoTable?.finalY ?? 42;
+
+            if (y + 18 > altura - margem) {
+                pdf.addPage();
+                y = margem;
+            } else {
+                y += 9;
+            }
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(11);
+            pdf.setTextColor(47, 80, 40);
+            pdf.text(titulo, margem, y);
+
+            pdf.setTextColor(0, 0, 0);
+
+            return y + 4;
+        };
+
+        const estiloTabela = {
+            theme: 'grid' as const,
+            margin: { left: margem, right: margem },
+            styles: {
+                font: 'helvetica' as const,
+                fontSize: 8,
+                cellPadding: 2.5,
+                overflow: 'linebreak' as const,
+                lineColor: [220, 225, 216] as [number, number, number],
+                textColor: [55, 60, 52] as [number, number, number],
+            },
+            headStyles: {
+                fillColor: [74, 105, 52] as [number, number, number],
+                textColor: [255, 255, 255] as [number, number, number],
+                fontStyle: 'bold' as const,
+            },
+            alternateRowStyles: {
+                fillColor: [246, 248, 243] as [number, number, number],
+            },
+        };
+
+        // Cabeçalho
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(20);
+        pdf.setTextColor(47, 80, 40);
+        pdf.text('Relatório de Atividades', margem, 17);
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(90, 90, 90);
+        pdf.text(
+            `Período: ${datas.inicio} a ${datas.fim}`,
+            margem,
+            24
+        );
+
+        if (isGlobal) {
+            const cidade = cidades.find(c => c.id === cidadeAtivaId);
+
+            if (cidade) {
+                pdf.text(
+                    `Cidade: ${cidade.nome} / ${cidade.uf}`,
+                    margem,
+                    30
+                );
+            }
+        }
+
+        pdf.setDrawColor(115, 157, 30);
+        pdf.setLineWidth(0.7);
+        pdf.line(margem, 34, largura - margem, 34);
+
+        // 1. Indicadores gerais
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor(47, 80, 40);
+        pdf.text('Indicadores gerais', margem, 42);
+        pdf.setTextColor(0, 0, 0);
+
+        autoTable(pdf, {
+            ...estiloTabela,
+            startY: 46,
+            head: [['Indicador', 'Quantidade']],
+            body: [
+                ['Total de requisições', nf.format(n?.totalRequisicoes ?? 0)],
+                ['Total de publicações', nf.format(n?.totalPublicacoes ?? 0)],
+                ['Espécies cadastradas', nf.format(n?.totalArvores ?? 0)],
+                ['Novos usuários', nf.format(n?.totalUsuarios ?? 0)],
+            ],
+            columnStyles: {
+                0: { cellWidth: larguraUtil * 0.7 },
+                1: { halign: 'center' },
+            },
+        });
+
+        // 2. Requisições por status
+        autoTable(pdf, {
+            ...estiloTabela,
+            startY: tituloSecao('Requisições por status'),
+            head: [['Status', 'Quantidade']],
+            body: STATUS.map(s => [
+                s.label,
+                nf.format(dados.requisicoesPorStatus[s.key] ?? 0),
+            ]),
+            columnStyles: {
+                1: { halign: 'center' },
+            },
+        });
+
+        // 3. Tipos de atendimento
+        autoTable(pdf, {
+            ...estiloTabela,
+            startY: tituloSecao('Tipos de atendimento'),
+            head: [['Tipo de atendimento', 'Quantidade']],
+            body: [
+                [
+                    'Retirada local',
+                    nf.format(
+                        dados.requisicoesPorAtendimento.RETIRADA_LOCAL ?? 0
+                    ),
+                ],
+                [
+                    'Plantio agendado',
+                    nf.format(
+                        dados.requisicoesPorAtendimento.PLANTIO_AGENDADO ?? 0
+                    ),
+                ],
+            ],
+            columnStyles: {
+                1: { halign: 'center' },
+            },
+        });
+
+        // 4. Espécies mais solicitadas
+        autoTable(pdf, {
+            ...estiloTabela,
+            startY: tituloSecao('Espécies mais solicitadas'),
+            head: [['Posição', 'Espécie', 'Quantidade de solicitações']],
+            body: arvores.map((a, index) => [
+                `${index + 1}º`,
+                a.nomePopular,
+                nf.format(a.quantidade),
+            ]),
+            columnStyles: {
+                0: { halign: 'center', cellWidth: 25 },
+                2: { halign: 'center', cellWidth: 55 },
+            },
+        });
+
+        // 5. Requisições por bairro e status
+        autoTable(pdf, {
+            ...estiloTabela,
+            startY: tituloSecao('Requisições por bairro'),
+            head: [[
+                'Bairro',
+                'Total',
+                ...STATUS.map(s => s.label),
+            ]],
+            body: bairros.map(b => [
+                b.bairro,
+                nf.format(b.quantidade),
+                ...STATUS.map(s =>
+                    nf.format(b.status[s.key] ?? 0)
+                ),
+            ]),
+            showHead: 'everyPage',
+            columnStyles: {
+                0: { cellWidth: 45 },
+            },
+        });
+
+        // 6. Lista completa de requisições filtradas
+        autoTable(pdf, {
+            ...estiloTabela,
+            startY: tituloSecao(
+                `Requisições detalhadas (${linhas.length} registros)`
+            ),
+            head: [[
+                'Código',
+                'Cidadão',
+                'Espécie',
+                'Bairro',
+                'Cidade',
+                'Atendimento',
+                'Status',
+                'Data',
+            ]],
+            body: linhas.map(r => [
+                r.id.substring(0, 8).toUpperCase(),
+                r.nomeBeneficiario ?? r.criadoPor?.nome ?? 'Não informado',
+                r.arvore?.nomePopular ?? '—',
+                r.bairro ?? '—',
+                r.cidadeEndereco ?? '—',
+                r.tipoAtendimento === 'RETIRADA_LOCAL'
+                    ? 'Retirada local'
+                    : 'Plantio agendado',
+                STATUS.find(s => s.key === r.status)?.label ?? r.status,
+                r.criadoEm.slice(0, 10).split('-').reverse().join('/'),
+            ]),
+            showHead: 'everyPage',
+            columnStyles: {
+                0: { cellWidth: 23 },
+                1: { cellWidth: 42 },
+                2: { cellWidth: 35 },
+                3: { cellWidth: 30 },
+                4: { cellWidth: 32 },
+                5: { cellWidth: 30 },
+                6: { cellWidth: 32 },
+                7: { cellWidth: 23 },
+            },
+            didDrawPage: () => {
+                // O cabeçalho da tabela é repetido automaticamente.
+            },
+        });
+
+        // Rodapé e numeração de todas as páginas
+        const totalPaginas = pdf.getNumberOfPages();
+
+        for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+            pdf.setPage(pagina);
+
+            pdf.setDrawColor(220, 225, 216);
+            pdf.setLineWidth(0.3);
+            pdf.line(
+                margem,
+                altura - 10,
+                largura - margem,
+                altura - 10
+            );
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(8);
+            pdf.setTextColor(110, 110, 110);
+
+            // Identificação do documento
+            pdf.text(
+                'Documento emitido por Cidade Raíz',
+                margem,
+                altura - 5
+            );
+
+            // Numeração da página
+            pdf.text(
+                `Página ${pagina} de ${totalPaginas}`,
+                largura - margem,
+                altura - 5,
+                { align: 'right' }
+            );
+        }
+
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        const novaAba = window.open(pdfUrl, '_blank');
+
+        if (!novaAba) {
+            URL.revokeObjectURL(pdfUrl);
+            alert(
+                'Não foi possível abrir o PDF. Verifique se o navegador bloqueou pop-ups.'
+            );
+        }
+    };
+
+
     return <main className="cr-dashboard">
+
         <header className="cr-headline">
-            <div><h1>Dash<span>board</span></h1><p>Acompanhe as solicitações, a comunidade e o impacto do plantio urbano.</p></div>
-            <span className="cr-period-label">RELATÓRIO DE ATIVIDADES</span>
+            <div>
+                <h1>Dash<span>board</span></h1>
+                <p>
+                    Acompanhe as solicitações, a comunidade
+                    e o impacto do plantio urbano.
+                </p>
+            </div>
+
+            <div className="cr-header-actions">
+                <span className="cr-period-label">
+                    RELATÓRIO DE ATIVIDADES
+                </span>
+
+                <button
+                    type="button"
+                    className="cr-export-btn cr-export-excel"
+                    onClick={exportarExcel}
+                    disabled={!dados || loading}
+                >
+                    <FontAwesomeIcon icon={faFileExcel} />
+                    Exportar Excel
+                </button>
+
+                <button
+                    type="button"
+                    className="cr-export-btn cr-export-pdf"
+                    onClick={gerarPDF}
+                    disabled={!dados || loading}
+                >
+                    <FontAwesomeIcon icon={faFilePdf} />
+                    Gerar PDF
+                </button>
+            </div>
         </header>
 
         <div className="cr-filterbar">

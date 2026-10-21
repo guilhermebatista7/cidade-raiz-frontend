@@ -12,7 +12,6 @@ import { listarCidadesAtivas } from "../../../services/cidadeService";
 import {
     atualizarRequisicao,
     cadastrarRequisicao,
-    listarMinhasRequisicoes
 } from "../../../services/requisicaoService";
 import { obterUsuarioLogado } from "../../../services/authService";
 
