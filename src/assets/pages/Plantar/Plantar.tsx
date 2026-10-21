@@ -67,17 +67,6 @@ export const Plantar = () => {
 
     const queryClient = useQueryClient();
 
-    const {
-        data: requisicoes = [],
-        isFetching: carregandoRequisicoes,
-    } = useQuery<Requisicao[]>({
-        queryKey: ["requisicoes", "minhas"],
-        queryFn: listarMinhasRequisicoes,
-        enabled: modalAberto,
-        staleTime: 10 * 60 * 1000,
-        gcTime: 10 * 60 * 1000,
-    });
-
     /*
      * Quando null:
      * - estamos criando uma nova requisição.
@@ -1689,8 +1678,6 @@ export const Plantar = () => {
             <ModalRequisicaoPlantar
                 aberto={modalAberto}
                 fechar={fecharModalRequisicao}
-                requisicoes={requisicoes}
-                carregando={carregandoRequisicoes}
                 onSelecionar={selecionarRequisicao}
             />
 

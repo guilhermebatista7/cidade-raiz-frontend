@@ -46,8 +46,14 @@ export async function listarRequisicoesCidade(id: string, dataInicio: string, da
   })
 }
 
-export async function listarMinhasRequisicoes(){
-  return await apiFetch('/requisicao/usuario', {
+export async function listarMinhasRequisicoes( dataInicial: string, dataFinal: string){
+
+  const params = new URLSearchParams({
+    dataInicial,
+    dataFinal,
+  }) 
+
+  return await apiFetch(`/requisicao/usuario?${params.toString()}`, {
     method: "GET"
   })
 }

@@ -4,22 +4,83 @@ import type { Requisicao } from "../../../types";
 import "../ModalRequisicao/ModalRequisicao.css";
 import { formatarData, formatarStatus } from "../../../utils/formatadores";
 import { SkeletonTable } from "../Skeletons/SkeletonTable";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { listarMinhasRequisicoes } from "../../../services/requisicaoService";
 
 interface ModalRequisicaoProps {
     aberto: boolean;
     fechar: () => void;
-    requisicoes?: Requisicao[];
-    carregando?: boolean;
     onSelecionar?: (requisicao: Requisicao) => void;
 }
 
 export default function ModalRequisicaoPlantar({
     aberto,
     fechar,
-    requisicoes = [],
-    carregando,
     onSelecionar
 }: ModalRequisicaoProps) {
+
+    const formatDate = (date: Date) => {
+        const ano = date.getFullYear();
+        const mes = String(date.getMonth() + 1).padStart(2, "0");
+        const dia = String(date.getDate()).padStart(2, "0");
+
+        return `${ano}-${mes}-${dia}`;
+    };
+
+    const hoje = new Date();
+
+    const umMesAtras = new Date();
+    umMesAtras.setMonth(hoje.getMonth() - 1);
+
+    const [dataInicio, setDataInicio] = useState(formatDate(umMesAtras));
+    const [dataFim, setDataFim] = useState(formatDate(hoje));
+
+    const [dataInicioFiltrada, setDataInicioFiltrada] = useState(
+        formatDate(umMesAtras)
+    );
+
+    const [dataFimFiltrada, setDataFimFiltrada] = useState(
+        formatDate(hoje)
+    );
+
+    const mostrarBotaoFiltrar =
+        dataInicio !== dataInicioFiltrada ||
+        dataFim !== dataFimFiltrada;
+
+    const {
+        data: requisicoes = [],
+        isFetching: carregando,
+    } = useQuery<Requisicao[]>({
+        queryKey: [
+            "requisicoes",
+            "minhas",
+            dataInicioFiltrada,
+            dataFimFiltrada,
+        ],
+        queryFn: () =>
+            listarMinhasRequisicoes(
+                dataInicioFiltrada,
+                dataFimFiltrada
+            ),
+        enabled: aberto,
+        staleTime: 5 * 60 * 1000, // 5 minutos
+        gcTime: 30 * 60 * 1000,   // 30 minutos
+        refetchOnWindowFocus: false,
+    });
+
+    const handleFiltrar = () => {
+        if (
+            !dataInicio ||
+            !dataFim ||
+            dataInicio > dataFim
+        ) {
+            return;
+        }
+
+        setDataInicioFiltrada(dataInicio);
+        setDataFimFiltrada(dataFim);
+    };
 
     return (
         <ModalForm
@@ -29,6 +90,39 @@ export default function ModalRequisicaoPlantar({
             descricao="Acompanhe suas solicitações de plantio."
         >
             <div className="modalRequisicao">
+                <div className="d-flex flex-row gap-2">
+
+                    <div className="d-flex flex-column datas">
+                        <span>Data inicial</span>
+                        <input className="dataInicial " type="date" value={dataInicio} onChange={(e) => {
+                            const novaData = e.target.value;
+                            setDataInicio(novaData);
+                        }} />
+                    </div>
+
+                    <div className="d-flex flex-column">
+                        <span>Data final</span>
+                        <input className="dataFinal " type="date" value={dataFim} onChange={(e) => {
+                            const novaData = e.target.value;
+                            setDataFim(novaData);
+                        }} />
+                    </div>
+
+                    {mostrarBotaoFiltrar && (
+                        <button
+                            type="button"
+                            className="btnGestaoGlobal align-self-end"
+                            onClick={handleFiltrar}
+                            disabled={
+                                !dataInicio ||
+                                !dataFim ||
+                                dataInicio > dataFim
+                            }
+                        >
+                            Filtrar
+                        </button>
+                    )}
+                </div>
 
                 <section className="secaoRequisicao">
 
