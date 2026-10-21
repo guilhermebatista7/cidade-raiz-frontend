@@ -5,8 +5,9 @@ import "./ModalRequisicao.css";
 import { useEffect, useState } from "react";
 import { agendarPlantio, alterarStatus, buscarUrlComprovante, recusarRequisicao } from "../../../services/requisicaoService";
 import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone, formatarTipoAtendimento } from "../../../utils/formatadores";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SkeletonTable } from "../Skeletons/SkeletonTable";
+import { queryKeys } from "../../../services/queryKeys";
 
 interface ModalRequisicaoProps {
     aberto: boolean;
@@ -24,6 +25,7 @@ export default function ModalRequisicao({
 }: ModalRequisicaoProps) {
 
     const requisicaoId = requisicao?.id;
+    const queryClient = useQueryClient();
 
     const {
         data: comprovanteResidencia,
@@ -98,6 +100,7 @@ export default function ModalRequisicao({
 
             await alterarStatus(requisicao.id, status);
             await onAtualizado();
+            queryClient.invalidateQueries({ queryKey: ['relatorios']});
             fechar();
 
         } catch (error: any) {
@@ -369,7 +372,7 @@ export default function ModalRequisicao({
                             <h4>Comprovante de residência</h4>
 
                             {carregandoComprovante ? (
-                                <SkeletonTable linhas={4}/>
+                                <SkeletonTable linhas={4} />
                             ) : erroComprovante ? (
                                 <div className="arquivoIndisponivel">
                                     <p>Não foi possível carregar o comprovante.</p>
