@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { salvarFotoPlantio } from "../../../services/requisicaoService";
 import ModalPublicarBlog from "../ModalPublicarBlog/ModalPublicarBlog";
 import { useNavigate } from "react-router-dom";
+import Alert from "../Alert/Alert";
+import { useAlert } from "../hooks/useAlert";
 
 interface StatusRequisicaoProps {
     requisicao: Requisicao | null;
@@ -33,6 +35,8 @@ export const StatusRequisicao = ({
 
     const [fotoPlantio, setFotoPlantio] = useState<File | null>(null);
     const [fotoPlantioUrl, setFotoPlantioUrl] = useState<string | null>(null);
+
+    const { alert, showAlert, closeAlert } = useAlert();
 
     const navigate = useNavigate();
 
@@ -182,15 +186,13 @@ export const StatusRequisicao = ({
         try {
             const resposta = await salvarFotoPlantio(id, formData);
 
-            console.log("Resposta:", resposta);
-
-            alert("Foto salva com sucesso!");
+            showAlert("Foto salva com sucesso!", 'success');
 
             setFotoPlantioUrl(resposta.fotoPlantioUrl);
             setFotoPlantio(null);
             onFotoPlantioSalva?.(resposta);
         } catch (error) {
-            alert(error);
+            showAlert("Erro ao salvar foto!", 'danger');
         }
     };
 
@@ -210,6 +212,14 @@ export const StatusRequisicao = ({
 
     return (
         <>
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={closeAlert}
+                />
+            )}
+
             <div className="statusHeader">
 
                 <div>

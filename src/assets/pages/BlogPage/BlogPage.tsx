@@ -7,7 +7,7 @@ import { HeaderVideo } from '../../components/HeaderVideo/HeaderVideo';
 import { CardBlog } from '../../components/CardBlog/CardBlog';
 
 import { listarPublicacoes } from '../../../services/blogService';
-import type { Cidade, CursorPublicacao, Publicacao } from '../../../types';
+import type { Cidade, CursorPublicacao } from '../../../types';
 import blogImg from '../../media/blogHeader.png';
 import userImg from '../../media/user.png';
 import './BlogPage.css';
