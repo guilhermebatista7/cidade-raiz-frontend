@@ -4,8 +4,11 @@ import type { Requisicao } from "../../../types";
 import "./ModalPublicarBlog.css";
 import "../../pages/Plantar/Plantar.css"
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { publicar } from "../../../services/blogService";
+import { useAlert } from "../hooks/useAlert";
+import Alert from "../Alert/Alert";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ModalBlogProps {
     aberto: boolean;
@@ -27,22 +30,36 @@ export default function ModalPublicarBlog({
     const [titulo, setTitulo] = useState('');
     const [descricao, setDescricao] = useState('');
 
+    const { alert, showAlert, closeAlert } = useAlert();
+
     const fotoPlantio = requisicao.fotoPlantioUrl ?? null;
+    const tituloRef = useRef<HTMLInputElement>(null);
+    const descricaoRef = useRef<HTMLTextAreaElement>(null);
+
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
 
     const handlePublicarFoto = async () => {
-        if(!requisicao.id || !titulo || !descricao){
-            alert('Preencha todos os campos');
-            console.log(requisicao.id, titulo, descricao);
-            return
+        if (!tituloRef.current?.reportValidity()) {
+            return;
+        }
+
+        if (!descricaoRef.current?.reportValidity()) {
+            return;
         }
         try {
-            
+
             const res = await publicar(requisicao.id, titulo, descricao);
-            console.log(res);
+
+            await queryClient.invalidateQueries({
+                queryKey: ['publicacoes', 'feed'],
+            });
+            
+            showAlert(`${res}`, 'success');
+
             navigate("/blog");
         } catch (error) {
-            console.log(error);
+            showAlert(`${error}`, 'danger');
         }
     }
 
@@ -54,87 +71,100 @@ export default function ModalPublicarBlog({
             descricao={`Beneficiário - ${requisicao.nomeBeneficiario}`}
         >
             <div className="modalPublicacao">
-                    {/* RESUMO */}
-                    <section className="secaoPublicacao">
 
-                        <h3 className="tituloSecaoPublicacao">
-                            Defina as informações da publicação
-                        </h3>
+                {alert && (
+                    <Alert
+                        message={alert.message}
+                        type={alert.type}
+                        onClose={closeAlert}
+                    />
+                )}
 
-                        <div className="gridPublicacao">
+                {/* RESUMO */}
+                <section className="secaoPublicacao">
 
-                            {/* INFORMAÇÕES */}
-                            <div className="informacoesPublicacao">
+                    <h3 className="tituloSecaoPublicacao">
+                        Defina as informações da publicação
+                    </h3>
 
-                                <div className="campoPublicacao">
-                                    <label htmlFor="titulo">
-                                        Título
-                                    </label>
+                    <div className="gridPublicacao">
 
-                                    <input
-                                        id="titulo"
-                                        type="text"
-                                        value={titulo}
-                                        onChange={(e) => setTitulo(e.target.value)}
-                                    />
-                                </div>
+                        {/* INFORMAÇÕES */}
+                        <div className="informacoesPublicacao">
 
-                                <div className="campoPublicacao">
-                                    <label htmlFor="descricao">
-                                        Descrição
-                                    </label>
+                            <div className="campoPublicacao">
+                                <label htmlFor="titulo">
+                                    Título
+                                </label>
 
-                                    <textarea
-                                        id="descricao"
-                                        name="descricao"
-                                        value={descricao}
-                                        onChange={(e) => setDescricao(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="campoPublicacao">
-                                    <button type="button" className="btnEnviar" onClick={handlePublicarFoto}>
-                                        Enviar
-                                    </button>                                
-                                </div>
-
+                                <input
+                                    ref={tituloRef}
+                                    id="titulo"
+                                    type="text"
+                                    value={titulo}
+                                    onChange={(e) => setTitulo(e.target.value)}
+                                    required
+                                />
                             </div>
 
-                            {/* FOTO */}
-                            <div className="areaFotoPublicacao">
+                            <div className="campoPublicacao">
+                                <label htmlFor="descricao">
+                                    Descrição
+                                </label>
 
-                                <div className="cardFotoPublicacao">
+                                <textarea
+                                    ref={descricaoRef}
+                                    id="descricao"
+                                    name="descricao"
+                                    value={descricao}
+                                    onChange={(e) => setDescricao(e.target.value)}
+                                    required
+                                />
+                            </div>
 
-                                    <h4 className="tituloFotoPublicacao">
-                                        Foto do local
-                                    </h4>
+                            <div className="campoPublicacao">
+                                <button type="button" className="btnEnviar" onClick={handlePublicarFoto}>
+                                    Enviar
+                                </button>
+                            </div>
 
-                                    {fotoPlantio ? (
-                                        <a
-                                            href={fotoPlantio}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="linkFotoPublicacao"
-                                        >
-                                            <img
-                                                src={fotoPlantio}
-                                                alt="Foto do plantio"
-                                                className="fotoPublicacao"
-                                            />
-                                        </a>
-                                    ) : (
-                                        <div className="fotoIndisponivel">
-                                            Foto não disponível
-                                        </div>
-                                    )}
+                        </div>
 
-                                </div>
+                        {/* FOTO */}
+                        <div className="areaFotoPublicacao">
+
+                            <div className="cardFotoPublicacao">
+
+                                <h4 className="tituloFotoPublicacao">
+                                    Foto do local
+                                </h4>
+
+                                {fotoPlantio ? (
+                                    <a
+                                        href={fotoPlantio}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="linkFotoPublicacao"
+                                    >
+                                        <img
+                                            src={fotoPlantio}
+                                            alt="Foto do plantio"
+                                            className="fotoPublicacao"
+                                        />
+                                    </a>
+                                ) : (
+                                    <div className="fotoIndisponivel">
+                                        Foto não disponível
+                                    </div>
+                                )}
 
                             </div>
 
                         </div>
 
-                    </section>
+                    </div>
+
+                </section>
 
             </div>
         </ModalForm>

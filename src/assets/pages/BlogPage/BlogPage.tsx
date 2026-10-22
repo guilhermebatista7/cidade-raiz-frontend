@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeaf } from '@fortawesome/free-solid-svg-icons';
 import { faPagelines } from '@fortawesome/free-brands-svg-icons';
@@ -12,178 +12,52 @@ import blogImg from '../../media/blogHeader.png';
 import userImg from '../../media/user.png';
 import './BlogPage.css';
 import { listarCidadesAtivas } from '../../../services/cidadeService';
+import { queryKeys } from '../../../services/queryKeys';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+
 export const BlogPage = () => {
-  const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
-  const [nextCursor, setNextCursor] =
-    useState<CursorPublicacao | null>(null);
-
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState('');
-
   const [cidadeFiltro, setCidadeFiltro] = useState('');
   const [minhasPublicacoes, setMinhasPublicacoes] = useState(false);
-  const [cidades, setCidades] = useState<Cidade[]>([]);
 
-  // Cada combinação de filtros tem seu próprio cancelamento.
-  const consultaAtual = useRef<AbortController | null>(null);
+  const { data: cidades = [] } = useQuery<Cidade[]>({
+    queryKey: queryKeys.cidades.ativas,
+    queryFn: listarCidadesAtivas,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  // Impede dois cliques rápidos de iniciarem a mesma página.
-  const carregandoMaisRef = useRef(false);
-
-  const cancelarConsultaAtual = () => {
-    consultaAtual.current?.abort();
-  };
-
-  const buscarPubliCidade = (e: ChangeEvent<HTMLSelectElement>) => {
-    cancelarConsultaAtual();
-    setCidadeFiltro(e.target.value);
-  };
-
-  const alterarMinhasPublicacoes = (
-    e: ChangeEvent<HTMLInputElement>,
-  ) => {
-    cancelarConsultaAtual();
-    setMinhasPublicacoes(e.target.checked);
-  };
-
-  const buscarPublicacoes = useCallback(
-    (
-      cursor?: CursorPublicacao | null,
-      signal?: AbortSignal,
-    ) => {
-      return listarPublicacoes(
+  const {
+    data,
+    isLoading: loading,
+    isError,
+    error,
+    hasNextPage,
+    isFetchingNextPage: loadingMore,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: queryKeys.publicacoes.infinitas({
+      cidadeFiltro,
+      minhasPublicacoes,
+    }),
+    initialPageParam: null as CursorPublicacao | null,
+    queryFn: ({ pageParam, signal }) =>
+      listarPublicacoes(
         10,
-        cursor,
+        pageParam,
         cidadeFiltro,
         minhasPublicacoes,
         signal,
-      );
-    },
-    [cidadeFiltro, minhasPublicacoes],
-  );
+      ),
+    getNextPageParam: (ultimaPagina) =>
+      ultimaPagina.hasMore
+        ? ultimaPagina.nextCursor
+        : undefined,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-  // Carrega as cidades uma vez ao montar a página.
-  useEffect(() => {
-    let ativo = true;
+  const publicacoes = data?.pages.flatMap((pagina) => pagina.items) ?? [];
 
-    async function carregarCidades() {
-      try {
-        const resultado = await listarCidadesAtivas();
-
-        if (ativo) {
-          setCidades(resultado);
-          
-        }
-      } catch {
-        
-      }
-    }
-
-    void carregarCidades();
-
-    return () => {
-      ativo = false;
-    };
-  }, []);
-
-  // Recomeça pela primeira página quando os filtros mudam.
-  useEffect(() => {
-    const controller = new AbortController();
-
-    consultaAtual.current = controller;
-    carregandoMaisRef.current = false;
-
-    setPublicacoes([]);
-    setNextCursor(null);
-    setHasMore(true);
-    setLoading(true);
-    setLoadingMore(false);
-    setError('');
-
-    async function carregarInicial() {
-      try {
-        const resultado = await buscarPublicacoes(
-          null,
-          controller.signal,
-        );
-
-        if (controller.signal.aborted) return;
-
-        setPublicacoes(resultado.items);
-        setNextCursor(resultado.nextCursor);
-        setHasMore(resultado.hasMore);
-      } catch {
-        if (controller.signal.aborted) return;
-
-        setError('Não foi possível carregar as publicações.');
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    void carregarInicial();
-
-    return () => {
-      controller.abort();
-    };
-  }, [buscarPublicacoes]);
-
-  const carregarMais = async () => {
-    const controller = consultaAtual.current;
-
-    if (
-      !controller ||
-      controller.signal.aborted ||
-      loading ||
-      carregandoMaisRef.current ||
-      !hasMore ||
-      !nextCursor
-    ) {
-      return;
-    }
-
-    carregandoMaisRef.current = true;
-    setLoadingMore(true);
-    setError('');
-
-    try {
-      const resultado = await buscarPublicacoes(
-        nextCursor,
-        controller.signal,
-      );
-
-      // Uma resposta do filtro anterior não entra na lista nova.
-      if (controller.signal.aborted) return;
-
-      setPublicacoes((anteriores) => {
-        const idsExistentes = new Set(
-          anteriores.map((publicacao) => publicacao.id),
-        );
-
-        const novas = resultado.items.filter(
-          (publicacao) => !idsExistentes.has(publicacao.id),
-        );
-
-        return [...anteriores, ...novas];
-      });
-
-      setNextCursor(resultado.nextCursor);
-      setHasMore(resultado.hasMore);
-    } catch {
-      if (controller.signal.aborted) return;
-
-      setError('Não foi possível carregar mais publicações.');
-    } finally {
-      if (!controller.signal.aborted) {
-        carregandoMaisRef.current = false;
-        setLoadingMore(false);
-      }
-    }
-  };
   return (
     <div className="blogPage">
       {/* Fixo na tela: não acompanha a rolagem. */}
@@ -218,13 +92,13 @@ export const BlogPage = () => {
                 <div className="blogFilters">
                   <label className="blogCityFilter" htmlFor="blogCidade">
                     <span>Cidade</span>
-                    <select id="blogCidade" value={cidadeFiltro} onChange={buscarPubliCidade}>
+                    <select id="blogCidade" value={cidadeFiltro} onChange={(e) => setCidadeFiltro(e.target.value)}>
                       <option value="">Todas as cidades</option>
                       {cidades.map((item) => <option key={item.id} value={item.id}>{item.nome}</option>)}
                     </select>
                   </label>
                   <label className="blogMyPosts" htmlFor="myPubli">
-                    <input type="checkbox" className="myPubli" id="myPubli" checked={minhasPublicacoes} onChange={alterarMinhasPublicacoes}/>
+                    <input type="checkbox" className="myPubli" id="myPubli" checked={minhasPublicacoes} onChange={(e) => setMinhasPublicacoes(e.target.checked)} />
                     <span>Minhas publicações</span>
                   </label>
                 </div>
@@ -253,13 +127,18 @@ export const BlogPage = () => {
                     Carregando publicações...
                   </p>
                 )}
-                {!loading && error && publicacoes.length === 0 && (
+                {isError && (
                   <div className="blogFeedback" role="alert">
-                    <p>{error}</p>
+                    <p>
+                      {error instanceof Error
+                        ? error.message
+                        : 'Não foi possível carregar as publicações.'}
+                    </p>
+
                     <button
                       className="blogLoadMore"
                       type="button"
-                      onClick={() => window.location.reload()}
+                      onClick={() => refetch()}
                     >
                       Tentar novamente
                     </button>
@@ -270,28 +149,19 @@ export const BlogPage = () => {
                     Nenhuma publicação encontrada.
                   </p>
                 )}
-                {error && !loadingMore && publicacoes.length > 0 && (
-                  <p className="blogStatus blogError" role="alert">
-                    {error}
-                  </p>
-                )}
-                {hasMore && !loading && nextCursor && (
+                {hasNextPage && !loading && (
                   <div className="blogActions">
                     <button
                       className="blogLoadMore"
                       type="button"
-                      onClick={carregarMais}
+                      onClick={() => fetchNextPage()}
                       disabled={loadingMore}
                     >
-                      {loadingMore
-                        ? 'Carregando...'
-                        : error
-                          ? 'Tentar novamente'
-                          : 'Carregar mais'}
+                      {loadingMore ? 'Carregando...' : 'Carregar mais'}
                     </button>
                   </div>
                 )}
-                {!hasMore && publicacoes.length > 0 && (
+                {(!hasNextPage && !loading && publicacoes.length !== 0) && (
                   <p className="blogStatus">
                     Você chegou ao fim das publicações.
                   </p>

@@ -17,7 +17,6 @@ import { SkeletonTable } from '../../../../components/Skeletons/SkeletonTable';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import html2canvas from 'html2canvas';
 import { faFileExcel, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 
 type Status = 'SOLICITADO' | 'APROVADO' | 'RECUSADO' | 'AGUARDANDO_RETIRADA' | 'AGENDADO_PLANTIO' | 'CONCLUIDO';

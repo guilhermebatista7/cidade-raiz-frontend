@@ -12,6 +12,7 @@ import "./StatusRequisicao.css";
 import { useEffect, useState } from "react";
 import { salvarFotoPlantio } from "../../../services/requisicaoService";
 import ModalPublicarBlog from "../ModalPublicarBlog/ModalPublicarBlog";
+import { useNavigate } from "react-router-dom";
 
 interface StatusRequisicaoProps {
     requisicao: Requisicao | null;
@@ -32,6 +33,8 @@ export const StatusRequisicao = ({
 
     const [fotoPlantio, setFotoPlantio] = useState<File | null>(null);
     const [fotoPlantioUrl, setFotoPlantioUrl] = useState<string | null>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setFotoPlantioUrl(requisicao?.fotoPlantioUrl ?? null);
@@ -483,7 +486,7 @@ export const StatusRequisicao = ({
                         <button
                             type="button"
                             className="btnEnviar mt-1"
-                        //onClick={(e) => handleSalvarFoto(e)}
+                            onClick={() => navigate('/blog')}
                         >
                             Ver publicação
                         </button>
