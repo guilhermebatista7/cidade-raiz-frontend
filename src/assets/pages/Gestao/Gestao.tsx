@@ -6,7 +6,8 @@ import {
     faUsers,
     faShieldHalved,
     faChartPie,
-    faGear
+    faGear,
+    faLocationDot
 } from "@fortawesome/free-solid-svg-icons";
 import { SectionContent } from "../../components/SectionContent/SectionContent";
 import "./Gestao.css";
@@ -17,9 +18,10 @@ import { AbaUsuarios } from "./abas/Usuarios/AbaUsuarios";
 import { obterUsuarioLogado } from "../../../services/authService";
 import { type Usuario } from "../../../types";
 import { AbaRelatorio } from "./abas/Relatorio/AbaRelatorio";
+import { AbaEnderecos } from "./abas/Enderecos/AbaEnderecos";
 
 // Definição das abas disponíveis
-export type AbaGestao = "requisicoes" | "arvores" | "usuarios" | "relatorios" | "configAdmin";
+export type AbaGestao = "requisicoes" | "arvores" | "endereco" | "usuarios" | "relatorios" | "configAdmin";
 
 interface TabItem {
     id: AbaGestao;
@@ -42,6 +44,11 @@ const TABS: TabItem[] = [
         id: "relatorios",
         label: "Relatórios",
         icon: faChartPie
+    },
+    {
+        id: "endereco",
+        label: "Endereços",
+        icon: faLocationDot
     },
     {
         id: "usuarios",
@@ -138,8 +145,6 @@ export function Gestao() {
                                 <h3>Gerenciar Requisições de Plantio</h3>
                             </div>
                             <AbaRequisicoes />
-
-                            {/* Em breve: Tabela ou lista de solicitações */}
                         </section>
                     )}
 
@@ -150,7 +155,6 @@ export function Gestao() {
                                 <h3>Catálogo de Árvores e Mudas</h3>
                             </div>
                             <AbaArvores />
-                            {/* Em breve: Listagem e cadastro de árvores */}
                         </section>
                     )}
 
@@ -164,7 +168,17 @@ export function Gestao() {
                         </section>
                     )}
 
-                    {/* Aba 4: Usuários e Cidades */}
+                    {/* Aba 4: Endereços */}
+                    {(usuario?.role === 'GLOBAL' || usuario?.role === 'ADMIN_LOCAL') && abaAtiva === "endereco" && (
+                        <section className="gestaoAbaCard" role="tabpanel">
+                            <div className="cardHeaderAba">
+                                <h3>Endereços para retirada de mudas</h3>
+                            </div>
+                            <AbaEnderecos/>
+                        </section>
+                    )}
+
+                    {/* Aba 5: Usuários e Cidades */}
                     {(usuario?.role === 'GLOBAL' || usuario?.role === 'ADMIN_LOCAL') && abaAtiva === "usuarios" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">
@@ -174,7 +188,7 @@ export function Gestao() {
                         </section>
                     )}
 
-                    {/* Aba 5: Configurações Admin */}
+                    {/* Aba 6: Configurações Admin */}
                     {usuario?.role === 'GLOBAL' && abaAtiva === "configAdmin" && (
                         <section className="gestaoAbaCard" role="tabpanel">
                             <div className="cardHeaderAba">

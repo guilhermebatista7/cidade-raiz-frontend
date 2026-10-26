@@ -33,5 +33,10 @@ export const queryKeys = {
     relatorios: {
         porCidade: ( inicio: string, fim: string, cidadeId?: string | null,) =>
             ['relatorios', cidadeId, { inicio, fim }] as const,
+    },
+
+    enderecos: {
+        todos: ['enderecos'] as const,
+        porCidade: (cidadeId: string) => ['enderecos', 'cidade', cidadeId] as const,
     }
 }

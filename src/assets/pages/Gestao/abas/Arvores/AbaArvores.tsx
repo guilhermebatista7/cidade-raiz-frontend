@@ -220,6 +220,7 @@ export function AbaArvores() {
                 >
                     Adicionar
                 </button>
+
             </div>
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}

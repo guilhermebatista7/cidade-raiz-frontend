@@ -89,6 +89,19 @@ export interface Cidade {
   ativa: boolean;
 }
 
+export interface Endereco {
+  id: string;
+  rua: string;
+  numero: string;
+  bairro: string;
+  cep?: string;
+  pontoReferencia?: string;
+  cidadeId: string;
+  ativo: boolean;
+  criadoEm: string;
+  atualizadoEm: string;
+}
+
 export interface Publicacao {
   id: string;
   idRequisicao: string;
