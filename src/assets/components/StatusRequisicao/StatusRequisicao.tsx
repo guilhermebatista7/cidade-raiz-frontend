@@ -332,18 +332,26 @@ export const StatusRequisicao = ({
                             </h3>
 
                             <p>
-                                {requisicao.tipoAtendimento === "RETIRADA_LOCAL"
-                                    ? "Sua requisição está aguardando retirada."
-                                    : requisicao.dataInicial && requisicao.dataFinal
-                                        ? `Seu plantio será realizado no período de ${new Date(requisicao.dataInicial).toLocaleDateString("pt-BR", {
+                                {requisicao.tipoAtendimento === "RETIRADA_LOCAL" ? (
+                                    <>
+                                        Sua requisição está aguardando retirada.
+                                        <br />
+                                        Local: {requisicao.endereco?.rua}, n° {requisicao.endereco?.numero}, {requisicao.endereco?.bairro}
+                                    </>
+                                ) : requisicao.dataInicial && requisicao.dataFinal ? (
+                                    <>
+                                        Seu plantio será realizado no período de{" "}
+                                        {new Date(requisicao.dataInicial).toLocaleDateString("pt-BR", {
                                             timeZone: "UTC"
-                                        })
-                                        } a ${new Date(requisicao.dataFinal).toLocaleDateString("pt-BR", {
+                                        })}{" "}
+                                        a{" "}
+                                        {new Date(requisicao.dataFinal).toLocaleDateString("pt-BR", {
                                             timeZone: "UTC"
-                                        })
-                                        }`
-                                        : "Aguardando definição do período de plantio."
-                                }
+                                        })}
+                                    </>
+                                ) : (
+                                    "Aguardando definição do período de plantio."
+                                )}
                             </p>
 
                         </div>
