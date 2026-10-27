@@ -60,17 +60,8 @@ export async function atualizarEnderecoCidade(idEndereco: string, idCidade: stri
     })
 }
 
-export async function ativarCidade(id: string){
-    return await apiFetch(`/cidades/ativar/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-}
-
-export async function desativarCidade(id: string){
-    return await apiFetch(`/cidades/desativar/${id}`, {
+export async function alterarStatusEndereco(idEndereco: string){
+    return await apiFetch(`/endereco/status/${idEndereco}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

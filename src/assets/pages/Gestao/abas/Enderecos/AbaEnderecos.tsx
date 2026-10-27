@@ -9,7 +9,7 @@ import { type Cidade, type Endereco } from "../../../../../types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../../../contexts/AuthContext";
 import { queryKeys } from "../../../../../services/queryKeys";
-import { atualizarEndereco, atualizarEnderecoCidade, criarEndereco, criarEnderecoCidade, listarEndereco, listarEnderecoCidade } from "../../../../../services/enderecoService";
+import { alterarStatusEndereco, atualizarEndereco, atualizarEnderecoCidade, criarEndereco, criarEnderecoCidade, listarEndereco, listarEnderecoCidade } from "../../../../../services/enderecoService";
 import { formatarCep } from "../../../../../utils/formatadores";
 import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
 
@@ -122,7 +122,6 @@ export function AbaEnderecos() {
                 item.bairro.toLowerCase().includes(termo) ||
                 item.cep.toLowerCase().includes(termo) ||
                 item.pontoReferencia.toLowerCase().includes(termo)
-
             );
         });
     }, [enderecos, busca]);
@@ -162,36 +161,20 @@ export function AbaEnderecos() {
         }
     };
 
-    const handleAtivar = async (id: string) => {
+    const handleAlterarStatus = async function (id: string) {
         if (!id) {
             alert('ID inválido');
         }
 
         try {
-            //await ativarUsuario(id);
+            await alterarStatusEndereco(id);
 
             // Invalida o cache do React Query 
-            queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.enderecos.todos });
         } catch (error) {
-            alert(`Erro ao ativar usuário: ${error}`);
+            alert(`Erro ao alterar status do endereço`);
         }
     }
-
-    const handleDesativar = async (id: string) => {
-        if (!id) {
-            alert("ID inválido");
-            return;
-        }
-
-        try {
-            //await desativarUsuario(id);
-
-            // Invalida o cache do React Query 
-            queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
-        } catch (error: any) {
-            alert(`Erro ao desativar usuário: ${error.message || error}`);
-        }
-    };
 
     return (
         <div className="abaArvoresConteudo">
@@ -236,7 +219,6 @@ export function AbaEnderecos() {
             </div>
 
             {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
-            {/* RENDERIZAÇÃO DA TABELA FILTRADA */}
             <div className="listaResultado">
                 {carregandoEnderecos ? (
                     <SkeletonTable linhas={4} />
@@ -276,7 +258,7 @@ export function AbaEnderecos() {
                                                 <button
                                                     type="button"
                                                     className="btn btn-light btnStatusCidade"
-                                                    onClick={() => handleDesativar(item.id)}
+                                                    onClick={() => handleAlterarStatus(item.id)}
                                                 >
                                                     Desativar
                                                 </button>
@@ -284,7 +266,7 @@ export function AbaEnderecos() {
                                                 <button
                                                     type="button"
                                                     className="btnGestaoGlobal btnAtivar btnStatusCidade"
-                                                    onClick={() => handleAtivar(item.id)}
+                                                    onClick={() => handleAlterarStatus(item.id)}
                                                 >
                                                     Ativar
                                                 </button>
