@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import './AbaRequisicao.css';
-import type { Cidade, Requisicao } from "../../../../../types";
+import type { Cidade, Endereco, Requisicao } from "../../../../../types";
 import { listarRequisicoes, listarRequisicoesCidade } from "../../../../../services/requisicaoService";
 import { listarCidades, listarCidadesUsuario } from "../../../../../services/cidadeService";
 import ModalRequisicao from "../../../../components/ModalRequisicao/ModalRequisicao";
@@ -8,6 +8,7 @@ import { useAuth } from "../../../../../contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../../../../services/queryKeys";
 import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
+import { listarEndereco, listarEnderecoCidade } from "../../../../../services/enderecoService";
 
 export function AbaRequisicoes() {
 
@@ -33,6 +34,18 @@ export function AbaRequisicoes() {
 
     // Se for global e não escolheu cidade ainda, pega a primeira cidade da lista
     const cidadeAtivaId = isGlobal ? (cidadeFiltro || cidades[0]?.id || "") : "";
+
+    //Traz endereços ativos
+    const { data: enderecos = [] } = useQuery<Endereco[]>({
+        queryKey: isGlobal ? queryKeys.enderecos.porCidade(cidadeAtivaId) : queryKeys.enderecos.todos,
+        queryFn: () => {
+            if (isGlobal) {
+                return listarEnderecoCidade(cidadeAtivaId);
+            }
+
+            return listarEndereco();
+        },
+    })
 
     const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
@@ -232,6 +245,7 @@ export function AbaRequisicoes() {
                     aberto={modalAberto}
                     fechar={fecharModalRequisicao}
                     requisicao={requisicaoSelecionada}
+                    enderecos={enderecos}
                     baseUrl={API_URL}
                     onAtualizado={atualizarRequisicoes}
                 />

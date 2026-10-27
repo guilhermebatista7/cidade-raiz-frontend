@@ -349,7 +349,7 @@ export function AbaEnderecos() {
                         {/* CEP e ponto de referência */}
                         <div className="row">
                             <div className="col-md-4 inputGroup mb-3">
-                                <label htmlFor="cep">CEP*</label>
+                                <label htmlFor="cep">CEP</label>
                                 <input
                                     id="cep"
                                     type="text"

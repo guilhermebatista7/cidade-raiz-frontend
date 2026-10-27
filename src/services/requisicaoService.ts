@@ -91,6 +91,18 @@ export async function agendarPlantio(id:string, dataInicial: Date, dataFinal: Da
   })
 }
 
+export async function aguardarRetirada(id: string, idEndereco: string){
+  return await apiFetch(`/requisicao/retirada/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      idEndereco,
+    })
+  })
+}
+
 export async function alterarStatus(id:string, status:StatusRequisicao){
   return await apiFetch(`/requisicao/alterarStatus/${id}`, {
     method: 'PUT',

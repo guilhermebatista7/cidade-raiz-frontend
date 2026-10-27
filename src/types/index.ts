@@ -52,6 +52,8 @@ export interface Requisicao {
   telefoneBeneficiario: string;
   emailBeneficiario: string;
   tipoAtendimento: TipoAtendimento;
+  enderecoId?: string; //Caso de tipoAtendimento for retirada
+  endereco?: Endereco;
   rua: string;
   numero: string;
   bairro: string;

@@ -1,9 +1,9 @@
 import ModalForm from "../ModalForm/ModalForm";
-import type { Requisicao, StatusRequisicao } from "../../../types";
+import type { Endereco, Requisicao, StatusRequisicao } from "../../../types";
 
 import "./ModalRequisicao.css";
 import { useEffect, useState } from "react";
-import { agendarPlantio, alterarStatus, buscarUrlComprovante, recusarRequisicao } from "../../../services/requisicaoService";
+import { agendarPlantio, aguardarRetirada, alterarStatus, buscarUrlComprovante, recusarRequisicao } from "../../../services/requisicaoService";
 import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone, formatarTipoAtendimento } from "../../../utils/formatadores";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SkeletonTable } from "../Skeletons/SkeletonTable";
@@ -12,6 +12,7 @@ interface ModalRequisicaoProps {
     aberto: boolean;
     fechar: () => void;
     requisicao: Requisicao | null;
+    enderecos: Endereco[] | null;
     baseUrl: string;
     onAtualizado: () => Promise<void>;
 }
@@ -19,6 +20,7 @@ interface ModalRequisicaoProps {
 export default function ModalRequisicao({
     aberto,
     fechar,
+    enderecos,
     requisicao,
     onAtualizado
 }: ModalRequisicaoProps) {
@@ -52,6 +54,8 @@ export default function ModalRequisicao({
     const [obsStatus, setObsStatus] = useState("");
     const [dataInicial, setDataInicial] = useState("");
     const [dataFinal, setDataFinal] = useState("");
+
+    const [endereco, setEndereco] = useState(enderecos?.[0]?.id ?? '');
 
     useEffect(() => {
         if (!requisicao) return;
@@ -97,9 +101,16 @@ export default function ModalRequisicao({
                 return;
             }
 
+            if (status === 'AGUARDANDO_RETIRADA') {
+                await aguardarRetirada(requisicao.id, endereco);
+                await onAtualizado();
+                fechar();
+                return;
+            }
+
             await alterarStatus(requisicao.id, status);
             await onAtualizado();
-            queryClient.invalidateQueries({ queryKey: ['relatorios']});
+            queryClient.invalidateQueries({ queryKey: ['relatorios'] });
             fechar();
 
         } catch (error: any) {
@@ -171,6 +182,27 @@ export default function ModalRequisicao({
                                                 required
                                                 onChange={(e) => setObsStatus(e.target.value)}
                                             />
+                                        </div>
+                                    )}
+
+                                    {status === "AGUARDANDO_RETIRADA" && (
+                                        <div className="campoStatus">
+                                            <label htmlFor="endereco">
+                                                Endereço
+                                            </label>
+
+                                            <select
+                                                name="requisicaoStatus"
+                                                id="requisicaoStatus"
+                                                value={endereco}
+                                                onChange={(e) =>
+                                                    setEndereco(e.target.value)
+                                                }
+                                            >
+                                                {enderecos?.map((item) => (
+                                                    <option value={item.id}>{`${item.rua}, ${item.bairro}, ${item.numero}`}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     )}
 
@@ -298,6 +330,20 @@ export default function ModalRequisicao({
                                         <span>Motivo recusado</span>
                                         <strong>
                                             {requisicao.observacaoStatus}
+                                        </strong>
+                                    </div>
+
+                                </>
+                                : ''
+                            }
+
+                            {(requisicao.tipoAtendimento === 'RETIRADA_LOCAL' && requisicao?.enderecoId !== null) ?
+                                <>
+
+                                    <div className="informacao">
+                                        <span>Endereço para retirada</span>
+                                        <strong>
+                                            {`${requisicao?.endereco?.rua}, n° ${requisicao?.endereco?.numero}, ${requisicao?.endereco?.bairro}`}
                                         </strong>
                                     </div>
 
