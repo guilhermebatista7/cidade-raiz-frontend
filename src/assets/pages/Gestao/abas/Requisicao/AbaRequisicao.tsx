@@ -202,6 +202,7 @@ export function AbaRequisicoes() {
                     <table className="table tableRequisicao">
                         <thead>
                             <tr>
+                                <th scope="col">Data</th>
                                 <th scope="col">Nome cidadão</th>
                                 <th scope="col">Árvore</th>
                                 <th scope="col">Cidade</th>
@@ -221,6 +222,9 @@ export function AbaRequisicoes() {
                             ) : (
                                 requisicoesFiltradas.map((item) => (
                                     <tr key={item.id}>
+                                        <td>{new Date(item?.criadoEm).toLocaleDateString("pt-BR", {
+                                            timeZone: "UTC"
+                                        })}</td>
                                         <td><strong>{item.nomeBeneficiario}</strong></td>
                                         <td>{item?.arvore?.nomePopular}</td>
                                         <td>{item?.cidadeEndereco}</td>
