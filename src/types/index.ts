@@ -89,6 +89,7 @@ export interface Cidade {
   criadoEm: string;
   atualizadoEm: string;
   ativa: boolean;
+  permiteEntrega: boolean;
 }
 
 export interface Endereco {

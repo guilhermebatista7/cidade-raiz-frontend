@@ -18,7 +18,7 @@ export async function listarCidadesAtivas(){
     })
 }
 
-export async function cadastrarCidade(nome: string, uf: string){
+export async function cadastrarCidade(nome: string, uf: string, permiteEntrega: boolean){
     return await apiFetch('/cidades', {
         method: 'POST',
         headers: {
@@ -27,11 +27,12 @@ export async function cadastrarCidade(nome: string, uf: string){
         body: JSON.stringify({
             nome,
             uf,
+            permiteEntrega
         }),
     })
 }
 
-export async function atualizarCidade(id: string, nome: string, uf: string){
+export async function atualizarCidade(id: string, nome: string, uf: string, permiteEntrega: boolean){
     return await apiFetch(`/cidades/${id}`, {
         method: 'PUT',
         headers: {
@@ -40,6 +41,7 @@ export async function atualizarCidade(id: string, nome: string, uf: string){
         body: JSON.stringify({
             nome,
             uf,
+            permiteEntrega
         }),
     })
 }

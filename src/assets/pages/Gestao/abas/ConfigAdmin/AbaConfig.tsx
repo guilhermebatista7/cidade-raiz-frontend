@@ -15,6 +15,7 @@ interface CidadeConfig {
     nome: string;
     uf: string;
     ativa: boolean;
+    permiteEntrega: boolean;
     _count?: {
         arvores?: number;
         requisicoes?: number;
@@ -37,6 +38,7 @@ export function AbaConfig() {
     // Campos do formulário
     const [nome, setNome] = useState("");
     const [uf, setUf] = useState("");
+    const [permiteEntrega, setPermiteEntrega] = useState(false);
 
     const { data: cidades = [], isFetching: carregandoCidades } = useQuery<CidadeConfig[]>({
         queryKey: queryKeys.cidades.todas,
@@ -62,6 +64,7 @@ export function AbaConfig() {
         setCidadeEmEdicaoId(null);
         setNome("");
         setUf("");
+        setPermiteEntrega(false);
         setModalAberto(true);
     };
 
@@ -73,6 +76,7 @@ export function AbaConfig() {
         setCidadeEmEdicaoId(id);
         setNome(cidadeAlvo.nome || "");
         setUf(cidadeAlvo.uf);
+        setPermiteEntrega(cidadeAlvo.permiteEntrega);
         setModalAberto(true);
     };
 
@@ -112,13 +116,14 @@ export function AbaConfig() {
 
             if (cidadeEmEdicaoId !== null) {
                 // MODO EDIÇÃO
-                await atualizarCidade(cidadeEmEdicaoId, nome, uf);
+                await atualizarCidade(cidadeEmEdicaoId, nome, uf, permiteEntrega);
                 alert("Cidade atualizada com sucesso!");
             } else {
                 // MODO CRIAÇÃO
                 await cadastrarCidade(
                     nome,
-                    uf
+                    uf,
+                    permiteEntrega
                 );
 
                 alert("Cidade cadastrada com sucesso!");
@@ -191,6 +196,7 @@ export function AbaConfig() {
                                 <th scope="col">N° árvores</th>
                                 <th scope="col">N° requisições</th>
                                 <th scope="col">N° usuários</th>
+                                <th scope="col">Permite entrega</th>
                                 <th scope="col" className="text-center">Ações</th>
                             </tr>
                         </thead>
@@ -209,6 +215,7 @@ export function AbaConfig() {
                                         <td>{item._count?.arvores ?? 0}</td>
                                         <td>{item._count?.requisicoes ?? 0}</td>
                                         <td>{item._count?.usuarios ?? 0}</td>
+                                        <td>{item.permiteEntrega ? 'Sim' : 'Não'}</td>
                                         <td className="text-center">
                                             {item.ativa ? (
                                                 <button type="button" className="btn btn-light btnStatusCidade" onClick={() => handleDesativar(item.id)}>
@@ -292,10 +299,21 @@ export function AbaConfig() {
                             </select>
                         </div>
 
+                        <div className="inputGroup mb-3">
+                            <label className="checkboxEntrega">
+                                <input
+                                    type="checkbox"
+                                    checked={permiteEntrega}
+                                    onChange={(e) => setPermiteEntrega(e.target.checked)}
+                                />
+                                <span>Permitir entrega nesta cidade</span>
+                            </label>
+                        </div>
+
                         <div className="d-flex justify-content-end gap-2 mt-4">
                             <button
                                 type="button"
-                                className="btnPagination btn-secondary"
+                                className="btn btn-secondary"
                                 onClick={fecharModal}
                             >
                                 Cancelar
@@ -303,9 +321,8 @@ export function AbaConfig() {
 
                             <button
                                 type="submit"
-                                className="btnPagination btn-success"
+                                className="btnGestaoGlobal btn-success"
                             >
-                                <FontAwesomeIcon icon={faCheck} />
 
                                 {cidadeEmEdicaoId !== null
                                     ? "Salvar Alterações"
