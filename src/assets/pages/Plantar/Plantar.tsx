@@ -25,7 +25,7 @@ import { verificarPublicacao } from "../../../services/blogService";
 
 import { buscarCep } from "../../../services/viaCepService";
 import { formatarCep, formatarTelefone } from "../../../utils/formatadores";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Plantar = () => {
     const [fotoLocal, setFotoLocal] = useState<File | null>(null);
@@ -233,11 +233,19 @@ export const Plantar = () => {
         const cidadeId = e.target.value;
 
         setCidadeSelecionada(cidadeId);
-
         setArvoreSelecionada(null);
         setArvores([]);
 
+        const cidade = cidades.find(
+            item => item.id === cidadeId
+        );
+
+        if (!cidade?.permiteEntrega) {
+            setTipoAtendimento("RETIRADA_LOCAL");
+        }
+
         if (!cidadeId) {
+            setTipoAtendimento("");
             return;
         }
 
@@ -300,6 +308,16 @@ export const Plantar = () => {
     const cidadeEscolhida = cidades.find(
         cidade => cidade.id === cidadeSelecionada
     );
+
+    const permiteEntrega = cidadeEscolhida?.permiteEntrega === true;
+
+    useEffect(() => {
+        if (!cidadeSelecionada || !cidadeEscolhida) return;
+
+        if (!permiteEntrega) {
+            setTipoAtendimento("RETIRADA_LOCAL");
+        }
+    }, [cidadeSelecionada, permiteEntrega, cidadeEscolhida]);
 
     /*
      * ============================================================
@@ -1014,85 +1032,98 @@ export const Plantar = () => {
                                     </div>
                                 </div>
 
-                                <div className="col-md-12">
-
-                                    <div className="inputGroup">
-
-                                        <label>
-                                            Deseja retirar no local ou
-                                            agendar o plantio e deixar por
-                                            nossa conta?
-                                        </label>
-
-                                        <div className="tipoSolicitacao">
-                                            <label className="tipoSolicitacaoTitulo">
-                                                Como deseja receber a árvore?
+                                {permiteEntrega && (
+                                    <div className="col-md-12">
+                                        <div className="inputGroup">
+                                            <label>
+                                                Deseja retirar no local ou agendar o plantio?
                                             </label>
 
-                                            <div className="tipoSolicitacaoOpcoes">
-
-                                                <label
-                                                    htmlFor="retirar"
-                                                    className={`tipoSolicitacaoCard ${tipoAtendimento === "RETIRADA_LOCAL"
-                                                        ? "selecionado"
-                                                        : ""
-                                                        }`}
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        id="retirar"
-                                                        name="tipoAtendimento"
-                                                        value="RETIRADA_LOCAL"
-                                                        checked={tipoAtendimento === "RETIRADA_LOCAL"}
-                                                        onChange={(e) => setTipoAtendimento(e.target.value)}
-                                                        disabled={modoVerificacao && !podeEditar}
-                                                    />
-
-                                                    <span className="tipoSolicitacaoTexto">
-                                                        <strong>Retirar no local</strong>
-                                                        <small>
-                                                            Você retira a muda no local indicado.
-                                                        </small>
-                                                    </span>
-
-                                                    <span className="tipoSolicitacaoCheck">
-                                                        <FontAwesomeIcon icon={faCheck} />
-                                                    </span>
+                                            <div className="tipoSolicitacao">
+                                                <label className="tipoSolicitacaoTitulo">
+                                                    Como deseja receber a árvore?
                                                 </label>
 
-                                                <label
-                                                    htmlFor="agendar"
-                                                    className={`tipoSolicitacaoCard ${tipoAtendimento === "PLANTIO_AGENDADO"
-                                                        ? "selecionado"
-                                                        : ""
-                                                        }`}
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        id="agendar"
-                                                        name="tipoAtendimento"
-                                                        value="PLANTIO_AGENDADO"
-                                                        checked={tipoAtendimento === "PLANTIO_AGENDADO"}
-                                                        onChange={(e) => setTipoAtendimento(e.target.value)}
-                                                        disabled={modoVerificacao && !podeEditar}
-                                                    />
+                                                <div className="tipoSolicitacaoOpcoes">
+                                                    <label
+                                                        htmlFor="retirar"
+                                                        className={`tipoSolicitacaoCard ${tipoAtendimento === "RETIRADA_LOCAL"
+                                                            ? "selecionado"
+                                                            : ""
+                                                            }`}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            id="retirar"
+                                                            name="tipoAtendimento"
+                                                            value="RETIRADA_LOCAL"
+                                                            checked={
+                                                                tipoAtendimento === "RETIRADA_LOCAL"
+                                                            }
+                                                            onChange={(e) =>
+                                                                setTipoAtendimento(e.target.value)
+                                                            }
+                                                            disabled={modoVerificacao && !podeEditar}
+                                                        />
 
-                                                    <span className="tipoSolicitacaoTexto">
-                                                        <strong>Agendar plantio</strong>
-                                                        <small>
-                                                            Nossa equipe realiza o plantio mediante agendamento.
-                                                        </small>
-                                                    </span>
+                                                        <span className="tipoSolicitacaoTexto">
+                                                            <strong>Retirar no local</strong>
+                                                            <small>
+                                                                Você retira a muda no local indicado.
+                                                            </small>
+                                                        </span>
 
-                                                    <span className="tipoSolicitacaoCheck">
-                                                        <FontAwesomeIcon icon={faCheck} />
-                                                    </span>
-                                                </label>
+                                                        <span className="tipoSolicitacaoCheck">
+                                                            <FontAwesomeIcon icon={faCheck} />
+                                                        </span>
+                                                    </label>
 
+                                                    <label
+                                                        htmlFor="agendar"
+                                                        className={`tipoSolicitacaoCard ${tipoAtendimento === "PLANTIO_AGENDADO"
+                                                            ? "selecionado"
+                                                            : ""
+                                                            }`}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            id="agendar"
+                                                            name="tipoAtendimento"
+                                                            value="PLANTIO_AGENDADO"
+                                                            checked={
+                                                                tipoAtendimento === "PLANTIO_AGENDADO"
+                                                            }
+                                                            onChange={(e) =>
+                                                                setTipoAtendimento(e.target.value)
+                                                            }
+                                                            disabled={modoVerificacao && !podeEditar}
+                                                        />
+
+                                                        <span className="tipoSolicitacaoTexto">
+                                                            <strong>Agendar plantio</strong>
+                                                            <small>
+                                                                Nossa equipe realiza o plantio mediante
+                                                                agendamento.
+                                                            </small>
+                                                        </span>
+
+                                                        <span className="tipoSolicitacaoCheck">
+                                                            <FontAwesomeIcon icon={faCheck} />
+                                                        </span>
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
+
+                                {!permiteEntrega && (
+                                    <input
+                                        type="hidden"
+                                        name="tipoAtendimento"
+                                        value="RETIRADA_LOCAL"
+                                    />
+                                )}
                             </div>
                         </div>
 
