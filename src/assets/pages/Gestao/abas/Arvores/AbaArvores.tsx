@@ -11,6 +11,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../../../contexts/AuthContext";
 import { queryKeys } from "../../../../../services/queryKeys";
 import { SkeletonCard } from "../../../../components/Skeletons/SkeletonCard";
+import { useAlert } from "../../../../components/hooks/useAlert";
+import Alert from "../../../../components/Alert/Alert";
 
 export function AbaArvores() {
 
@@ -118,12 +120,14 @@ export function AbaArvores() {
         });
     }, [arvores, busca]);
 
+    const { alert, showAlert, closeAlert } = useAlert();
+
     // Manipulador unificado de salvamento (Adição ou Edição)
     const handleSubmitForm = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!nome || !descricao || !quantidade) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
+            showAlert("Por favor, preencha todos os campos obrigatórios.", 'warning');
             return;
         }
 
@@ -141,11 +145,11 @@ export function AbaArvores() {
             if (arvoreEmEdicaoId !== null) {
                 // MODO EDIÇÃO
                 await atualizarArvore(arvoreEmEdicaoId, formData);
-                alert("Árvore atualizada com sucesso!");
+                showAlert("Árvore atualizada com sucesso!", 'success');
             } else {
                 // MODO CRIAÇÃO
                 await cadastrarArvore(formData);
-                alert("Árvore cadastrada com sucesso!");
+                showAlert("Árvore cadastrada com sucesso!", "success");
             }
 
             // Invalida o cache do React Query (ele recarrega a lista sozinho!)
@@ -156,7 +160,7 @@ export function AbaArvores() {
 
             fecharModal();
         } catch (error: any) {
-            alert(`Erro ao salvar: ${error.message}`);
+            showAlert(`Erro ao salvar: ${error.message}`, "danger");
         }
     };
 
@@ -167,7 +171,7 @@ export function AbaArvores() {
 
         try {
             await excluirArvore(id);
-            alert("Árvore excluída com sucesso!");
+            showAlert("Árvore excluída com sucesso!", "success");
 
             // Invalida o cache do React Query para recarregar a lista
             queryClient.invalidateQueries({ queryKey: queryKeys.arvores.todas });
@@ -176,14 +180,20 @@ export function AbaArvores() {
             }
 
         } catch (error) {
-            alert('Não foi possível realizar a exclusão');
-            console.log(error);
+            showAlert('Não foi possível realizar a exclusão', 'danger');
         }
     }
 
     return (
         <div className="abaArvoresConteudo">
             {/* BARRA VISUAL DE FILTROS */}
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={closeAlert}
+                />
+            )}
             <div className="barraFiltros">
                 <input
                     type="text"

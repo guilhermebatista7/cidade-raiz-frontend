@@ -9,6 +9,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../../../contexts/AuthContext";
 import { queryKeys } from "../../../../../services/queryKeys";
 import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
+import { useAlert } from "../../../../components/hooks/useAlert";
+import Alert from "../../../../components/Alert/Alert";
 
 export function AbaUsuarios() {
 
@@ -128,12 +130,14 @@ export function AbaUsuarios() {
         });
     }, [usuarios, busca]);
 
+    const { alert, showAlert, closeAlert } = useAlert();
+
     // Manipulador unificado de salvamento (Adição ou Edição)
     const handleSubmitForm = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!nome || !email || !tipo) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
+            showAlert("Por favor, preencha todos os campos obrigatórios.", 'warning');
             return;
         }
 
@@ -142,7 +146,7 @@ export function AbaUsuarios() {
             if (usuarioEmEdicaoId !== null) {
                 // MODO EDIÇÃO
                 await atualizarUsuario(usuarioEmEdicaoId, nome, email, tipo, telefone, cidadeId);
-                alert("Usuário atualizado com sucesso!");
+                showAlert("Usuário atualizado com sucesso!", 'success');
             } else {
                 // MODO CRIAÇÃO - Futura implementação, em razão da limitação de email do supabase 
                 //await cadastrarCidade(nome,uf);
@@ -156,14 +160,14 @@ export function AbaUsuarios() {
 
             fecharModal();
         } catch (error: any) {
-            alert(`Erro ao salvar: ${error.message}`);
+            showAlert(`Erro ao salvar: ${error.message}`, 'danger');
         }
 
     };
 
     const handleAtivar = async (id: string) => {
         if (!id) {
-            alert('ID inválido');
+            showAlert('ID inválido', 'warning');
         }
 
         try {
@@ -172,13 +176,13 @@ export function AbaUsuarios() {
             // Invalida o cache do React Query 
             queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
         } catch (error) {
-            alert(`Erro ao ativar usuário: ${error}`);
+            showAlert(`Erro ao ativar usuário: ${error}`, 'danger');
         }
     }
 
     const handleDesativar = async (id: string) => {
         if (!id) {
-            alert("ID inválido");
+            showAlert("ID inválido", 'warning');
             return;
         }
 
@@ -188,12 +192,19 @@ export function AbaUsuarios() {
             // Invalida o cache do React Query 
             queryClient.invalidateQueries({ queryKey: queryKeys.usuarios.todos });
         } catch (error: any) {
-            alert(`Erro ao desativar usuário: ${error.message || error}`);
+            showAlert(`Erro ao desativar usuário: ${error.message || error}`, 'danger');
         }
     };
 
     return (
         <div className="abaRequisicaoConteudo">
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={closeAlert}
+                />
+            )}
             {/* BARRA VISUAL DE FILTROS */}
             <div className="barraFiltros">
                 {/* Input de Busca Textual */}
@@ -235,7 +246,7 @@ export function AbaUsuarios() {
             <div className="listaResultado">
                 {carregandoUsuarios ? (
                     <SkeletonTable linhas={4} />
-                
+
                 ) : (
                     <table className="table tableRequisicao">
                         <thead>

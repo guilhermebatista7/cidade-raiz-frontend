@@ -2,13 +2,13 @@ import { useState, useMemo, useEffect } from "react";
 import './AbaConfig.css';
 import { ativarCidade, atualizarCidade, cadastrarCidade, desativarCidade, listarCidades } from "../../../../../services/cidadeService";
 import { estados } from "../../../../dataInfo/estados";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../../../../services/queryKeys";
 import { useAuth } from "../../../../../contexts/AuthContext";
 import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
+import { useAlert } from "../../../../components/hooks/useAlert";
+import Alert from "../../../../components/Alert/Alert";
 
 interface CidadeConfig {
     id: string;
@@ -103,12 +103,14 @@ export function AbaConfig() {
 
     console.log(cidades);
 
+    const { alert, showAlert, closeAlert } = useAlert();
+
     // Manipulador unificado de salvamento (Adição ou Edição)
     const handleSubmitForm = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!nome || !uf) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
+            showAlert("Por favor, preencha todos os campos obrigatórios.", 'warning');
             return;
         }
 
@@ -117,7 +119,7 @@ export function AbaConfig() {
             if (cidadeEmEdicaoId !== null) {
                 // MODO EDIÇÃO
                 await atualizarCidade(cidadeEmEdicaoId, nome, uf, permiteEntrega);
-                alert("Cidade atualizada com sucesso!");
+                showAlert("Cidade atualizada com sucesso!", "success");
             } else {
                 // MODO CRIAÇÃO
                 await cadastrarCidade(
@@ -126,49 +128,56 @@ export function AbaConfig() {
                     permiteEntrega
                 );
 
-                alert("Cidade cadastrada com sucesso!");
+                showAlert("Cidade cadastrada com sucesso!", "success");
             }
 
             queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas });
             fecharModal();
         } catch (error: any) {
-            alert(`Erro ao salvar: ${error.message}`);
+            showAlert(`Erro ao salvar: ${error.message}`, "danger");
         }
 
     };
 
     const handleAtivar = async (id: string) => {
         if (!id) {
-            alert('ID inválido');
+            showAlert('ID inválido', "warning");
         }
 
         try {
             await ativarCidade(id);
-            alert("Cidade ativada com sucesso");
+            showAlert("Cidade ativada com sucesso", "success");
             queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas });
         } catch (error) {
-            alert(`Erro ao ativar cidade: ${error}`);
+            showAlert(`Erro ao ativar cidade: ${error}`, "danger");
         }
     }
 
     const handleDesativar = async (id: string) => {
         if (!id) {
-            alert("ID inválido");
+            showAlert("ID inválido", "warning");
             return;
         }
 
         try {
             // Certifique-se de importar e usar a função correta do seu service, ex: desativarCidade(id)
             await desativarCidade(id);
-            alert("Cidade desativada com sucesso!");
+            showAlert("Cidade desativada com sucesso!", "success");
             queryClient.invalidateQueries({ queryKey: queryKeys.cidades.todas });
         } catch (error: any) {
-            alert(`Erro ao desativar cidade: ${error.message || error}`);
+            showAlert(`Erro ao desativar cidade: ${error.message || error}`, 'danger');
         }
     };
 
     return (
         <div className="abaRequisicaoConteudo">
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={closeAlert}
+                />
+            )}
             {/* BARRA VISUAL DE FILTROS */}
             <div className="barraFiltros">
                 {/* Input de Busca Textual */}

@@ -12,6 +12,8 @@ import { queryKeys } from "../../../../../services/queryKeys";
 import { alterarStatusEndereco, atualizarEndereco, atualizarEnderecoCidade, criarEndereco, criarEnderecoCidade, listarEndereco, listarEnderecoCidade } from "../../../../../services/enderecoService";
 import { formatarCep } from "../../../../../utils/formatadores";
 import { SkeletonTable } from "../../../../components/Skeletons/SkeletonTable";
+import { useAlert } from "../../../../components/hooks/useAlert";
+import Alert from "../../../../components/Alert/Alert";
 
 export function AbaEnderecos() {
 
@@ -126,27 +128,31 @@ export function AbaEnderecos() {
         });
     }, [enderecos, busca]);
 
+    const { alert, showAlert, closeAlert } = useAlert();
+
     // Manipulador unificado de salvamento (Adição ou Edição)
     const handleSubmitForm = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!rua || !numero || !bairro) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
+            showAlert("Por favor, preencha todos os campos obrigatórios.", "warning");
             return;
         }
 
         try {
             if (enderecoEmEdicaoId !== null) {
                 // MODO EDIÇÃO
-                isGlobal 
-                ? await atualizarEnderecoCidade(enderecoEmEdicaoId, cidadeAtivaId, rua, numero, bairro, cep, pontoReferencia)
-                : await atualizarEndereco(enderecoEmEdicaoId, rua, numero, bairro, cep, pontoReferencia)
-                alert("Edereço atualizado com sucesso!");
+                isGlobal
+                    ? await atualizarEnderecoCidade(enderecoEmEdicaoId, cidadeAtivaId, rua, numero, bairro, cep, pontoReferencia)
+                    : await atualizarEndereco(enderecoEmEdicaoId, rua, numero, bairro, cep, pontoReferencia)
+                showAlert("Edereço atualizado com sucesso!", "success");
             } else {
                 // MODO CRIAÇÃO
-                isGlobal 
+                isGlobal
                     ? await criarEnderecoCidade(cidadeAtivaId, rua, numero, bairro, cep, pontoReferencia)
                     : await criarEndereco(rua, numero, bairro, cep, pontoReferencia)
+
+                showAlert("Edereço cadastrado com sucesso!", "success");
             }
 
             // Invalida o cache do React Query 
@@ -157,13 +163,13 @@ export function AbaEnderecos() {
 
             fecharModal();
         } catch (error: any) {
-            alert(`Erro ao salvar: ${error.message}`);
+            showAlert(`Erro ao salvar: ${error.message}`, "danger");
         }
     };
 
     const handleAlterarStatus = async function (id: string) {
         if (!id) {
-            alert('ID inválido');
+            showAlert('ID inválido', 'warning');
         }
 
         try {
@@ -172,12 +178,20 @@ export function AbaEnderecos() {
             // Invalida o cache do React Query 
             queryClient.invalidateQueries({ queryKey: queryKeys.enderecos.todos });
         } catch (error) {
-            alert(`Erro ao alterar status do endereço`);
+            showAlert(`Erro ao alterar status do endereço`, 'danger');
         }
     }
 
     return (
         <div className="abaArvoresConteudo">
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={closeAlert}
+                />
+            )}
+
             {/* BARRA VISUAL DE FILTROS */}
             <div className="barraFiltros">
                 <input

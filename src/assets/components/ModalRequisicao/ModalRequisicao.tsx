@@ -8,6 +8,9 @@ import { formatarData, formatarDataAgendamento, formatarStatus, formatarTelefone
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SkeletonTable } from "../Skeletons/SkeletonTable";
 
+import { useAlert } from "../hooks/useAlert";
+import Alert from "../Alert/Alert";
+
 interface ModalRequisicaoProps {
     aberto: boolean;
     fechar: () => void;
@@ -72,6 +75,8 @@ export default function ModalRequisicao({
 
     const fotoLocal = requisicao.fotoLocalUrl ?? null;
 
+    const { alert, showAlert, closeAlert } = useAlert();
+
     const handleChangeStatus = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -81,7 +86,7 @@ export default function ModalRequisicao({
             !status || (!obsStatus && status === 'RECUSADO') ||
             ((!dataInicial || !dataFinal) && status === 'AGENDADO_PLANTIO')
         ) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
+            showAlert("Por favor, preencha todos os campos obrigatórios.", "warning");
             return;
         }
 
@@ -114,7 +119,7 @@ export default function ModalRequisicao({
             fechar();
 
         } catch (error: any) {
-            alert(`Erro ao salvar: ${error.message}`);
+            showAlert(`Erro ao salvar: ${error.message}`, 'danger');
         }
     }
 
@@ -125,6 +130,14 @@ export default function ModalRequisicao({
             titulo="Detalhes da requisição"
             descricao={`Requisição #${requisicao.id.substring(0, 8)}`}
         >
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={closeAlert}
+                />
+            )}
+            
             <div className="modalRequisicao">
                 <form className="formSection" onSubmit={handleChangeStatus}>
 

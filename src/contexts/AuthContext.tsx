@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             await logoutService();
         } catch (e) {
-            console.error("Erro ao fazer logout", e);
+            console.error("Erro ao fazer logout");
         } finally {
             setUsuario(null);
         }
