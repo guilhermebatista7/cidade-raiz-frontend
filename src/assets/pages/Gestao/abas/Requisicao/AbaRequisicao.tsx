@@ -215,7 +215,7 @@ export function AbaRequisicoes() {
                         <tbody>
                             {requisicoesFiltradas.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="mensagemVazio">
+                                    <td colSpan={8} className="mensagemVazio">
                                         Nenhum resultado encontrado com os filtros atuais.
                                     </td>
                                 </tr>
