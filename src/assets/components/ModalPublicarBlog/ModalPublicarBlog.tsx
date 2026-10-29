@@ -22,6 +22,8 @@ export default function ModalPublicarBlog({
     fechar,
     requisicao,
 }: ModalBlogProps) {
+    
+    const { alert, showAlert, closeAlert } = useAlert();
 
     if (!requisicao) {
         return null;
@@ -30,7 +32,6 @@ export default function ModalPublicarBlog({
     const [titulo, setTitulo] = useState('');
     const [descricao, setDescricao] = useState('');
 
-    const { alert, showAlert, closeAlert } = useAlert();
 
     const fotoPlantio = requisicao.fotoPlantioUrl ?? null;
     const tituloRef = useRef<HTMLInputElement>(null);

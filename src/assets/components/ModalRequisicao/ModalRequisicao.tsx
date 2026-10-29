@@ -69,13 +69,14 @@ export default function ModalRequisicao({
         setDataFinal("");
     }, [requisicao]);
 
+    const { alert, showAlert, closeAlert } = useAlert();
+    
     if (!requisicao) {
         return null;
     }
 
     const fotoLocal = requisicao.fotoLocalUrl ?? null;
 
-    const { alert, showAlert, closeAlert } = useAlert();
 
     const handleChangeStatus = async (e: React.FormEvent) => {
         e.preventDefault();
