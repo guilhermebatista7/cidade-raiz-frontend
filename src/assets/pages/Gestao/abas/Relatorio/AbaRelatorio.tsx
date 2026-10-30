@@ -14,9 +14,6 @@ import { useAuth } from '../../../../../contexts/AuthContext';
 import { queryKeys } from '../../../../../services/queryKeys';
 import { SkeletonTable } from '../../../../components/Skeletons/SkeletonTable';
 
-import * as XLSX from 'xlsx';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { faFileExcel, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 
 type Status = 'SOLICITADO' | 'APROVADO' | 'RECUSADO' | 'AGUARDANDO_RETIRADA' | 'AGENDADO_PLANTIO' | 'CONCLUIDO';
@@ -203,9 +200,10 @@ export function AbaRelatorio() {
             },
         ];
 
-    const exportarExcel = () => {
+    const exportarExcel = async () => {
         if (!dados) return;
 
+        const XLSX = await import('xlsx');
         const wb = XLSX.utils.book_new();
 
         // Aba 1: resumo dos indicadores
@@ -309,9 +307,13 @@ export function AbaRelatorio() {
     };
 
 
-    const gerarPDF = () => {
+    const gerarPDF = async () => {
         if (!dados) return;
 
+        const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+            import('jspdf'),
+            import('jspdf-autotable'),
+        ]);
         const pdf = new jsPDF('l', 'mm', 'a4');
 
         const margem = 12;

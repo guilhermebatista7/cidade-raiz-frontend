@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { podeAcessarGestao } from "../../../utils/permissoes";
+import { PageSkeleton } from "../Skeletons/PageSkeleton";
 
 interface RotaProtegidaProps {
   children: ReactNode;
@@ -13,13 +14,7 @@ export function RotaProtegida({ children }: RotaProtegidaProps) {
 
   // 1. Enquanto valida o cookie com o backend, não redireciona
   if (carregando) {
-    return (
-      <div className="paginaSkeletonContainer">
-        <div className="skeletonBox paginaSkeletonHeader" />
-        <div className="skeletonBox paginaSkeletonAbas" />
-        <div className="skeletonBox paginaSkeletonConteudo" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   // 2. Não está autenticado -> vai para o Login

@@ -45,6 +45,8 @@ export function AbaRequisicoes() {
 
             return listarEndereco();
         },
+        enabled: !isGlobal || !!cidadeAtivaId,
+
     })
 
     const formatDate = (date: Date) => {
