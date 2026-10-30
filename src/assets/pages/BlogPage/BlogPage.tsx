@@ -8,7 +8,7 @@ import { CardBlog } from '../../components/CardBlog/CardBlog';
 
 import { listarPublicacoes } from '../../../services/blogService';
 import type { Cidade, CursorPublicacao } from '../../../types';
-import blogImg from '../../media/blogHeader.png';
+import blogImg from '../../media/blogHeader.webp';
 import userImg from '../../media/user.png';
 import './BlogPage.css';
 import { listarCidadesAtivas } from '../../../services/cidadeService';
