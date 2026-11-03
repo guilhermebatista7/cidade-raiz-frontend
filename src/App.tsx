@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
-import imgLogo from './assets/media/imgLogo.png'
+import imgLogo from './assets/media/imgLogo.webp'
 import { Footer } from './assets/components/Footer/Footer'
 import { Menu } from './assets/components/Menu/Menu'
 import { AuthProvider } from './contexts/AuthContext'

@@ -15,8 +15,8 @@ import { CardInfo } from "../../components/CardInfo/CardInfo";
 import { CardSolution } from "../../components/CardSolution/CardSolution";
 import { solucao } from "../../dataInfo/solucao";
 
-import treeVideo from "../../media/tree_video.mp4";
-import notebook from "../../media/notebook.png";
+import treeVideo from "../../media/tree_video.webm";
+import notebook from "../../media/notebook.webp";
 
 import "./HomePage.css";
 
