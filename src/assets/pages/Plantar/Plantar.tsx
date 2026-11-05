@@ -73,7 +73,6 @@ export const Plantar = () => {
                         />
 
                         <SecaoBeneficiario
-                            usuarioLogado={usuario}
                             nome={form.nome}
                             onNomeChange={form.setNome}
                             email={form.email}

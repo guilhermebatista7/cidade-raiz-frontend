@@ -1,10 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import type { Usuario } from "../../../../types";
 import { formatarTelefone } from "../../../../utils/formatadores";
 
 interface SecaoBeneficiarioProps {
-    usuarioLogado: Usuario | null;
     nome: string;
     onNomeChange: (valor: string) => void;
     email: string;
@@ -18,7 +16,6 @@ interface SecaoBeneficiarioProps {
 }
 
 export const SecaoBeneficiario = ({
-    usuarioLogado,
     nome,
     onNomeChange,
     email,
@@ -30,7 +27,6 @@ export const SecaoBeneficiario = ({
     onTipoAtendimentoChange,
     desabilitado,
 }: SecaoBeneficiarioProps) => {
-    const isGestor = usuarioLogado?.role !== "CIDADAO" && Boolean(usuarioLogado);
 
     return (
         <div className="formSection">
@@ -39,17 +35,15 @@ export const SecaoBeneficiario = ({
                 <h3>Informações pessoais</h3>
             </div>
 
-            {isGestor && (
-                <p className="sectionDescription">
-                    <strong>Atenção</strong>: Caso esteja realizando esta requisição em nome de outra pessoa, informe os dados do beneficiário para que ele possa receber as atualizações sobre o andamento da solicitação.
-                </p>
-            )}
+            <p className="sectionDescription">
+                <strong>Atenção</strong>: Caso esteja realizando esta requisição em nome de outra pessoa, informe os dados do beneficiário para que ele possa receber as atualizações sobre o andamento da solicitação.
+            </p>
 
             <div className="row g-3 mt-2">
-                <div className={isGestor ? "col-md-12" : "col-md-8"}>
+                <div className={"col-md-12"}>
                     <div className="inputGroup">
                         <label htmlFor="nomeBeneficiario">
-                            Nome {isGestor && "Beneficiário"}
+                            Nome {"Beneficiário"}
                         </label>
 
                         <input
@@ -65,7 +59,7 @@ export const SecaoBeneficiario = ({
                     </div>
                 </div>
 
-                {isGestor && (
+               
                     <div className="col-md-6">
                         <div className="inputGroup">
                             <label htmlFor="emailBeneficiario">
@@ -83,12 +77,12 @@ export const SecaoBeneficiario = ({
                             />
                         </div>
                     </div>
-                )}
+           
 
-                <div className={isGestor ? "col-md-6" : "col-md-4"}>
+                <div className={"col-md-6" }>
                     <div className="inputGroup">
                         <label htmlFor="telefoneBeneficiario">
-                            Telefone {isGestor && "Beneficiário"}
+                            Telefone {"Beneficiário"}
                         </label>
 
                         <input
@@ -121,11 +115,10 @@ export const SecaoBeneficiario = ({
                                 <div className="tipoSolicitacaoOpcoes">
                                     <label
                                         htmlFor="retirar"
-                                        className={`tipoSolicitacaoCard ${
-                                            tipoAtendimento === "RETIRADA_LOCAL"
+                                        className={`tipoSolicitacaoCard ${tipoAtendimento === "RETIRADA_LOCAL"
                                                 ? "selecionado"
                                                 : ""
-                                        }`}
+                                            }`}
                                     >
                                         <input
                                             type="radio"
@@ -157,11 +150,10 @@ export const SecaoBeneficiario = ({
 
                                     <label
                                         htmlFor="agendar"
-                                        className={`tipoSolicitacaoCard ${
-                                            tipoAtendimento === "PLANTIO_AGENDADO"
+                                        className={`tipoSolicitacaoCard ${tipoAtendimento === "PLANTIO_AGENDADO"
                                                 ? "selecionado"
                                                 : ""
-                                        }`}
+                                            }`}
                                     >
                                         <input
                                             type="radio"
