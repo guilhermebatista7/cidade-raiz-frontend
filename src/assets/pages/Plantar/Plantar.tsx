@@ -16,18 +16,30 @@ import { ModalSelecaoArvore } from "./components/ModalSelecaoArvore";
 import { ColunaStatusRequisicao } from "./components/ColunaStatusRequisicao";
 
 import "./Plantar.css";
+import { useNavigate } from "react-router-dom";
 
 export const Plantar = () => {
     const { usuario } = useAuth();
     const form = useFormularioPlantar();
+    const navigate = useNavigate();
+
+    if (!usuario) {
+        navigate("/login", {
+            state: {
+                message: "Você precisa fazer login ou criar uma conta para acessar esta página.",
+                type: "warning"
+            }
+        });
+        return null;
+    }
 
     const textoBotaoSubmit = form.salvando
         ? " Enviando..."
         : form.modoVerificacao
-        ? form.requisicaoSelecionada?.status === "RECUSADO"
-            ? " Reenviar requisição"
-            : " Atualizar requisição"
-        : " Enviar requisição";
+            ? form.requisicaoSelecionada?.status === "RECUSADO"
+                ? " Reenviar requisição"
+                : " Atualizar requisição"
+            : " Enviar requisição";
 
     return (
         <SectionContent className="sectionPlantar">

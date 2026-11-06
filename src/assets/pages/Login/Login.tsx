@@ -4,7 +4,7 @@ import loginTree from '../../media/login_tree.webm'
 import { cadastrar } from '../../../services/authService';
 import Alert from '../../components/Alert/Alert';
 import { podeAcessarGestao } from '../../../utils/permissoes';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useAlert } from '../../components/hooks/useAlert';
 
@@ -16,7 +16,11 @@ export function Login() {
   const [senhaRepet, setSenhaRepet] = useState('');
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login: loginContext } = useAuth();
+
+  const message = location.state?.message;
+  const messageType = location.state?.type;
 
   const { alert, showAlert, closeAlert } = useAlert();
 
@@ -91,7 +95,7 @@ export function Login() {
       setSenha('');
 
       showAlert(
-        'Login efetuado com sucesso!', 
+        'Login efetuado com sucesso!',
         'success'
       );
 
@@ -165,7 +169,18 @@ export function Login() {
               }
             />
 
-            {alert && (
+            {message ? (
+              <Alert
+                message={message}
+                type={messageType || "warning"}
+                onClose={() => {
+                  navigate(location.pathname, {
+                    replace: true,
+                    state: null
+                  });
+                }}
+              />
+            ) : alert && (
               <Alert
                 message={alert.message}
                 type={alert.type}

@@ -170,6 +170,10 @@
   margin-top: 10px;
   border: none;
   font-weight: 500;
+  padding: 5px 10px;
+  border: 1px solid var(--cor-verde);
+  color: var(--cor-verde);
+  border-radius: 15px;
 }
 
 .loginContainer button:hover {
@@ -355,5 +359,11 @@
 
   .loginContainer.rightPanelActive .signUpContainer {
     transform: translateX(0);
+  }
+}
+
+@media (min-width: 600px){
+  .loginContainer button.btnSecondary{
+    display: none;
   }
 }
