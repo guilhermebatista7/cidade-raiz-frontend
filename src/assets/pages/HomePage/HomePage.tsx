@@ -4,8 +4,8 @@ import {
   faLeaf,
   faSeedling,
   faTree,
-  faArrowDown,
   faCity,
+  faArrowAltCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { HeaderVideo } from "../../components/HeaderVideo/HeaderVideo";
@@ -145,9 +145,9 @@ export function HomePage() {
               </div>
             </div>
 
-            <a href="#nossaSolucao" className="systemLink">
-              Descubra nossa solução
-              <FontAwesomeIcon icon={faArrowDown} />
+            <a href="/plantar" className="systemLink">
+              Veja as espécies disponíveis
+              <FontAwesomeIcon icon={faArrowAltCircleRight} />
             </a>
           </div>
         </div>
